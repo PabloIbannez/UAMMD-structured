@@ -661,13 +661,10 @@ namespace Interactor{
 
             const real3 r1f = box.apply_pbc(fixedPoint-make_real3(*(comM))/M);
 
-            const real  r2  = dot(r1f,r1f);
-            const real invr = rsqrt(r2);
-            
             //Force over 1
             real3 F1f =  Potentials::CommonPotentials::HarmonicAnisotropic::force(r1f,
                                                                                   K,
-                                                                                  fixedPoint);
+                                                                                  make_real3(0.0));
             int index = groupIterator[i];
             const real3 f = (mass[index]/M)*F1f;
             
@@ -855,7 +852,7 @@ namespace Interactor{
             //Force over 1
             real3 F1f =  Potentials::CommonPotentials::HarmonicAnisotropic::force(r1f,
                                                                                   K,
-                                                                                  fixedPoint);
+                                                                                  make_real3(0.0));
             for(int i=0;i<N1;i++){
                 int index = id2index[copies1[i+ncopy*N1]];
                 const real3 f =  (mass[index]/totalMass1)*F1f;
