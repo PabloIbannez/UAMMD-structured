@@ -103,6 +103,7 @@ class InfoStep: public SimulationStep {
 
 };
 
+template <class Units>
 class WriteStep: public SimulationStep{
 
     public:
@@ -285,11 +286,11 @@ class WriteStep: public SimulationStep{
         }
         
         virtual void updateTimeStep(real newDt) override {
-            dt = newDt;
+            dt = newDt*Units::FROM_INTERNAL_TIME;
         }
         
         virtual void updateSimulationTime(real simulationTime) override {
-            time = simulationTime;
+            time = simulationTime*Units::FROM_INTERNAL_TIME;
         }
 
         void setPBC(bool new_pbc){
