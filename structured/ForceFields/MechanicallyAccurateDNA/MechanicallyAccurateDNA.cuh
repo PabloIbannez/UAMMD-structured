@@ -34,7 +34,8 @@ namespace MechanicallyAccurateDNA{
             
             using InteractorDHType   = Interactor::PairInteractor<DHType,typename Base::NeighbourList>;
             using InteractorWCAType = Interactor::PairInteractor<WCAType,typename Base::NeighbourList>;
-            
+
+            std::vector<std::string> componentsList = {"bonds","angles","dihedrals","dh","wca"};
 
             std::shared_ptr<InteractorBondType>     bonds;
             std::shared_ptr<InteractorAngleType>    angles;
@@ -179,6 +180,29 @@ namespace MechanicallyAccurateDNA{
 
                 wca = std::make_shared<InteractorWCAType>(this->sys,this->pd,this->pg,
                                                           interactorWCAParameters);
+            }
+
+
+            std::vector<std::string> getComponentsList(){return componentsList;}
+            
+            void sum(std::string component,Computables comp,cudaStream_t st) {
+                if(std::find(componentsList.begin(),componentsList.end(),component) != componentsList.end()){
+                    if       (component=="bonds"){
+                        bonds->sum(comp,st);
+                    } else if(component=="angles"){
+                        angles->sum(comp,st);
+                    } else if(component=="dihedrals"){
+                        dihedrals->sum(comp,st);
+                    } else if(component=="dh"){
+                        dh->sum(comp,st);
+                    } else if(component=="wca"){
+                        wca->sum(comp,st);
+                    }
+                } else {
+                    this->sys->template log<System::CRITICAL>("[MADnaLAB] Requested potential %s to sum. "
+                                                                "But %s is not present in the force field",
+                                                                component.c_str(),component.c_str());
+                }
             }
             
             void sum(Computables comp,cudaStream_t st) override {

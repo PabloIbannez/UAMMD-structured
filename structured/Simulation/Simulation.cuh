@@ -103,6 +103,8 @@ class Simulation{
         std::shared_ptr<ParticleData>  getParticleData(){return this->pd;}
         std::shared_ptr<ParticleGroup> getParticleGroup(){return this->pg;}
         
+        std::shared_ptr<Integrator>   getIntegrator(){return this->integrator;}
+        
         std::shared_ptr<Topology>   getTopology()  {return this->top;}
         std::shared_ptr<ForceField> getForceField(){return this->ff;}
         
