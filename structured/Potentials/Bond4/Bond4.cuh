@@ -273,9 +273,6 @@ inline __device__ void dihedralEnergy(const real3 &posi,
     const real raijk2=dot(aijk,aijk);
     const real rajkl2=dot(ajkl,ajkl);
     
-    const real inv_raijk2=real(1.0)/raijk2;
-    const real inv_rajkl2=real(1.0)/rajkl2;
-    
     const real inv_raijkl = rsqrt(raijk2*rajkl2);
     
     real cos_dih = dot(aijk,ajkl)*inv_raijkl;
@@ -283,7 +280,6 @@ inline __device__ void dihedralEnergy(const real3 &posi,
     cos_dih=std::max(real(-1.0),cos_dih);
     
     const real rjk     = sqrt(dot(djk,djk));
-    const real inv_rjk = real(1.0)/rjk;
     
     real sin_dih = dot(aijk,dlk)*rjk*inv_raijkl;
     sin_dih=std::min(real( 1.0),sin_dih);

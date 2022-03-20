@@ -263,8 +263,6 @@ inline __device__ void angularEnergy(const real3 &posi,
     const real rjk2 = dot(rjk, rjk);
 
     const real inv_rjirjk = rsqrt(rji2*rjk2);
-    const real inv_rji2 = real(1.0)/rji2;
-    const real inv_rjk2 = real(1.0)/rjk2;
     
     real cijk = dot(rji, rjk)*inv_rjirjk; //cijk = cos (theta) = rji*rkj / mod(rji)*mod(rkj)
     //Cos must stay in range

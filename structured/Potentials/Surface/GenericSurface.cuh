@@ -47,7 +47,7 @@ namespace Surface{
     	    
     	    __device__ __forceinline__ real3 force(const real4 &pos){
                 
-                const int type = int(pos.w);
+                //const int type = int(pos.w);
     	    	
                 const real dz = abs(surfacePosition-pos.z);
 
@@ -72,7 +72,7 @@ namespace Surface{
     	    
             __device__ __forceinline__ real  energy(const real4 &pos){
 
-                const int type = int(pos.w);
+                //const int type = int(pos.w);
     	    	
                 const real dz = abs(surfacePosition-pos.z);
 

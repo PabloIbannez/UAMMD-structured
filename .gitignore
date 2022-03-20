@@ -48,3 +48,5 @@ examples/data.main*
 *.list
 structured/Projects/*
 structured/Test/*
+structured/Tools/MADna/CreateMolecule/__pycache__/*
+structured/Tools/TopologyUtilities/__pycache__/*

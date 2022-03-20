@@ -478,7 +478,6 @@ namespace CommonPotentials{
                                                  const real& dielectricConstant,const real& debyeLenght){
 
                 const real      r  = sqrt(r2);
-                const real  invr2  = real(1.0)/r2;
 
                 const real efactor = Units_::ELECOEF*chgProduct/dielectricConstant; //ELECOEF = 1/(4*pi*e_0)
 
