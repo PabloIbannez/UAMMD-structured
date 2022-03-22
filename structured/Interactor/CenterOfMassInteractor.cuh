@@ -208,6 +208,187 @@ namespace Interactor{
                 box = newBox;
             }
     };
+    
+    namespace ExternalTorqueCOMCopies_ns{
+
+        void __global__ computeExternalTorqueCOMCopiesForceKernel(const int * __restrict__ id2index,
+                                                                  real* mass,
+                                                                  real4* pos,
+                                                                  real4* force,
+                                                                  int* copies1,
+                                                                  int N1,
+                                                                  int Ncopies,
+                                                                  Box box,
+                                                                  real3 T){
+
+            int ncopy = blockIdx.x*blockDim.x + threadIdx.x;
+            
+            if(ncopy >= Ncopies) return;
+
+            //Compute center of mass
+            real totalMass = real(0);
+            real3 com = make_real3(0.0);
+            for(int i=0;i<N1;i++){
+                int index = id2index[copies1[i+ncopy*N1]];
+                totalMass+=mass[index];
+                com+=mass[index]*make_real3(pos[index]);
+            }
+            com=com/totalMass;
+ 
+            //Axis
+            real prefactor = real(0);
+            for(int i=0;i<N1;i++){
+                int index = id2index[copies1[i+ncopy*N1]];
+                real  mi = mass[index];
+                real3 ri = make_real3(pos[index])-com;
+                
+                real3 ui = ri-T*dot(ri,T)/dot(T,T);
+                prefactor+=mi*dot(ui,ui);
+            }
+            prefactor=real(1.0)/prefactor;
+            
+            for(int i=0;i<N1;i++){
+                int index = id2index[copies1[i+ncopy*N1]];
+                real  mi = mass[index];
+                real3 ri = make_real3(pos[index])-com;
+                
+                real3 ui = ri-T*dot(ri,T)/dot(T,T);
+                const real3 f =  mi*prefactor*cross(T,ui);
+                force[index] += make_real4(f,0);
+            }
+
+            //real3 Fcomp = make_real3(0);
+            //real3 TcompAxis = make_real3(0);
+            //real3 TcompCOM  = make_real3(0);
+            //for(int i=0;i<N1;i++){
+            //    int index = id2index[copies1[i+ncopy*N1]];
+            //    real  mi = mass[index];
+            //    real3 ri = make_real3(pos[index])-com;
+            //    
+            //    const real3 f =  mi*prefactor*cross(T,ri);
+
+            //    real3 ui = ri-T*dot(ri,T)/dot(T,T);
+            //    
+            //    Fcomp+=f;
+            //    TcompAxis+=cross(ui,f);
+            //    TcompCOM+=cross(ri,f);
+            //}
+            //
+            //printf("AXIS Fcomp: %f %f %f, T: %f %f %f, TcompAxis: %f %f %f, %f, TcompCOM: %f %f %f, %f\n",
+            //        Fcomp.x,Fcomp.y,Fcomp.z,T.x,T.y,T.z,
+            //        TcompAxis.x,TcompAxis.y,TcompAxis.z,length(TcompAxis),
+            //        TcompCOM.x,TcompCOM.y,TcompCOM.z,length(TcompCOM));
+            
+            ////COM
+            //real3 preTmp = make_real3(0.0);
+            //for(int i=0;i<N1;i++){
+            //    int index = id2index[copies1[i+ncopy*N1]];
+            //    real  mi = mass[index];
+            //    real3 ri = make_real3(pos[index])-com;
+            //    
+            //    preTmp+=cross(ri,cross(mi*ri,T));
+            //}
+            //real prefactor = dot(preTmp,T);
+            //prefactor=dot(T,T)/prefactor;
+            //
+            //for(int i=0;i<N1;i++){
+            //    int index = id2index[copies1[i+ncopy*N1]];
+            //    real  mi = mass[index];
+            //    real3 ri = make_real3(pos[index])-com;
+            //    
+            //    const real3 f =  mi*prefactor*cross(T,ri);
+            //    force[index] += make_real4(f,0);
+            //}
+            //
+            //real3 Fcomp = make_real3(0);
+            //real3 TcompAxis = make_real3(0);
+            //real3 TcompCOM  = make_real3(0);
+            //for(int i=0;i<N1;i++){
+            //    int index = id2index[copies1[i+ncopy*N1]];
+            //    real  mi = mass[index];
+            //    real3 ri = make_real3(pos[index])-com;
+            //    
+            //    const real3 f =  mi*prefactor*cross(T,ri);
+
+            //    real3 ui = ri-T*dot(ri,T)/dot(T,T);
+            //    
+            //    Fcomp+=f;
+            //    TcompAxis+=cross(ui,f);
+            //    TcompCOM+=cross(ri,f);
+            //}
+            //
+            //printf("COM Fcomp: %f %f %f, T: %f %f %f, TcompAxis: %f %f %f, %f, TcompCOM: %f %f %f, %f\n",
+            //        Fcomp.x,Fcomp.y,Fcomp.z,T.x,T.y,T.z,
+            //        TcompAxis.x,TcompAxis.y,TcompAxis.z,length(TcompAxis),
+            //        TcompCOM.x,TcompCOM.y,TcompCOM.z,length(TcompCOM));
+        }
+    }
+    
+    class ExternalTorqueCOMCopies: public Interactor{
+
+        protected:
+
+            int Ncopies;
+
+            int N1;
+            
+            thrust::device_vector<int> copies1;
+                
+            Box box;
+            
+            //State 
+
+            real3 T;
+
+        public:
+
+            struct Parameters{};
+
+        public:
+            
+            ExternalTorqueCOMCopies(std::shared_ptr<System>       sys,
+                                    std::shared_ptr<ParticleData>  pd,
+                                    std::shared_ptr<ParticleGroup> pg,
+                                    int N1,
+                                    thrust::host_vector<int> copies1_host,
+                                    int Ncopies,
+                                    Parameters par):Interactor(pd,pg,sys,std::string("ExternalTorqueCOMCopies")),
+                                                    N1(N1),
+                                                    copies1(copies1_host),
+                                                    Ncopies(Ncopies){}
+            
+            void sum(Computables comp,cudaStream_t st) override {
+
+                real* mass = pd->getMass(access::location::gpu, access::mode::read).raw();
+                real4* pos = pd->getPos(access::location::gpu, access::mode::read).raw();
+
+                int Nthreads = 128;
+                int Nblocks=Ncopies/Nthreads + ((Ncopies%Nthreads)?1:0);
+
+                if(comp.force == true){
+
+                    auto force = pd->getForce(access::location::gpu, access::mode::readwrite).raw();
+
+                    ExternalTorqueCOMCopies_ns::computeExternalTorqueCOMCopiesForceKernel<<<Nblocks, Nthreads, 0, st>>>(pd->getIdOrderedIndices(access::location::gpu),
+                                                                                                                        mass,
+                                                                                                                        pos,
+                                                                                                                        force,
+                                                                                                                        thrust::raw_pointer_cast(copies1.data()), 
+                                                                                                                        N1,
+                                                                                                                        Ncopies,
+                                                                                                                        box,
+                                                                                                                        T);  
+
+                }
+            }
+            
+            void  setState(real3 newT){T=newT;}
+            real3 getState(){return T;}
+            
+            void updateBox(Box newBox) override {
+                box = newBox;
+            }
+    };
 
     namespace HarmonicCOM_ns{
 

@@ -89,16 +89,18 @@ class InfoStep: public SimulationStep {
     }
 
     void applyStep(int step, cudaStream_t st) override{
-        
-        real time = tim.toc();
 
-        std::chrono::seconds rtime_s(uint((nSteps-step)/(real(step)/time)));
+        if(step != 0){
+            real time = tim.toc();
 
-        int hours   = std::chrono::duration_cast<std::chrono::hours>(rtime_s).count();
-        int minutes = std::chrono::duration_cast<std::chrono::minutes>(rtime_s).count()%60;
-        int seconds = std::chrono::duration_cast<std::chrono::seconds>(rtime_s).count()%60;
+            std::chrono::seconds rtime_s(uint((nSteps-step)/(real(step)/time)));
 
-        this->sys->template log<System::MESSAGE>("Step %i, ETA: h:%i m:%i s:%i, mean FPS: %0.2f", step, hours,minutes,seconds,real(step)/time);
+            int hours   = std::chrono::duration_cast<std::chrono::hours>(rtime_s).count();
+            int minutes = std::chrono::duration_cast<std::chrono::minutes>(rtime_s).count()%60;
+            int seconds = std::chrono::duration_cast<std::chrono::seconds>(rtime_s).count()%60;
+
+            this->sys->template log<System::MESSAGE>("Step %i, ETA: h:%i m:%i s:%i, mean FPS: %0.2f", step, hours,minutes,seconds,real(step)/time);
+        }
     }
 
 };
