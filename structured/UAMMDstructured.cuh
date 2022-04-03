@@ -113,6 +113,8 @@ SFINAE_DEFINE_HAS_MEMBER(isConstrained);
 #include"Interactor/QCMInteractor.cuh"
 #include"Interactor/PlatesInteractor.cuh"
 
+#include"Interactor/SetsInteractor.cuh"
+
 #include"Interactor/CenterOfMassInteractor.cuh"
 #include"Interactor/UmbrellaInteractor.cuh"
 
@@ -135,7 +137,7 @@ SFINAE_DEFINE_HAS_MEMBER(isConstrained);
 #include"Simulation/SimulationAFM.cuh"
 #include"Simulation/SimulationPlates.cuh"
 #include"Simulation/SimulationSphere.cuh"
-#include"Simulation/SimulationPulling.cuh"
+//#include"Simulation/SimulationPulling.cuh"
 #include"Simulation/SimulationUmbrellaCenterOfMassDistance.cuh"
 #include"Simulation/SimulationUmbrellaAlongVector.cuh"
 

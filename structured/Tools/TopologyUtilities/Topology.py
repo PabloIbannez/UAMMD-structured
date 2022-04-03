@@ -229,6 +229,10 @@ class Topology:
         #for i in self.coordLoaded: 
         #    print(i)
 
+    def setSimId(self,simId:int):
+        for c in self.propertiesLoaded["STRUCTURE"]:
+            c[5]=simId
+
     def write(self,outputFile):
         with open(outputFile+'.coord','w') as cf:
             for c in self.coordLoaded:
@@ -407,6 +411,13 @@ def merging2File(top1:Topology,top2:Topology,output:str,mode:str = "simId"):
                 tf.write("%i %s %i %i %i %i\n" % (c[0]       ,str(c[1]),c[2],c[3],c[4],c[5]))
             for c in top2.propertiesLoaded["STRUCTURE"]:
                 tf.write("%i %s %i %i %i %i\n" % (c[0]+offset,str(c[1]),c[2],c[3],c[4]+maxMdl,c[5]))
+        elif(mode=="none"):
+            #Write structure
+            tf.write("[STRUCTURE]\n")
+            for c in top1.propertiesLoaded["STRUCTURE"]:
+                tf.write("%i %s %i %i %i %i\n" % (c[0]       ,str(c[1]),c[2],c[3],c[4],c[5]))
+            for c in top2.propertiesLoaded["STRUCTURE"]:
+                tf.write("%i %s %i %i %i %i\n" % (c[0]+offset,str(c[1]),c[2],c[3],c[4],c[5]))
         else:
             print("ERROR in merging2File, not valid mode:", mode)
             sys.exit()

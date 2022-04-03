@@ -60,6 +60,55 @@ namespace Bond1{
         }
     };
     
+    struct HarmonicAnisotropicConst_r0_ : public HarmonicAnisotropic_{
+    
+        struct BondInfo{
+            real3 pos;
+            real3  K;
+        };
+            
+        real3  r0;
+
+        struct Parameters : HarmonicAnisotropic_::Parameters{
+            real3  r0;
+        };
+        
+        HarmonicAnisotropicConst_r0_(Parameters param):HarmonicAnisotropic_(param),
+                                                       r0(param.r0){}
+
+        inline __device__ real3 force(int i,                                      
+                                      int bond_index,
+                                      const real3 &posi,
+                                      const BondInfo &bi){
+
+            const HarmonicAnisotropic_::BondInfo biB = { bi.K,
+                                                        {r0.x,r0.y,r0.z},
+                                                         bi.pos};
+
+            return HarmonicAnisotropic_::force(i,bond_index,posi,biB);
+        
+        }
+        
+        inline __device__ real energy(int i,
+                                      int bond_index,
+                                      const real3 &posi,
+                                      const BondInfo &bi){
+
+            const HarmonicAnisotropic_::BondInfo biB = { bi.K,
+                                                        {r0.x,r0.y,r0.z},
+                                                         bi.pos};
+
+            return HarmonicAnisotropic_::energy(i,bond_index,posi,biB);
+        }
+        
+        static __host__ BondInfo readBond(std::istream &in){
+            BondInfo bi;
+            in >> bi.K.x   >> bi.K.y   >> bi.K.z   
+               >> bi.pos.x >> bi.pos.y >> bi.pos.z;
+            return bi;
+        }
+    };
+    
     struct HarmonicAnisotropicConst_K_r0_ : public HarmonicAnisotropic_{
     
         struct BondInfo{
@@ -205,6 +254,7 @@ namespace Bond1{
     };
 
     using Harmonic                 = Bond1<addVirial<HarmonicAnisotropic_>>;
+    using HarmonicConst_r0         = Bond1<addVirial<HarmonicAnisotropicConst_r0_>>;
     using HarmonicConst_K_r0       = Bond1<addVirial<HarmonicAnisotropicConst_K_r0_>>;
     using HarmonicCommon_K_r0      = Bond1<addVirial<HarmonicAnisotropicCommon_K_r0_>>;
     using HarmonicConstCommon_K_r0 = Bond1<addVirial<HarmonicAnisotropicConstCommon_K_r0_>>;

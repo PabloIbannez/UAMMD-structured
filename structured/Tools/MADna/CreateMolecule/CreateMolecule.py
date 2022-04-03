@@ -11,8 +11,10 @@ import re
 
 def get_script_path():
     return os.path.dirname(os.path.realpath(sys.argv[0]))
+
 scr_fold = get_script_path()
 sys.path.insert(1, scr_fold)
+
 import CreateCoordinates
 import CreateBonds
 import CreateAngles
