@@ -96,15 +96,24 @@ class none : public ForceFieldBase<Units_,Types_>{
 
         using Base = ForceFieldBase<Units_,Types_>;
 
+        std::vector<std::string> componentsList;
+
     public:
 
         none(std::shared_ptr<System>        sys,
              std::shared_ptr<ParticleData>  pd,
              std::shared_ptr<ParticleGroup> pg,
              InputFile&                     in):Base(sys,pd,pg,in){}
+        
+        std::vector<std::string> getComponentsList(){return componentsList;}
 
         void sum(Computables comp,cudaStream_t st) override {return;}
-
+        
+        void sum(std::string component,Computables comp,cudaStream_t st) {
+            this->sys->template log<System::CRITICAL>("[NONE] Requested potential %s to sum. "
+                                                        "But %s is not present in the force field",
+                                                        component.c_str(),component.c_str());
+        }
 };
 
 }}}
@@ -151,6 +160,10 @@ class none : public ForceFieldBase<Units_,Types_>{
 namespace uammd{
 namespace structured{
 namespace forceField{
+
+    //
+    using EMPTY_KCALMOL_A = none<UnitsSystem::KCALMOL_A,
+                                 Types::BASIC>;
     
     //WCA
     using WCA = WeeksChandlerAndersen::WeeksChandlerAndersen<ForceFieldNeighbourBase<UnitsSystem::NONE,
@@ -169,7 +182,6 @@ namespace forceField{
 
     //KP
     using KP   = KratkyPorodModel::KratkyPorodModel<ForceFieldBase<UnitsSystem::NONE,Types::BASIC>>;
-    using KP_F = KratkyPorodModel::KratkyPorodModelFixed<ForceFieldBase<UnitsSystem::NONE,Types::BASIC>>;
 
     //GenericBonded
     using GB_BASE = Generic::GenericBonded<ForceFieldNeighbourBase<UnitsSystem::KCALMOL_A,
