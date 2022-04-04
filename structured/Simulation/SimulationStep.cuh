@@ -130,6 +130,7 @@ class WriteStep: public SimulationStep{
 
         bool pbc;
 
+        int lastWrittenStep;
         int frame;
 
         real dt;
@@ -185,6 +186,7 @@ class WriteStep: public SimulationStep{
     
         void init(cudaStream_t st) override{
 
+            lastWrittenStep = -1;
             frame=0;
 
             sys->log<System::DEBUG>("[WriteStep] Parameter outPutFormat added: %s",
@@ -235,6 +237,12 @@ class WriteStep: public SimulationStep{
         }
 
         void applyStep(int step, cudaStream_t st) override{
+
+            if(step==lastWrittenStep){
+                return;
+            } else {
+                lastWrittenStep = step;
+            }
 
             frame++;
 
