@@ -1,7 +1,11 @@
 import sys
+import copy
+
 import re
+
 from scanf import scanf
 from collections import OrderedDict
+
 
 class Topology:
 
@@ -228,6 +232,79 @@ class Topology:
         
         #for i in self.coordLoaded: 
         #    print(i)
+
+    def append(self,top,mode:str):
+            
+        offset = 0
+        for c in self.coordLoaded:
+            pass
+        offset = c[0]+1
+
+        for c in top.coordLoaded:
+            self.coordLoaded.append([c[0]+offset,c[1]])
+
+        for common in top.propertiesCommon:
+            if common in top.propertiesLoaded.keys():
+                if common in self.propertiesLoaded.keys(): 
+                    for p in  top.propertiesLoaded[common]:
+                        if p not in self.propertiesLoaded[common]:
+                            self.propertiesLoaded[common].append(copy.deepcopy(p))
+                else:
+                    self.propertiesLoaded[common] = {}
+                    for p in  top.propertiesLoaded[common]:
+                        self.propertiesLoaded[common].append(copy.deepcopy(p))
+
+        if  (mode=="simId"):
+            maxSimId=0
+            for c in self.propertiesLoaded["STRUCTURE"]:
+                if(c[5]):
+                    maxSimId=max([maxSimId,c[5]])
+            #print("MaxSimId:",maxSimId)
+
+            for c in top.propertiesLoaded["STRUCTURE"]:
+                tmp = [c[0]+offset,str(c[1]),c[2],c[3],c[4],c[5]+maxSimId]
+                self.propertiesLoaded["STRUCTURE"].append(copy.deepcopy(tmp))
+
+        elif(mode=="mdl"):
+            maxMdl=0
+            for c in self.propertiesLoaded["STRUCTURE"]:
+                maxMdl=max([maxMdl,c[4]])
+            if maxMdl==0:
+                maxMdl=1
+
+            for c in top.propertiesLoaded["STRUCTURE"]:
+                tmp = [c[0]+offset,str(c[1]),c[2],c[3],c[4]+maxMdl,c[5]]
+                self.propertiesLoaded["STRUCTURE"].append(copy.deepcopy(tmp))
+        elif(mode=="none"):
+            #Write structure
+            for c in top.propertiesLoaded["STRUCTURE"]:
+                tmp = [c[0]+offset,str(c[1]),c[2],c[3],c[4],c[5]]
+                self.propertiesLoaded["STRUCTURE"].append(copy.deepcopy(tmp))
+        else:
+            print("ERROR in Topology.append(top,mode), not valid mode:", mode)
+            sys.exit()
+        
+        #Load properties
+        for prop in top.propertiesLoaded.keys():
+            if prop in self.propertiesDict.keys():
+                if prop in self.propertiesLoaded.keys():
+                    ni = self.propertiesDict[prop]
+                    if ni < 0:
+                        for p in top.propertiesLoaded[prop]:
+                            tmp = []
+                            for i in p:
+                                tmp.append(i+offset)
+                            self.propertiesLoaded[prop].append(copy.deepcopy(tmp))
+                    else:
+                        for p in top.propertiesLoaded[prop]:
+                            tmp = []
+                            for i in range(ni):
+                                tmp.append(p[i]+offset)
+                            tmp.append(p[ni])
+                            self.propertiesLoaded[prop].append(copy.deepcopy(tmp))
+
+                else:
+                    self.propertiesLoaded[prop]=copy.deepcopy(top.propertiesLoaded[prop])
 
     def setSimId(self,simId:int):
         for c in self.propertiesLoaded["STRUCTURE"]:
