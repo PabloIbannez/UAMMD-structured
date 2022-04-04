@@ -174,7 +174,12 @@ namespace Sets{
                                                   setSize(setSize),
                                                   nSets(nSets),
                                                   set2id(set2id),
-                                                  externalTorque(externalTorque){}
+                                                  externalTorque(externalTorque){
+                if(setSize == 1){
+                    sys->log<uammd::System::CRITICAL>("[ExternalTorqueOverCOM] "
+                                                      "The size of the group over the torque has to be applied is equal to one.");
+                }
+            }
             
             void sum(Computables comp,cudaStream_t st) override {
 
