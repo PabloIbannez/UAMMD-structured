@@ -584,6 +584,175 @@ namespace Sets{
             }
     };
     
+    namespace ConstantTorqueBtwCOM_ns{
+        
+        void __global__ computeConstantTorqueBtwCOM_TorqueKernel(const int * __restrict__ id2index,
+                                                                real* mass,
+                                                                real4* pos,
+                                                                real4* force,
+                                                                int setSize1,
+                                                                int setSize2,
+                                                                int nSets,
+                                                                int* set2id1,
+                                                                int* set2id2,
+                                                                real* torque,
+                                                                Box box){
+
+            int set = blockIdx.x*blockDim.x + threadIdx.x;
+            
+            if(set >= nSets) return;
+
+            real totalMass1 = 0;
+            real3 com1 = make_real3(0.0);
+
+            for(int i=0;i<setSize1;i++){
+                int index = id2index[set2id1[i+set*setSize1]];
+                totalMass1+=mass[index];
+                com1+=make_real3(pos[index])*mass[index];
+            }
+            com1=com1/totalMass1;
+
+            real totalMass2 = 0;
+            real3 com2 = make_real3(0.0);
+
+            for(int i=0;i<setSize2;i++){
+                int index = id2index[set2id2[i+set*setSize2]];
+                totalMass2+=mass[index];
+                com2+=make_real3(pos[index])*mass[index];
+            }
+            com2=com2/totalMass2;
+            
+            real3 torqueVector = torque[set]*normalize(box.apply_pbc(com2-com1));
+            
+            ////////////////////////////
+
+            //Axis
+            real prefactor = real(0);
+            for(int i=0;i<setSize1;i++){
+                int index = id2index[set2id1[i+set*setSize1]];
+                
+                real  mi = mass[index];
+                real3 ri = make_real3(pos[index])-com1;
+                
+                real3 ui = ri-torqueVector*dot(ri,torqueVector)/dot(torqueVector,torqueVector);
+                prefactor+=mi*dot(ui,ui);
+            }
+            prefactor=real(1.0)/prefactor;
+            
+            for(int i=0;i<setSize1;i++){
+                int index = id2index[set2id1[i+set*setSize1]];
+
+                real  mi = mass[index];
+                real3 ri = make_real3(pos[index])-com1;
+                
+                real3 ui = ri-torqueVector*dot(ri,torqueVector)/dot(torqueVector,torqueVector);
+                
+                const real3 f =  mi*prefactor*cross(torqueVector,ui);
+
+                force[index] += make_real4(f,0);
+            }
+            
+            ////////////////////////////
+
+            torqueVector = real(-1.0)*torqueVector;
+
+            //Axis
+            prefactor = real(0);
+            for(int i=0;i<setSize2;i++){
+                int index = id2index[set2id2[i+set*setSize2]];
+                
+                real  mi = mass[index];
+                real3 ri = make_real3(pos[index])-com2;
+                
+                real3 ui = ri-torqueVector*dot(ri,torqueVector)/dot(torqueVector,torqueVector);
+                prefactor+=mi*dot(ui,ui);
+            }
+            prefactor=real(1.0)/prefactor;
+            
+            for(int i=0;i<setSize2;i++){
+                int index = id2index[set2id2[i+set*setSize2]];
+
+                real  mi = mass[index];
+                real3 ri = make_real3(pos[index])-com2;
+                
+                real3 ui = ri-torqueVector*dot(ri,torqueVector)/dot(torqueVector,torqueVector);
+                
+                const real3 f =  mi*prefactor*cross(torqueVector,ui);
+
+                force[index] += make_real4(f,0);
+            }
+        }
+    }
+    
+    class ConstantTorqueBtwCOM: public Interactor{
+
+        protected:
+
+            int nSets;
+            
+            int setSize1;
+            int setSize2;
+            
+            thrust::device_vector<int> set2id1;
+            thrust::device_vector<int> set2id2;
+            
+            thrust::device_vector<real> T;
+            
+            Box box;
+
+        public:
+
+            struct Parameters{};
+            
+            ConstantTorqueBtwCOM(std::shared_ptr<System>       sys,
+                                 std::shared_ptr<ParticleData>  pd,
+                                 std::shared_ptr<ParticleGroup> pg,
+                                 int setSize1,
+                                 int setSize2,
+                                 int nSets,
+                                 thrust::host_vector<int> set2id1,
+                                 thrust::host_vector<int> set2id2,
+                                 thrust::host_vector<real> T,
+                                 Parameters par):Interactor(pd,pg,sys,std::string("ConstantTorqueBtwCOM")),
+                                                 setSize1(setSize1),
+                                                 setSize2(setSize2),
+                                                 nSets(nSets),
+                                                 set2id1(set2id1),
+                                                 set2id2(set2id2),
+                                                 T(T){}
+            
+            void sum(Computables comp,cudaStream_t st) override {
+
+                real* mass = pd->getMass(access::location::gpu, access::mode::read).raw();
+                real4* pos = pd->getPos(access::location::gpu, access::mode::read).raw();
+
+                int Nthreads = 128;
+                int Nblocks=nSets/Nthreads + ((nSets%Nthreads)?1:0);
+
+                if(comp.force == true){
+
+                    auto force = pd->getForce(access::location::gpu, access::mode::readwrite).raw();
+
+                    ConstantTorqueBtwCOM_ns::computeConstantTorqueBtwCOM_TorqueKernel<<<Nblocks, Nthreads, 0, st>>>(pd->getIdOrderedIndices(access::location::gpu),
+                                                                                                                    mass,
+                                                                                                                    pos,
+                                                                                                                    force,
+                                                                                                                    setSize1, 
+                                                                                                                    setSize2, 
+                                                                                                                    nSets, 
+                                                                                                                    thrust::raw_pointer_cast(set2id1.data()), 
+                                                                                                                    thrust::raw_pointer_cast(set2id2.data()), 
+                                                                                                                    thrust::raw_pointer_cast(T.data()),  
+                                                                                                                    box);  
+
+                }
+            }
+            
+            void updateBox(Box newBox) override {
+                box = newBox;
+            }
+    };
+    
 }}}}
 
 
