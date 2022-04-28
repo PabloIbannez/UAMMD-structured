@@ -171,6 +171,13 @@ namespace structured{
                     //CudaSafeCall(cudaStreamSynchronize(stream));
                 }
             }
+
+            void resetVelocities(){
+                IntegratorBasic_ns::generateVelocity(this->pd,this->pg,this->sys,
+                                                     this->N,this->kB*this->T,
+                                                     this->name,
+                                                     this->stream);
+            }
             
             void init(){
                 CudaCheckError();
@@ -186,10 +193,7 @@ namespace structured{
                 this->copyToRef();
                 
                 //Inital velocities for some T
-                IntegratorBasic_ns::generateVelocity(this->pd,this->pg,this->sys,
-                                                     this->N,this->kB*this->T,
-                                                     this->name,
-                                                     this->stream);
+                this->resetVelocities();
                 
                 if(stopTransRotSteps > 0){
                     //Stop global movements
@@ -508,20 +512,20 @@ namespace structured{
         public:
 
             struct Parameters: public IntegratorBasicNVT::Parameters{
-                real tdamp;
+                real frictionConstant;
             };
 
         private:
             
-            real tdamp;
+            real frictionConstant;
             
             Parameters inputFileToParam(InputFile& in){
                 
                 Parameters param;
                 static_cast<IntegratorBasicNVT::Parameters&>(param) = IntegratorBasicNVT::inputFileToParam(in); 
             
-                in.getOption("tdamp",InputFile::Required)
-                              >>param.tdamp;
+                in.getOption("frictionConstant",InputFile::Required)
+                              >>param.frictionConstant;
 
                 return param;
             }
@@ -539,11 +543,11 @@ namespace structured{
                 shared_ptr<System>       sys,
                 Parameters param,
                 cudaStream_t stream):IntegratorBasicNVT(pd, pg, sys,param, "LangevinNVT::GJF",stream),
-                                     tdamp(param.tdamp){
+                                     frictionConstant(param.frictionConstant){
 
-                sys->log<System::MESSAGE>("[%s] tdamp: %f",this->name.c_str(),tdamp);
+                sys->log<System::MESSAGE>("[%s] frictionConstant: %f",this->name.c_str(),frictionConstant);
 
-                IntegratorBasic_ns::loadFrictionConstant(pd,pg,tdamp);
+                IntegratorBasic_ns::loadFrictionConstant(pd,pg,frictionConstant);
 
             }
             
@@ -551,11 +555,18 @@ namespace structured{
             void applyUnits(){
                 IntegratorBasicNVT::applyUnits<UNITS>();
                 
-                tdamp = tdamp*UNITS::TO_INTERNAL_TIME; //Note not 1/units... !!!
-                IntegratorBasic_ns::loadFrictionConstant(pd,pg,tdamp); 
+                frictionConstant = frictionConstant/UNITS::TO_INTERNAL_TIME;
+                IntegratorBasic_ns::loadFrictionConstant(pd,pg,frictionConstant); 
                 
-                sys->log<System::MESSAGE>("[%s] FrictionConstant (after units): %f", this->name.c_str(), tdamp);
+                sys->log<System::MESSAGE>("[%s] FrictionConstant (after units): %f", this->name.c_str(), frictionConstant);
                 
+            }
+            
+            void resetVelocities(){
+                IntegratorBasic_ns::generateVelocity(this->pd,this->pg,this->sys,
+                                                     this->N,this->kB*this->T,
+                                                     this->name,
+                                                     this->stream);
             }
             
             void init(){
@@ -567,10 +578,7 @@ namespace structured{
                 N = pg->getNumberParticles();
                 
                 //Inital velocities for some T
-                IntegratorBasic_ns::generateVelocity(this->pd,this->pg,this->sys,
-                                                     this->N,this->kB*this->T,
-                                                     this->name,
-                                                     this->stream);
+                this->resetVelocities();
                 
                 this->resetForce();
                 this->sumForce();
@@ -599,8 +607,8 @@ namespace structured{
                 uint step_temp  = steps;
                 uint seed_temp  = seed;
                                                             
-                real comboGJ = 0.5*dt/tdamp;
-	            real sigmaGaussPrefactor = sqrt(2./tdamp*kB*T*dt);
+                real comboGJ = 0.5*dt*frictionConstant;
+	            real sigmaGaussPrefactor = sqrt(2*frictionConstant*kB*T*dt);
                 real bGJ = 1.0/(1.0+comboGJ);
                 real aGJ = (1.0-comboGJ)/(1.0+comboGJ);
 	            real cr2 = bGJ*dt;

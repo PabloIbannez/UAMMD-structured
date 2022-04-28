@@ -73,6 +73,17 @@ namespace LennardJonesSurface{
                 Base::sum(comp,st);
             }
             
+            void sum(std::string potName,Computables comp,cudaStream_t st){
+                if(potName == "surface"){
+                    surface->sum(comp,st);
+                    return;
+                }  
+
+                this->sys->template log<System::CRITICAL>("[LennardJonesSurface] Requested potential %s to sum. "
+                                                            "But %s is not present in the force field",
+                                                            potName.c_str(),potName.c_str());
+            }
+            
             void updateBox(Box box){
                 Base::updateBox(box);
             }

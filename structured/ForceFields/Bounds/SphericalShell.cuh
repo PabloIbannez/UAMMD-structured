@@ -104,8 +104,6 @@ namespace Bounds{
                                                                  "Initial inner radius: %f, has to be smaller than shell radius %f",innerRadius,
                                                                                                                                     shellRadius);    
                     }
-                
-
                 }
                 
                 sphericalPotential = std::make_shared<SphericalShellType>(sphericalShellParameters);
@@ -124,6 +122,10 @@ namespace Bounds{
             void updateBox(Box box){
                 Base::updateBox(box);
                 spherical->updateBox(box);
+            }
+            
+            real getSurfacePosition(){
+                return shellCenter.z;
             }
     };
 

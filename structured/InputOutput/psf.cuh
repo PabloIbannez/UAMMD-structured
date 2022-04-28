@@ -15,6 +15,8 @@ namespace psf{
         auto id    = pd->getId(access::location::cpu, 
                                access::mode::read);
     
+        auto radius  = pd->getRadius(access::location::cpu, 
+                                     access::mode::read);
         auto mass    = pd->getMass(access::location::cpu, 
                                    access::mode::read);
         auto charge  = pd->getCharge(access::location::cpu, 
@@ -55,9 +57,20 @@ namespace psf{
                                       std::get<2>(si.first),si.second);
         }
     
+        std::map<int,real> type2radius;
+        fori(0,N){
+            type2radius[int(pos[i].w)] = radius[i];
+        }
+    
         out << "PSF CMAP" << std::endl << std::endl;
         
-        out << "       0 !NTITLE" << std::endl << std::endl; 
+        out << "       " << type2radius.size() << " !NTITLE" << std::endl; 
+
+        for(auto& tr : type2radius){
+            out << "REMARKS " << tr.first << " " << tr.second << std::endl;
+        }
+
+        out << std::endl;
     
         out << std::fixed              <<
                std::right              <<

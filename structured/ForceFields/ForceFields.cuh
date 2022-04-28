@@ -155,7 +155,7 @@ class none : public ForceFieldBase<Units_,Types_>{
 
 #include"KaranicolasBrooks/KaranicolasBrooksSurface.cuh"
 
-#include"DLVO/DLVO.cuh"
+//#include"DLVO/DLVO.cuh"
 
 namespace uammd{
 namespace structured{

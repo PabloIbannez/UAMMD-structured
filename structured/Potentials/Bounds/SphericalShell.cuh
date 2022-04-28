@@ -40,15 +40,33 @@ namespace Bounds{
     	    
     	    __device__ __forceinline__ real3 force(const real4 &pos){
                 
-                const real3 rij = shellCenter-make_real3(pos);
+                const real3 dr = shellCenter-make_real3(pos);
                 
-                real  r2 = abs(sqrt(dot(rij,rij))-shellRadius);
-                      r2 = r2*r2;
+                const real r  = sqrt(dot(dr,dr));
+                      real r2 = r-shellRadius;
+                           r2 = r2*r2;
                 
-                real3 f12 = Ashell*CommonPotentials::Steric::Steric::force<12>(rij,r2,epsilonShell,sigmaShell);
-                real3 f6  = Bshell*CommonPotentials::Steric::Steric::force<6>(rij,r2,epsilonShell,sigmaShell);
+                const real sinvr2  = sigmaShell*sigmaShell/r2;
+                const real sinvr6  = sinvr2*sinvr2*sinvr2;
+                const real sinvr12 = sinvr6*sinvr6;
                 
-                real3 f = -(f12 + f6);
+                real fmod = -epsilonShell*real(6.0)*(real(2.0)*Ashell*sinvr12+Bshell*sinvr6)/abs(r-shellRadius);
+
+                real3 f = -fmod*(dr/r);
+                
+                //real  r2 = sqrt(dot(rij,rij))-shellRadius;
+                //      r2 = r2*r2;
+                //
+                //real3 f12 = Ashell*CommonPotentials::Steric::Steric::force<12>(rij,r2,epsilonShell,sigmaShell);
+                //real3 f6  = Bshell*CommonPotentials::Steric::Steric::force<6>(rij,r2,epsilonShell,sigmaShell);
+
+                //real3 f = -(f12 + f6);
+                //
+                //if(sqrt(dot(f,f))>real(0.1)){
+                //    printf("A:%f B:%f f: %f f6:%f f6x:%f f6y:%f f6z:%f f12:%f f12x:%f f12y:%f f12z:%f r:%f\n",Ashell,Bshell,sqrt(dot(f,f)),sqrt(dot(f6,f6)),f6.x,f6.y,f6.z,
+                //                                                                                                   sqrt(dot(f12,f12)),f12.x,f12.y,f12.z,
+                //                                                                                                   sqrt(dot(rij,rij)));
+                //}
 
                 return f;
             }

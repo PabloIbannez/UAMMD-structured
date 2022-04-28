@@ -46,7 +46,7 @@ namespace structured{
                               cudaStream_t stream){
 
             if(pd->isVelAllocated()){
-                sys->log<System::WARNING>("[%s] Velocity will be overwritten to ensure temperature conservation!", name.c_str());
+                sys->log<System::WARNING>("[%s] Velocity overwritten!", name.c_str());
             }
 
             auto groupIterator = pg->getIndexIterator(access::location::gpu);
@@ -156,6 +156,8 @@ namespace structured{
                             seed = sys->rng().next32();
                 
                         }
+
+            void setStep(uint nSteps){steps=nSteps;}
 
             Box  getBox(){return box;}
             real getTimeStep(){return dt;}

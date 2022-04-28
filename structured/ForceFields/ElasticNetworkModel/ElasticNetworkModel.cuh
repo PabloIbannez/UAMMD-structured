@@ -40,7 +40,7 @@ namespace ElasticNetworkModel{
                 
                 typename InteractorBondType::Parameters interactorBondParameters;
                 
-                interactorBondParameters.bondName = "ENM_BONDS";
+                interactorBondParameters.bondName = "ENM";
 
                 bonds = std::make_shared<InteractorBondType>(this->sys, this->pd, this->pg,
                                                              this->top, b,

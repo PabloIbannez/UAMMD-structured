@@ -53,7 +53,8 @@ namespace structured{
                 force[groupSampleIterator[i]] += make_real4(f,0);
                 
                 //Force on the tip due to the particles and the umbrella-like potential
-                tipForce[i] = make_real4(0,0,-f.z,0); //Note NOT +=
+                //tipForce[i] = make_real4(0,0,-f.z,0); //Note NOT +=
+                tipForce[i] = make_real4(-f,0); //Note NOT +=
             }
             
             //Compute surface and umbrella force in thread 0

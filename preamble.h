@@ -46,7 +46,8 @@
 // You may safely assume any ParameterUpdatable entity (such as Interactor) exposes a function with the signature
 // void updateMyParameter(real newMyParameter);
 //You may use this function equivalently to the ones already available in UAMMD (like updateTemperature of updateBox)
-#define EXTRA_UPDATABLE_PARAMETERS ((WriteBackup, std::ofstream&))
+#define EXTRA_UPDATABLE_PARAMETERS ((WriteBackup, std::ofstream&)) \
+                                   ((ReadBackup, std::ofstream&))
 
 
 #endif

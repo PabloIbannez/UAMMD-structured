@@ -35,40 +35,116 @@ class SimulationAFM: public Simulation<ForceField_,
         real Rtip;
             
         real initialTipSampleDst;
-        real minimalChipHeight;
             
         real dt;
         real descentVelocity;
+            
+        bool setTargetIndentationForce;
+        real targetIndentationForce;
+        bool targetIndentationForceReached;
+        
+        bool setMinimalChipHeight;
+        real minimalChipHeight;
+        bool minimalChipHeightReached;
+        
+        bool checkSurfacePosition;
 
         int nStepsIndentMeasure;
-
-        std::string outputIndentationMeasureFilePath;
         
+        std::string outputIndentationMeasureFilePath;
         std::ofstream outputIndentationMeasureFile;
 
     public:
 
-        SimulationAFM(std::shared_ptr<System> sys,
-                      uammd::InputFile& in,
-                      bool init = true):Simulation(sys,in,false){
-                                           
+        struct Parameters: public Simulation::Parameters{
+            real Mtip;
+            real Rtip;
+                
+            real initialTipSampleDst;
+                
+            real dt;
+            real descentVelocity;
+            
+            bool setMinimalChipHeight;
+            real minimalChipHeight;
+            
+            bool setTargetIndentationForce;
+            real targetIndentationForce;
+            
+            bool checkSurfacePosition=true;
+
+            int nStepsIndentMeasure;
+
+            std::string outputIndentationMeasureFilePath;
+        };
+        
+        static Parameters inputFileToParam(InputFile& in){
+
+            Parameters param;
+            static_cast<typename Simulation::Parameters&>(param) = Simulation::inputFileToParam(in); 
+            
             in.getOption("Mtip",InputFile::Required)
-                          >>Mtip;
+                          >>param.Mtip;
             in.getOption("Rtip",InputFile::Required)
-                          >>Rtip;
+                          >>param.Rtip;
             
             in.getOption("initialTipSampleDst",InputFile::Required)
-                          >>initialTipSampleDst;
+                          >>param.initialTipSampleDst;
             
             in.getOption("dt",InputFile::Required)
-                          >>dt;
+                          >>param.dt;
             in.getOption("descentVelocity",InputFile::Required)
-                          >>descentVelocity;
+                          >>param.descentVelocity;
             
             in.getOption("nStepsIndentMeasure",InputFile::Required)
-                          >>nStepsIndentMeasure;
+                          >>param.nStepsIndentMeasure;
             in.getOption("outputIndentationMeasureFilePath",InputFile::Required)
-                          >>outputIndentationMeasureFilePath;
+                          >>param.outputIndentationMeasureFilePath;
+            
+            if(in.getOption("minimalChipHeight",InputFile::Optional)){
+                in.getOption("minimalChipHeight",InputFile::Optional)>>param.minimalChipHeight;
+                param.setMinimalChipHeight = true;
+            } else {
+                param.minimalChipHeight    = std::numeric_limits<real>::lowest();
+                param.setMinimalChipHeight = false;
+            }
+            
+            if(in.getOption("targetIndentationForce",InputFile::Optional)){
+                in.getOption("targetIndentationForce",InputFile::Optional)>>param.targetIndentationForce;
+                param.setTargetIndentationForce = true;
+            } else {
+                param.targetIndentationForce = std::numeric_limits<real>::max();
+                param.setTargetIndentationForce = false;
+            }
+            
+            if(in.getOption("notCheckSurfacePosition",InputFile::Optional)){
+                param.checkSurfacePosition = false;
+            } else {
+                param.checkSurfacePosition = true;
+            }
+
+            return param;
+        }
+        
+        SimulationAFM(std::shared_ptr<System> sys,
+                      Parameters param,
+                      uammd::InputFile& in,
+                      bool init = true):Simulation(sys,param,in,false),
+                                        Mtip(param.Mtip),
+                                        Rtip(param.Rtip),
+                                        initialTipSampleDst(param.initialTipSampleDst),
+                                        dt(param.dt),
+                                        descentVelocity(param.descentVelocity),
+                                        nStepsIndentMeasure(param.nStepsIndentMeasure),
+                                        outputIndentationMeasureFilePath(param.outputIndentationMeasureFilePath),
+                                        setTargetIndentationForce(param.setTargetIndentationForce),
+                                        targetIndentationForce(param.targetIndentationForce),
+                                        targetIndentationForceReached(false),
+                                        setMinimalChipHeight(param.setMinimalChipHeight),
+                                        minimalChipHeight(param.minimalChipHeight),
+                                        minimalChipHeightReached(false),
+                                        checkSurfacePosition(param.checkSurfacePosition){
+                
             
             this->sys->template log<System::MESSAGE>("[SimulationAFM] "
                                                       "Parameter Mtip %f"
@@ -95,20 +171,31 @@ class SimulationAFM: public Simulation<ForceField_,
                                                       "Parameter outputIndentationMeasureFilePath %s",
                                                       outputIndentationMeasureFilePath.c_str());
             
-            if(in.getOption("minimalChipHeight",InputFile::Optional)){
-                in.getOption("minimalChipHeight",InputFile::Optional)>>minimalChipHeight;
+            if(setMinimalChipHeight){
                 this->sys->template log<System::MESSAGE>("[SimulationAFM] "
                                                           "Parameter minimalChipHeight %f"
                                                           ,minimalChipHeight);
-            } else {
-                minimalChipHeight = std::numeric_limits<real>::lowest();
             }
-
-                                        
+            
+            if(setTargetIndentationForce){
+                this->sys->template log<System::WARNING>("[SimulationAFM] "
+                                                         "Target force set to:%f",targetIndentationForce);
+            }
+            
+            if(!checkSurfacePosition){
+                this->sys->template log<System::WARNING>("[SimulationAFM] "
+                                                         "Not performing surface position checking...");
+            }
+            
             if(init){
                 this->init(in);
             }
+
         }
+
+        SimulationAFM(std::shared_ptr<System> sys,
+                      uammd::InputFile& in,
+                      bool init = true):SimulationAFM(sys,inputFileToParam(in),in,init){}
         
         void loadParticleBuffer(){
             
@@ -136,7 +223,6 @@ class SimulationAFM: public Simulation<ForceField_,
             
             this->Simulation::loadParticleData();
         }
-        
 
         void init(uammd::InputFile& in){
             
@@ -240,20 +326,21 @@ class SimulationAFM: public Simulation<ForceField_,
             }
             
             
-            if(this->pdBuffer.size() > 0){
-                real minPartHeight = std::min_element(this->pdBuffer.begin(),
-                                                      this->pdBuffer.end(),
-                                                      [](const auto& a,const auto& b){return a.pos.z < b.pos.z; })->pos.z;
-            
-                real surfacePosition = this->ff->getSurfacePosition();
+            if(checkSurfacePosition){
+                if(this->pdBuffer.size() > 0){
+                    real minPartHeight = std::min_element(this->pdBuffer.begin(),
+                                                          this->pdBuffer.end(),
+                                                          [](const auto& a,const auto& b){return a.pos.z < b.pos.z; })->pos.z;
+                
+                    real surfacePosition = this->ff->getSurfacePosition();
 
-                if(surfacePosition > minPartHeight){
-                    this->sys->template log<System::CRITICAL>("[SimulationAFM] Surface position (%f) is larger than the minimal particle height (%f)",
-                                                                surfacePosition,
-                                                                minPartHeight);
+                    if(surfacePosition > minPartHeight){
+                        this->sys->template log<System::CRITICAL>("[SimulationAFM] Surface position (%f) is larger than the minimal particle height (%f)",
+                                                                    surfacePosition,
+                                                                    minPartHeight);
+                    }
                 }
             }
-
             
             this->tip->setSurfacePosition(this->ff->getSurfacePosition());
 
@@ -293,13 +380,6 @@ class SimulationAFM: public Simulation<ForceField_,
             
             outputIndentationMeasureFile = std::ofstream(outputIndentationMeasureFilePath);
             
-            if(minimalChipHeight != std::numeric_limits<real>::lowest()){
-                int requiredStepsEstimation = std::ceil(((this->tip->getChipPosition()).z-minimalChipHeight)/(dt*descentVelocity));
-                this->sys->template log<System::MESSAGE>("[SimulationAFM] "
-                                                          "Estimated steps to get the minimal chip height: %i",
-                                                          requiredStepsEstimation);
-            }
-            
             this->minimization->addInteractor(this->ff);
             this->integrator->addInteractor(this->ff);
             this->integrator->addInteractor(this->tip);
@@ -335,9 +415,8 @@ class SimulationAFM: public Simulation<ForceField_,
 
             this->t++;
 
-            if(double(this->tip->getChipHeight())>minimalChipHeight){
-                this->tip->setChipHeight(double(this->tip->getChipHeight())-double(dt*descentVelocity));
-            }
+            this->tip->setChipHeight(double(this->tip->getChipHeight())-double(dt*descentVelocity));
+
             this->integrator->forwardTime();
             this->tryApplySteps();
                  
@@ -354,8 +433,14 @@ class SimulationAFM: public Simulation<ForceField_,
             Timer tim;
             tim.tic();
             
-            while(this->t<=this->nSteps){
-                this->next();
+            if(!setTargetIndentationForce and !setMinimalChipHeight){
+                while(this->t<=this->nSteps){
+                    this->next();
+                }
+            } else {
+                while(!targetIndentationForceReached and !minimalChipHeightReached){
+                    this->next();
+                }
             }
 
             auto totalTime = tim.toc();
@@ -430,7 +515,6 @@ class SimulationAFM: public Simulation<ForceField_,
 
             real tipDeflection      = tip->getTipDeflection();
             real tipDeflectionForce = tip->getTipDeflectionForce()*Simulation::Topology::Units::FROM_INTERNAL_FORCE;
-                
 
             out << "  "  
                 << std::setw(11) << std::left
@@ -451,6 +535,14 @@ class SimulationAFM: public Simulation<ForceField_,
                 << sampleForce.z      << " " 
                 << std::setw(11) << std::left
                 << tipDeflectionForce << std::endl;
+
+            if(chipPos.z < minimalChipHeight){
+                minimalChipHeightReached = true;
+            }
+
+            if(tipDeflectionForce > targetIndentationForce){
+                targetIndentationForceReached = true;
+            }
         }
 };
 

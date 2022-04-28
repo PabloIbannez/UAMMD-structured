@@ -51,25 +51,48 @@ class SimulationSphere: public Simulation<ForceField_,
             
             in.getOption("initialSphereRadius",InputFile::Required)
                           >>initialSphereRadius;
+            in.getOption("minimalSphereRadius",InputFile::Required)
+                          >>minimalSphereRadius;
             
             in.getOption("compressionVelocity",InputFile::Required)
                           >>compressionVelocity;
-            in.getOption("minimalSphereRadius",InputFile::Required)
-                          >>minimalSphereRadius;
 
             this->sys->template log<System::MESSAGE>("[SimulationSphere] "
                                                       "Parameter dt %f"
                                                       ,dt);
+
             this->sys->template log<System::MESSAGE>("[SimulationSphere] "
                                                       "Parameter initialSphereRadius %f"
                                                       ,initialSphereRadius);
+            this->sys->template log<System::MESSAGE>("[SimulationSphere] "
+                                                      "Parameter minimalSphereRadius %f"
+                                                      ,minimalSphereRadius);
             
             this->sys->template log<System::MESSAGE>("[SimulationSphere] "
                                                       "Parameter compressionVelocity %f"
                                                       ,compressionVelocity);
+            
+            in.getOption("epsilonSphere",InputFile::Optional)
+                          >>epsilonSphere;
+            in.getOption("sigmaSphere",InputFile::Optional)
+                          >>sigmaSphere;
+            in.getOption("Asphere",InputFile::Optional)
+                          >>Asphere;
+            in.getOption("Bsphere",InputFile::Optional)
+                          >>Bsphere;
+            
             this->sys->template log<System::MESSAGE>("[SimulationSphere] "
-                                                      "Parameter minimalSphereRadius %f"
-                                                      ,minimalSphereRadius);
+                                                      "Parameter epsilonSphere %f"
+                                                      ,epsilonSphere);
+            this->sys->template log<System::MESSAGE>("[SimulationSphere] "
+                                                      "Parameter sigmaSphere %f"
+                                                      ,sigmaSphere);
+            this->sys->template log<System::MESSAGE>("[SimulationSphere] "
+                                                      "Parameter Asphere %f"
+                                                      ,Asphere);
+            this->sys->template log<System::MESSAGE>("[SimulationSphere] "
+                                                      "Parameter Bsphere %f"
+                                                      ,Bsphere);
             
             if(init){
                 this->init(in);
@@ -105,7 +128,7 @@ class SimulationSphere: public Simulation<ForceField_,
 
             SphereType::Parameters sphereParameters;
 
-            sphereParameters.epsilonShell = epsilonSphere; //TODO apply units
+            sphereParameters.epsilonShell = epsilonSphere;
             sphereParameters.sigmaShell   = sigmaSphere;
             sphereParameters.Ashell       = Asphere;
             sphereParameters.Bshell       = Bsphere;

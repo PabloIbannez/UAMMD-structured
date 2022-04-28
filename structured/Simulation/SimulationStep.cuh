@@ -17,6 +17,8 @@ class SimulationStep: public ParameterUpdatable{
         int interval;
         int skip;
 
+        int lastStepApplied;
+
     public:
 
     SimulationStep(std::shared_ptr<System>       sys,
@@ -28,7 +30,8 @@ class SimulationStep: public ParameterUpdatable{
                              pd(pd),pg(pg),
                              name(name),
                              interval(interval),
-                             skip(skip){}
+                             skip(skip),
+                             lastStepApplied(-1){}
     
     SimulationStep(std::shared_ptr<System>       sys,
                    std::shared_ptr<ParticleData>  pd,
@@ -39,12 +42,14 @@ class SimulationStep: public ParameterUpdatable{
     ~SimulationStep(){}
 
     std::string getName(){return name;}
+    int getLastStepApplied(){return lastStepApplied;}
             
     virtual void init( cudaStream_t st) = 0;
 
-    virtual void tryApplyStep(int step, cudaStream_t st){
-        if(this->interval==0){return;}
-        if((step%this->interval)==0 and (step>=skip)){
+    virtual void tryApplyStep(int step, cudaStream_t st,bool force=false){
+        if(this->interval==0 and !force){return;}
+        if(((step%this->interval)==0 and (step>=skip)) or force){
+            lastStepApplied = step;
             this->applyStep(step,st);
         }
     }
@@ -93,13 +98,18 @@ class InfoStep: public SimulationStep {
         if(step != 0){
             real time = tim.toc();
 
-            std::chrono::seconds rtime_s(uint((nSteps-step)/(real(step)/time)));
+            if(nSteps != 0){
+                std::chrono::seconds rtime_s(uint((nSteps-step)/(real(step)/time)));
 
-            int hours   = std::chrono::duration_cast<std::chrono::hours>(rtime_s).count();
-            int minutes = std::chrono::duration_cast<std::chrono::minutes>(rtime_s).count()%60;
-            int seconds = std::chrono::duration_cast<std::chrono::seconds>(rtime_s).count()%60;
+                int hours   = std::chrono::duration_cast<std::chrono::hours>(rtime_s).count();
+                int minutes = std::chrono::duration_cast<std::chrono::minutes>(rtime_s).count()%60;
+                int seconds = std::chrono::duration_cast<std::chrono::seconds>(rtime_s).count()%60;
+                
+                this->sys->template log<System::MESSAGE>("Step %i, ETA: h:%i m:%i s:%i, mean FPS: %0.2f", step, hours,minutes,seconds,real(step)/time);
+            } else {
+                this->sys->template log<System::MESSAGE>("Step %i, mean FPS: %0.2f", step, real(step)/time);
+            }
 
-            this->sys->template log<System::MESSAGE>("Step %i, ETA: h:%i m:%i s:%i, mean FPS: %0.2f", step, hours,minutes,seconds,real(step)/time);
         }
     }
 
@@ -114,7 +124,8 @@ class WriteStep: public SimulationStep{
         
         struct Parameters{
 
-            bool pbc = true;
+            bool pbc    = true;
+            bool append = false;
 
             std::string outPutFormat;
             std::string outPutFilePath;
@@ -129,6 +140,7 @@ class WriteStep: public SimulationStep{
         std::ofstream outPutFile;
 
         bool pbc;
+        bool append;
 
         int lastWrittenStep;
         int frame;
@@ -143,7 +155,8 @@ class WriteStep: public SimulationStep{
 
             Parameters param;
 
-            param.pbc = true;
+            param.pbc    = true;
+            param.append = false;
 
             in.getOption("outPutFormat"  ,InputFile::Required)
                           >>param.outPutFormat;
@@ -158,8 +171,9 @@ class WriteStep: public SimulationStep{
                   std::shared_ptr<ParticleGroup> pg,
                   int interval,
                   bool pbc,
+                  bool append,
                   std::string outPutFormat,
-                  std::string outPutFilePath):WriteStep(sys,pd,pg,interval,{pbc,outPutFormat,outPutFilePath}){}
+                  std::string outPutFilePath):WriteStep(sys,pd,pg,interval,{pbc,append,outPutFormat,outPutFilePath}){}
         
         WriteStep(std::shared_ptr<System>       sys,
                   std::shared_ptr<ParticleData>  pd,
@@ -180,6 +194,7 @@ class WriteStep: public SimulationStep{
                   int interval,
                   Parameters param):SimulationStep(sys,pd,pg,"Output",interval),
                                     pbc(param.pbc),
+                                    append(param.append),
                                     outPutFileName(param.outPutFilePath),
                                     outPutFormat(param.outPutFormat),
                                     outPutFilePath(param.outPutFilePath){}
@@ -213,21 +228,29 @@ class WriteStep: public SimulationStep{
                     if(outPutFormat == 
                        std::string("dcd")){
                         
-                        std::ofstream outPSF(outPutFilePath + ".psf");
-                        
-                        psf::WritePSF(sys,pd,pg,outPSF);
+                        if(!append){
+                            std::ofstream outPSF(outPutFilePath + ".psf");
+                            
+                            psf::WritePSF(sys,pd,pg,outPSF);
 
-                        outPutFilePath = outPutFilePath + "." + outPutFormat;
-                        outPutFile.open(outPutFilePath,std::ios::binary);
+                            outPutFilePath = outPutFilePath + "." + outPutFormat;
+                            outPutFile.open(outPutFilePath,std::ios::binary);
                     
-                        InputOutput::Output::WriteDCDheader(sys,pd,pg,
-                                                            frame,
-                                                            this->interval,
-                                                            outPutFile);
-
+                            InputOutput::Output::WriteDCDheader(sys,pd,pg,
+                                                                frame,
+                                                                this->interval,
+                                                                outPutFile);
+                        } else {
+                            outPutFilePath = outPutFilePath + "." + outPutFormat;
+                            outPutFile.open(outPutFilePath,std::ios::binary | std::ios_base::app);
+                        }
                     } else {
                         outPutFilePath = outPutFilePath + "." + outPutFormat;
-                        outPutFile.open(outPutFilePath);
+                        if(!append){
+                            outPutFile.open(outPutFilePath);
+                        } else {
+                            outPutFile.open(outPutFilePath,std::ios_base::app);
+                        }
                     }
                 }
             } else {

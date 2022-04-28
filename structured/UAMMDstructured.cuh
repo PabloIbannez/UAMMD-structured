@@ -6,6 +6,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include <limits>
+
 #include"uammd.cuh"
 
 #include"misc/ParameterUpdatable.h"

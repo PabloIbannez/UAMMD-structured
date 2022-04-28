@@ -117,8 +117,26 @@ namespace selectors{
                 int partMdlId = (pd->getModelId(access::cpu, access::read).raw())[particleIndex];
                 return (partMdlId==mdlId);
             }
+    };
 
+    class modelIdChainId{
 
+        private:
+            
+            int mdlId;
+            int chnId;
+
+        public:
+            
+            modelIdChainId(int mdlId,
+                           int chnId):mdlId(mdlId),
+                                      chnId(chnId){};
+
+            bool isSelected(int particleIndex, std::shared_ptr<ParticleData> &pd){
+                int partMdlId = (pd->getModelId(access::cpu, access::read).raw())[particleIndex];
+                int partChnId = (pd->getChainId(access::cpu, access::read).raw())[particleIndex];
+                return (partMdlId==mdlId and partChnId==chnId);
+            }
     };
     
     class notModelId{

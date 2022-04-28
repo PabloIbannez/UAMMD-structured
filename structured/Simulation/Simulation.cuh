@@ -53,29 +53,49 @@ class Simulation{
         std::string inputCoordPath;
         std::string inputTopologyPath;
 
-        int nSteps;
-        int nStepsInfoInterval=0;
-        int nStepsSortInterval=0;
+        uint nSteps;
+        int  nStepsInfoInterval=0;
+        int  nStepsSortInterval=0;
 
     public:
 
-        Simulation(std::shared_ptr<System> sys,
-                   uammd::InputFile& in,
-                   bool init = true):sys(sys){
-                        
-            cudaStreamCreate(&simulationStream);
-                                           
-            in.getOption("inputCoordPath"   ,InputFile::Required)
-                          >>inputCoordPath;
-            in.getOption("inputTopologyPath",InputFile::Required)
-                          >>inputTopologyPath;
+        struct Parameters{
+            std::string inputCoordPath;
+            std::string inputTopologyPath;
 
-            in.getOption("nSteps",InputFile::Required)
-                          >>nSteps;
+            uint nSteps=0;
+            int  nStepsInfoInterval=0;
+            int  nStepsSortInterval=0;
+        };
+        
+        static Parameters inputFileToParam(InputFile& in){
+
+            Parameters param;
+            
+            in.getOption("inputCoordPath"   ,InputFile::Required)
+                          >>param.inputCoordPath;
+            in.getOption("inputTopologyPath",InputFile::Required)
+                          >>param.inputTopologyPath;
+
+            in.getOption("nSteps",InputFile::Optional)
+                          >>param.nSteps;
             in.getOption("nStepsInfoInterval",InputFile::Optional)
-                          >>nStepsInfoInterval;
+                          >>param.nStepsInfoInterval;
             in.getOption("nStepsSortInterval",InputFile::Optional)
-                          >>nStepsSortInterval;
+                          >>param.nStepsSortInterval;
+
+            return param;
+        }
+        
+        Simulation(std::shared_ptr<System> sys,
+                   Parameters param,
+                   uammd::InputFile& in,
+                   bool init = true):sys(sys),
+                                     inputCoordPath(param.inputCoordPath),
+                                     inputTopologyPath(param.inputTopologyPath),
+                                     nSteps(param.nSteps),
+                                     nStepsInfoInterval(param.nStepsInfoInterval),
+                                     nStepsSortInterval(param.nStepsSortInterval){
             
             sys->log<System::MESSAGE>("[Simulation] Parameter inputCoordPath added: %s",
                                         inputCoordPath.c_str());
@@ -88,17 +108,30 @@ class Simulation{
                                         nStepsInfoInterval);
             sys->log<System::MESSAGE>("[Simulation] Parameter nStepsSortInterval added: %i",
                                         nStepsSortInterval); 
-                                  
+            
+            cudaStreamCreate(&simulationStream);
+            
             if(init){
                 this->init(in);
             }
         }
+
+        Simulation(std::shared_ptr<System> sys,
+                   uammd::InputFile& in,
+                   bool init = true):Simulation(sys,inputFileToParam(in),in,init){}
 
         ~Simulation(){
             cudaStreamDestroy(simulationStream);
         }
 
         cudaStream_t getSimulationStream(){return this->simulationStream;}
+        
+        uint getStep(){return t;}
+
+        void setStep(uint nT){
+            t=nT;
+            integrator->setStep(t);
+        }
         
         std::shared_ptr<ParticleData>  getParticleData(){return this->pd;}
         std::shared_ptr<ParticleGroup> getParticleGroup(){return this->pg;}
@@ -165,19 +198,20 @@ class Simulation{
             
         }
         
-        void loadParticleBuffer(){
-            pdBuffer = InputOutput::loadCoordFromFile<coordFormat>(sys,inputCoordPath);
+        void loadParticleBuffer(std::string inputFilePath){
+            pdBuffer = InputOutput::loadCoordFromFile<coordFormat>(sys,inputFilePath);
         }
         
-        void loadParticleData(){
-
-            //Load particles to particle data and create all group
-            pd = std::make_shared<ParticleData>(pdBuffer.size(),sys);
+        void loadParticleBuffer(){
+            loadParticleBuffer(inputCoordPath);
+        }
+        
+        void updateParticleData(bool keepTypes=false){
             
-            auto pId = pd->getId(access::location::cpu, access::mode::write);
-            auto pos = pd->getPos(access::location::cpu, access::mode::write);
-            auto vel = pd->getVel(access::location::cpu, access::mode::write);
-            auto dir = pd->getDir(access::location::cpu, access::mode::write);
+            auto pId = this->pd->getId(access::location::cpu, access::mode::write);
+            auto pos = this->pd->getPos(access::location::cpu, access::mode::write);
+            auto vel = this->pd->getVel(access::location::cpu, access::mode::write);
+            auto dir = this->pd->getDir(access::location::cpu, access::mode::write);
 
             fori(0,pdBuffer.size()){
                 
@@ -186,7 +220,6 @@ class Simulation{
                     pos[i].x = pdBuffer[i].pos.x;
                     pos[i].y = pdBuffer[i].pos.y;
                     pos[i].z = pdBuffer[i].pos.z;
-                    pos[i].w = int(0);
                     vel[i].x = pdBuffer[i].vel.x;
                     vel[i].y = pdBuffer[i].vel.y;
                     vel[i].z = pdBuffer[i].vel.z;
@@ -194,11 +227,23 @@ class Simulation{
                     dir[i].y = pdBuffer[i].dir.y;
                     dir[i].z = pdBuffer[i].dir.z;
                     dir[i].w = pdBuffer[i].dir.w;
+                    
+                    if(!keepTypes){pos[i].w = int(0);}
+
                 } else {
                     sys->log<System::CRITICAL>("[Simulation] The internal id has to "
                                                 "match with the given by coord file. Inte: %i, File %i",i,pdBuffer[i].id);
                 }
             }
+        }
+        
+        void loadParticleData(){
+
+            //Load particles to particle data and create all group
+            pd = std::make_shared<ParticleData>(pdBuffer.size(),sys);
+
+            this->updateParticleData();
+            
         }
 
         void next(){
@@ -227,9 +272,18 @@ class Simulation{
 
         }
 
-        void run(){
+        void run(bool start=true){
 
-            this->start();
+            if(start){
+                this->start();
+            } else {
+                for(auto& s : simSteps){
+                    s->init(simulationStream);
+                    integrator->addUpdatable(s);
+                }
+                
+                integrator->update();
+            }
             
             Timer tim;
             tim.tic();
