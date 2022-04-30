@@ -32,9 +32,6 @@ namespace Bond2{
     
             real3 rij = box.apply_pbc(posj-posi);
             
-            const real dielectricConstant = bi.dielectricConstant;
-            const real debyeLength = bi.debyeLength;
-            
             real  r2 = dot(rij, rij);
 
             real3 f=make_real3(0.0);
@@ -61,9 +58,6 @@ namespace Bond2{
                                       const BondInfo &bi) {
             
             real3 rij = box.apply_pbc(posj-posi);
-            
-            const real dielectricConstant = bi.dielectricConstant;
-            const real debyeLength = bi.debyeLength;
             
             real  r2 = dot(rij, rij);
 
