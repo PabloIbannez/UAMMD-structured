@@ -488,6 +488,7 @@ struct addVirial: public potential{
 #include "Fene.cuh"
 #include "Morse.cuh"
 #include "LennardJones.cuh"
+#include "DebyeHuckel.cuh"
 
 #include "Oriented.cuh"
 

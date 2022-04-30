@@ -27,6 +27,7 @@ class Topology:
                         "ANGLES":3,
                         "DIHEDRALS":4,
                         "FIXED":1,
+                        "BONDS_DH":2,
                         "SOP_COVALENT":2,
                         "PAIRS":2,
                         "SOP_NATIVE_CONTACT":2,

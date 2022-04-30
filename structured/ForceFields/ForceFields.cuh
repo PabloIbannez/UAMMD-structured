@@ -142,7 +142,6 @@ class none : public ForceFieldBase<Units_,Types_>{
 
 #include"KaranicolasBrooks/KaranicolasBrooks.cuh"
 #include"SelfOrganizedPolymer/SelfOrganizedPolymer.cuh"
-#include"MechanicallyAccurateDNA/MechanicallyAccurateDNA.cuh"
 
 #include"KimHummer/KimHummer.cuh"
 #include"KimHummer/KimHummerLinkers.cuh"
@@ -191,10 +190,6 @@ namespace forceField{
     //Statistical
     using STAT    = Statistical::Statistical<GB_BASE>;
 
-    //MechanicallyAccurateDNA
-    using MADna = MechanicallyAccurateDNA::MechanicallyAccurateDNA<ForceFieldNeighbourBase<UnitsSystem::KCALMOL_A,
-                                                                                           Types::BASIC,
-                                                                                           conditions::chargedExcluded>>;
     
     //KaranicolasBrooks
     using KB = KaranicolasBrooks::KaranicolasBrooks<ForceFieldNeighbourBase<UnitsSystem::KCALMOL_A,
