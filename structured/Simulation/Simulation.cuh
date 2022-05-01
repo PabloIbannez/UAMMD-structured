@@ -258,7 +258,7 @@ class Simulation{
             
             //SimStep
             for(auto& s : simSteps){
-                s->init(simulationStream);
+                s->tryInit(simulationStream);
                 integrator->addUpdatable(s);
             }
             
@@ -278,7 +278,7 @@ class Simulation{
                 this->start();
             } else {
                 for(auto& s : simSteps){
-                    s->init(simulationStream);
+                    s->tryInit(simulationStream);
                     integrator->addUpdatable(s);
                 }
                 

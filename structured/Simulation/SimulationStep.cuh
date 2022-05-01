@@ -14,47 +14,58 @@ class SimulationStep: public ParameterUpdatable{
 
         std::string name;
 
+        bool initialized = false;
+
         int interval;
         int skip;
 
         int lastStepApplied;
-
+        
+        virtual void init( cudaStream_t st) = 0;
+        virtual void applyStep(int step, cudaStream_t st) = 0;
+            
     public:
 
-    SimulationStep(std::shared_ptr<System>       sys,
-                   std::shared_ptr<ParticleData>  pd,
-                   std::shared_ptr<ParticleGroup> pg,
-                   std::string name,
-                   int interval,
-                   int skip):sys(sys),
-                             pd(pd),pg(pg),
-                             name(name),
-                             interval(interval),
-                             skip(skip),
-                             lastStepApplied(-1){}
-    
-    SimulationStep(std::shared_ptr<System>       sys,
-                   std::shared_ptr<ParticleData>  pd,
-                   std::shared_ptr<ParticleGroup> pg,
-                   std::string name,
-                   int interval):SimulationStep(sys,pd,pg,name,interval,0){}
+        SimulationStep(std::shared_ptr<System>       sys,
+                       std::shared_ptr<ParticleData>  pd,
+                       std::shared_ptr<ParticleGroup> pg,
+                       std::string name,
+                       int interval,
+                       int skip):sys(sys),
+                                 pd(pd),pg(pg),
+                                 name(name),
+                                 interval(interval),
+                                 skip(skip),
+                                 lastStepApplied(-1){}
+        
+        SimulationStep(std::shared_ptr<System>       sys,
+                       std::shared_ptr<ParticleData>  pd,
+                       std::shared_ptr<ParticleGroup> pg,
+                       std::string name,
+                       int interval):SimulationStep(sys,pd,pg,name,interval,0){}
 
-    ~SimulationStep(){}
+        ~SimulationStep(){}
 
-    std::string getName(){return name;}
-    int getLastStepApplied(){return lastStepApplied;}
-            
-    virtual void init( cudaStream_t st) = 0;
+        std::string getName(){return name;}
+        int getLastStepApplied(){return lastStepApplied;}
 
-    virtual void tryApplyStep(int step, cudaStream_t st,bool force=false){
-        if(this->interval==0 and !force){return;}
-        if(((step%this->interval)==0 and (step>=skip)) or force){
-            lastStepApplied = step;
-            this->applyStep(step,st);
+        virtual void tryInit( cudaStream_t st){
+            if(!initialized){
+                this->init(st);
+                initialized=true;
+            } 
+        };
+
+        virtual void tryApplyStep(int step, cudaStream_t st,bool force=false){
+            if(initialized){
+                if(this->interval==0 and !force){return;}
+                if(((step%this->interval)==0 and (step>=skip)) or force){
+                    lastStepApplied = step;
+                    this->applyStep(step,st);
+                }
+            }
         }
-    }
 
-    virtual void applyStep(int step, cudaStream_t st) = 0;
 };
 
 class SortStep: public SimulationStep {

@@ -212,7 +212,7 @@ class SimulationUmbrellaAlongVector: public Simulation<ForceField_,
             
             //SimStep
             for(auto& s : this->simSteps){
-                s->init(this->simulationStream);
+                s->tryInit(this->simulationStream);
                 this->integrator->addUpdatable(s);
             }
             
