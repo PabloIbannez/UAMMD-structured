@@ -99,7 +99,8 @@ namespace psf{
                    std::fixed            <<
                    std::left             <<
                    std::setw(4) << segid[simMdlCh] <<
-                   //std::setw(4) << modelId[index] <<
+                   " "                   <<
+                   std::setw(4) << modelId[index] <<
                    " "                   <<
                    std::setw(4) << resId[index] <<
                    " "                   <<
@@ -109,8 +110,8 @@ namespace psf{
                    //std::setw(4) << typeParameterHandler->getTypeParameters(int(pos[index].w)).name <<
                    std::setw(4) << int(pos[index].w) <<
                    " "                   <<
-                   std::setw(4) << int(pos[index].w) <<
-                   " "                   <<
+                   //std::setw(4) << int(pos[index].w) <<
+                   //" "                   <<
                    std::fixed            <<
                    std::right            <<
                    std::setprecision(6)  <<

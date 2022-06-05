@@ -128,11 +128,11 @@ namespace Bond2{
         }
     };
 
-    template<int power>
-    using Steric                    = Bond2<addVirial<Steric_<power>>>;
-
-    template<int power>
-    using StericConst_epsilon_sigma = Bond2<addVirial<StericConst_epsilon_sigma_<power>>>;
+    using Steric6                    = Bond2<addVirial<Steric_<6>>>;
+    using Steric6Const_epsilon_sigma = Bond2<addVirial<StericConst_epsilon_sigma_<6>>>;
+    
+    using Steric12                    = Bond2<addVirial<Steric_<12>>>;
+    using Steric12Const_epsilon_sigma = Bond2<addVirial<StericConst_epsilon_sigma_<12>>>;
 
 }}}}
 

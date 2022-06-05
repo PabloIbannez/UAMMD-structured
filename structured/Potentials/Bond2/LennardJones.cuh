@@ -83,19 +83,17 @@ namespace Bond2{
     template<class LennardJonesType>
     struct LennardJonesConst_e_ : public LennardJones_<LennardJonesType>{
 
-        using LennardJonesBase = LennardJones_<LennardJonesType>;
-
         struct BondInfo{
             real sigma;
         };
 
         real epsilon;
 
-        struct Parameters : LennardJonesBase::Parameters{
+        struct Parameters : LennardJones_<LennardJonesType>::Parameters{
             real epsilon;
         };
 
-        LennardJonesConst_e_(Parameters par):LennardJonesBase(par),
+        LennardJonesConst_e_(Parameters par):LennardJones_<LennardJonesType>(par),
                                              epsilon(par.epsilon){}
 
         inline __device__ real3 force(int i, int j,
@@ -104,9 +102,9 @@ namespace Bond2{
                                       const real3 &posj,
                                       const BondInfo &bi){
     
-            const typename LennardJonesBase::BondInfo biB = {epsilon,bi.sigma};
+            const typename LennardJones_<LennardJonesType>::BondInfo biB = {epsilon,bi.sigma};
 
-            return LennardJonesBase::force(i,j,bond_index,posi,posj,biB);
+            return LennardJones_<LennardJonesType>::force(i,j,bond_index,posi,posj,biB);
         
         }
         
@@ -116,9 +114,9 @@ namespace Bond2{
                                       const real3 &posj,
                                       const BondInfo &bi) {
             
-            const typename LennardJonesBase::BondInfo biB = {epsilon,bi.sigma};
+            const typename LennardJones_<LennardJonesType>::BondInfo biB = {epsilon,bi.sigma};
 
-            return LennardJonesBase::energy(i,j,bond_index,posi,posj,biB);
+            return LennardJones_<LennardJonesType>::energy(i,j,bond_index,posi,posj,biB);
         }
         
         static __host__ BondInfo readBond(std::istream &in){
@@ -288,8 +286,6 @@ namespace Bond2{
     
     struct LennardJonesGaussianConst_e_D_ : public LennardJonesGaussian_{
 
-        using LennardJonesBase = LennardJonesGaussian_;
-
         struct BondInfo{
             real sigma;
         };
@@ -297,12 +293,12 @@ namespace Bond2{
         real epsilon;
         real D;
 
-        struct Parameters : LennardJonesBase::Parameters{
+        struct Parameters : LennardJonesGaussian_::Parameters{
             real epsilon;
             real D;
         };
 
-        LennardJonesGaussianConst_e_D_(Parameters par):LennardJonesBase(par),
+        LennardJonesGaussianConst_e_D_(Parameters par):LennardJonesGaussian_(par),
                                                        epsilon(par.epsilon),
                                                        D(par.D){}
 
@@ -312,9 +308,9 @@ namespace Bond2{
                                       const real3 &posj,
                                       const BondInfo &bi){
     
-            const typename LennardJonesBase::BondInfo biB = {epsilon,bi.sigma,D};
+            const typename LennardJonesGaussian_::BondInfo biB = {epsilon,bi.sigma,D};
 
-            return LennardJonesBase::force(i,j,bond_index,posi,posj,biB);
+            return LennardJonesGaussian_::force(i,j,bond_index,posi,posj,biB);
         
         }
         
@@ -324,9 +320,9 @@ namespace Bond2{
                                       const real3 &posj,
                                       const BondInfo &bi) {
             
-            const typename LennardJonesBase::BondInfo biB = {epsilon,bi.sigma,D};
+            const typename LennardJonesGaussian_::BondInfo biB = {epsilon,bi.sigma,D};
 
-            return LennardJonesBase::energy(i,j,bond_index,posi,posj,biB);
+            return LennardJonesGaussian_::energy(i,j,bond_index,posi,posj,biB);
         }
         
         static __host__ BondInfo readBond(std::istream &in){

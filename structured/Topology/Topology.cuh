@@ -7,6 +7,12 @@ namespace structured{
 template<class Units_,
          class Types_>
 class Topology: public InputOutput::InputBlocksFile{
+    
+    private:
+        
+        std::string labelDelimiter = ";";
+        std::string paramDelimiter = ",";
+        std::string assocDelimiter = "=";
 
     public:
 
@@ -16,6 +22,19 @@ class Topology: public InputOutput::InputBlocksFile{
         using TypeParameterHandler = TypeParameterHandler<Types>;
 
     private:
+
+        struct entryInfo{
+            
+            std::string label;
+
+            std::string alias;
+            std::string type;
+            std::string name;
+            std::map<std::string,std::string> param;
+
+        };
+        
+        std::map<std::string,entryInfo> entries;
 
         std::shared_ptr<TypeParameterHandler> typeParamH;
         
@@ -65,6 +84,67 @@ class Topology: public InputOutput::InputBlocksFile{
         Topology(std::shared_ptr<System> sys,
                  std::string topologyFilePath):InputBlocksFile(sys,topologyFilePath){
             sys->log<System::MESSAGE>("[Topology] Parameter inputTopologyPath added: %s",topologyFilePath.c_str());
+
+            ///
+
+            std::vector<std::string> entriesList = this->getBlocksList();
+
+            for(std::string label : entriesList){
+                std::vector<std::string> labelBuffer = Miscellany::split(label,labelDelimiter);
+
+                entries[label].label = label;
+
+                //
+                
+                entries[label].alias = labelBuffer[0];
+                
+                if(labelBuffer.size()>1){
+                    entries[label].type = labelBuffer[1];
+                }
+
+                if(labelBuffer.size()>2){
+                    entries[label].name = labelBuffer[2];
+                }
+
+                if(labelBuffer.size()>3){
+                    std::vector<std::string> paramBuffer = Miscellany::split(labelBuffer[3],paramDelimiter);
+                    for(std::string p : paramBuffer){
+                        std::vector<std::string> pBuffer = Miscellany::split(p,assocDelimiter);
+                        entries[label].param[pBuffer[0]] = pBuffer[1];
+                    }
+                }
+            }
+
+            /*
+            for(auto l : entries){
+                std::cout << "key "     << l.first << 
+                             " label: " << l.second.label << 
+                             " alias: " << l.second.alias << 
+                             " type: "  << l.second.type  << 
+                             " name: "  << l.second.name  << " params: ";
+
+                for(auto p : l.second.param){
+                    std::cout << p.first << "," << p.second << "      ";
+                }
+                std::cout << std::endl;
+            }
+            
+            std::cin.get();
+            */
+
+            ////
+            
+            std::set<std::string> aliasSet;
+            for(auto& entry : entries){
+                std::string alias=entry.second.alias;
+                if(aliasSet.count(alias)){
+                    sys->log<System::CRITICAL>("[Topology] "
+                                               "Alias %s has been added twice.",alias.c_str());
+                } else {
+                    aliasSet.insert(alias);
+                }
+            }
+
             this->loadTypeParameterHandler("TYPES");
         }
         
@@ -72,6 +152,54 @@ class Topology: public InputOutput::InputBlocksFile{
                  uammd::InputFile& in):Topology(sys,in.getOption("inputTopologyPath",InputFile::Required).str()){}
         
         std::shared_ptr<TypeParameterHandler> getTypes(){return typeParamH;}
+
+        bool isEntryPresent(std::string alias,std::string type,std::string name){
+            for(auto& entry : entries){
+                if(((entry.second.alias == alias) or (alias.empty())) and 
+                   ((entry.second.type  == type ) or ( type.empty())) and 
+                   ((entry.second.name  == name ) or ( name.empty())) ){
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        bool isEntryPresent(std::string alias){
+            return isEntryPresent(alias,std::string(),std::string());
+        }
+        
+        bool isEntryPresent(std::string type,std::string name){
+            return isEntryPresent(std::string(),type,name);
+        }
+        
+        std::vector<entryInfo> getEntryInfo(std::string alias,std::string type,std::string name){
+            std::vector<entryInfo> entriesInfo;
+            for(auto& entry : entries){
+                if(((entry.second.alias == alias) or (alias.empty())) and 
+                   ((entry.second.type  == type ) or ( type.empty())) and 
+                   ((entry.second.name  == name ) or ( name.empty())) ){
+                    entriesInfo.push_back(entry.second);
+                }
+            }
+            if(entries.size()>0){
+                return entriesInfo;
+            }
+            sys->log<System::CRITICAL>("[Topology] "
+                                       "There is not entry with alias:%s ,type:%s and name:%s.",alias.c_str(),type.c_str(),name.c_str());
+            return std::vector<entryInfo>();
+        }
+        
+        std::vector<entryInfo> getEntryInfo(std::string alias){
+            return getEntryInfo(alias,
+                                std::string(),
+                                std::string());
+        }
+        
+        std::vector<entryInfo> getEntryInfo(std::string type,std::string name){
+            return getEntryInfo(std::string(),
+                                type,
+                                name);
+        }
 
         template<class InteractionParameters>
         std::shared_ptr<typename structured::PairParameterHandler<InteractionParameters>> readPairs(std::string pairLabel){

@@ -38,11 +38,12 @@ namespace Bond2{
 
             if        (bond_index == i){
                 /*
-                printf("i:%i j:%i ,pi: %f %f %f, pj: %f %f %f, r:%f ,e:%f ,fi %f %f %f \n",i,j,
-                                                                                          posi.x/10,posi.y/10,posi.z/10, 
-                                                                                          posj.x/10,posj.y/10,posj.z/10, 
-                                                                                           sqrt(r2)/10,CommonPotentials::Harmonic::energy(rij,r2,K,r0)*4.18,41.8*f.x,41.8*f.y,41.8*f.z);
-                                                                                           */
+                if(sqrt(r2)>r0+5.0 or sqrt(r2)<r0-5.0){
+                    printf("i:%i j:%i ,r:%f r0:%f, pi: %f %f %f, pj: %f %f %f\n",i,j,
+                                                                                 sqrt(r2),r0,
+                                                                                 posi.x,posi.y,posi.z, 
+                                                                                 posj.x,posj.y,posj.z);
+                }*/
             } else if (bond_index == j){
                 f=-f;
             }

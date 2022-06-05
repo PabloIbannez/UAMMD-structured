@@ -9,37 +9,6 @@ from collections import OrderedDict
 
 class Topology:
 
-    propertiesIgnored = ["defaults",
-                         "atomtypes",
-                         "moleculetype",
-                         "system",
-                         "molecules"]
-    
-    propertiesCommon = ["TYPES",
-                        "MJ",
-                        "PDNA",
-                        "LJ_WCA",
-                        "UNBOUND",
-                        "NONPOLAR"]
-
-    propertiesDict   = {"SASA":1,
-                        "BONDS":2,
-                        "ANGLES":3,
-                        "DIHEDRALS":4,
-                        "FIXED":1,
-                        "BONDS_DH":2,
-                        "SOP_COVALENT":2,
-                        "PAIRS":2,
-                        "SOP_NATIVE_CONTACT":2,
-                        "ENM_BONDS":2,
-                        "EXCLUSIONS":-1,
-                        "atoms":1,
-                        "bonds":2,
-                        "angles":3,
-                        "dihedrals":4,
-                        "pairs":2,
-                        "exclusions":1}
-
     def __isEmptyOrCommented(self,line:str):
 
         if(line.isspace()):
@@ -190,6 +159,56 @@ class Topology:
     def __init__(self,
                  CoordFilePath    : str,
                  TopologyFilePath : str):
+
+        self.propertiesIgnored = ["defaults",
+                                  "atomtypes",
+                                  "moleculetype",
+                                  "system",
+                                  "molecules"]
+        
+        self.propertiesCommon = ["TYPES",
+                                 "MJ",
+                                 "PDNA",
+                                 "LJ_WCA",
+                                 "UNBOUND",
+                                 "CLASH",
+                                 "POLAR",
+                                 "STERIC",
+                                 "STERIC_INTRA",
+                                 "STERIC_INTER",
+                                 "NONPOLAR"]
+
+        self.propertyTypesDict   = {"Bond1":1,
+                                    "Bond2":2,
+                                    "Bond3":3,
+                                    "Bond4":4}
+
+        self.propertiesDict   = {"SASA":1,
+                                 "BONDS":2,
+                                 "BONDS_PROT":2,
+                                 "BONDS_WLC":2,
+                                 "BONDS_DNA":2,
+                                 "BONDS_RNA":2,
+                                 "ANGLES":3,
+                                 "ANGLES_WLC":3,
+                                 "ANGLES_DNA":3,
+                                 "ANGLES_RNA":3,
+                                 "DIHEDRALS":4,
+                                 "FIXED":1,
+                                 "BONDS_DH":2,
+                                 "SOP_COVALENT":2,
+                                 "PAIRS":2,
+                                 "PAIRS_PROT":2,
+                                 "SOP_NATIVE_CONTACT":2,
+                                 "ENM_BONDS":2,
+                                 "EXCLUSIONS":-1,
+                                 "atoms":1,
+                                 "bonds":2,
+                                 "angles":3,
+                                 "dihedrals":4,
+                                 "pairs":2,
+                                 "exclusions":1}
+
     
         self.propertiesLoaded = {}
         
@@ -209,12 +228,22 @@ class Topology:
         #print(self.d)
 
         for i in self.d:
+            
+            tpy=""
+            if len(i.split(";"))>1:
+                tpy=i.split(";")[1]
+
             if   (i in self.propertiesCommon):
                 #print("Detected common property:", i)
                 self.propertiesLoaded[i]=self.__getCommon(i)
             elif (i == "STRUCTURE"):
                 #print("Detected structure:", i)
                 self.propertiesLoaded[i]=self.__getStructure(i)
+            elif (tpy in self.propertyTypesDict.keys()):
+                self.propertiesDict[i]=self.propertyTypesDict[tpy]
+            elif (tpy == "UnBound"):
+                self.propertiesCommon.append(i)
+                self.propertiesLoaded[i]=self.__getCommon(i)
             elif (i in self.propertiesDict):
                 #print("Detected property:", i)
                 n = self.propertiesDict[i]
@@ -233,6 +262,49 @@ class Topology:
         
         #for i in self.coordLoaded: 
         #    print(i)
+    
+    def addProperty(self,name:str,info):
+        
+        if (name not in self.propertiesCommon) and (name not in self.propertiesDict.keys()): 
+            tpy=""
+            if len(name.split(";"))>1:
+                tpy=name.split(";")[1]
+
+            if tpy in self.propertyTypesDict.keys():
+                self.propertiesDict[name]=self.propertyTypesDict[name.split(";")[0]]
+            elif tpy == "UnBound":
+                self.propertiesCommon.append(name)
+            else:
+                print("ERROR property",name," is not in any property list")
+                sys.exit(1)
+        
+        if info==None:
+            self.propertiesLoaded[name] = []
+        else:
+            self.propertiesLoaded[name] = info
+
+    def renamePropertyLoaded(self,oldName:str,newName:str):
+
+        if newName not in self.propertiesLoaded.keys():
+
+            self.propertiesLoaded[newName] = self.propertiesLoaded.pop(oldName)
+            
+            if oldName in self.propertiesCommon:
+                self.propertiesCommon.append(newName)
+            else:
+                self.propertiesDict[newName]   = self.propertiesDict[oldName]
+
+        else:
+            for i in self.propertiesLoaded[oldName]:
+                self.propertiesLoaded[newName].append(copy.deepcopy(i))
+            
+            del self.propertiesLoaded[oldName]
+
+
+    def renamePropertiesLoadedUsingDict(self,old2newNameDict:dict):
+        for oldName in old2newNameDict.keys():
+            if oldName in self.propertiesLoaded.keys():
+                self.renamePropertyLoaded(oldName,old2newNameDict[oldName])
 
     def append(self,top,mode:str):
             
@@ -305,7 +377,23 @@ class Topology:
                             self.propertiesLoaded[prop].append(copy.deepcopy(tmp))
 
                 else:
-                    self.propertiesLoaded[prop]=copy.deepcopy(top.propertiesLoaded[prop])
+                    self.addProperty(prop,None)
+                    
+                    ni = self.propertiesDict[prop]
+                    if ni < 0:
+                        for p in top.propertiesLoaded[prop]:
+                            tmp = []
+                            for i in p:
+                                tmp.append(i+offset)
+                            self.propertiesLoaded[prop].append(copy.deepcopy(tmp))
+                    else:
+                        for p in top.propertiesLoaded[prop]:
+                            tmp = []
+                            for i in range(ni):
+                                tmp.append(p[i]+offset)
+                            tmp.append(p[ni])
+                            self.propertiesLoaded[prop].append(copy.deepcopy(tmp))
+                    
 
     def setSimId(self,simId:int):
         for c in self.propertiesLoaded["STRUCTURE"]:

@@ -6,28 +6,16 @@ namespace structured{
 namespace Potentials{
 namespace UnBound{
     
-    namespace KimHummerPotential_ns{
-    namespace ModelType{
+    namespace KimHummer_ns{
+    namespace SasaModel{
 
         struct A{
-
-            static constexpr bool SASArequired = false;
-            
-            static constexpr real lambda = 0.159;
-            static constexpr real epsilon_0 = -2.27;
-            
             __host__ __device__ inline static real SASAweight(real SASAratio){
                 return real(1.0);
             }
         };
         
         struct B{
-            
-            static constexpr bool SASArequired = true;
-            
-            static constexpr real lambda = 0.186;
-            static constexpr real epsilon_0 = -1.95;
-            
             __host__ __device__ inline static real SASAweight(real SASAratio){
                 real w = tanhf(real(10)*tanf(SASAratio*real(M_PI_2)));
                 return (w<real(0.0))?real(1.0):w;
@@ -35,12 +23,6 @@ namespace UnBound{
         };
         
         struct C{
-            
-            static constexpr bool SASArequired = true;
-            
-            static constexpr real lambda = 0.192;
-            static constexpr real epsilon_0 = -1.85;
-            
             __host__ __device__ inline static real SASAweight(real SASAratio){
                 real w = tanhf(real(5)*tanf(SASAratio*real(M_PI_2)));
                 return (w<real(0.0))?real(1.0):w;
@@ -48,12 +30,6 @@ namespace UnBound{
         };
         
         struct D{
-            
-            static constexpr bool SASArequired = true;
-            
-            static constexpr real lambda = 0.228;
-            static constexpr real epsilon_0 = -1.67;
-            
             __host__ __device__ inline static real SASAweight(real SASAratio){
                 real w = tanhf(real(2)*tanf(SASAratio*real(M_PI_2)));
                 return (w<real(0.0))?real(1.0):w;
@@ -61,12 +37,6 @@ namespace UnBound{
         };
         
         struct E{
-            
-            static constexpr bool SASArequired = true;
-            
-            static constexpr real lambda = 0.194;
-            static constexpr real epsilon_0 = -2.00;
-            
             __host__ __device__ inline static real SASAweight(real SASAratio){
                 real w = (real(1.0)+tanhf(real(2)*tanf(SASAratio*real(M_PI_2))))/real(2.0);
                 return (w<real(0.0))?real(1.0):w;
@@ -74,132 +44,139 @@ namespace UnBound{
         };
         
         struct F{
-            
-            static constexpr bool SASArequired = true;
-            
-            static constexpr real lambda = 0.223;
-            static constexpr real epsilon_0 = -1.96;
-            
             __host__ __device__ inline static real SASAweight(real SASAratio){
                 real w = (real(1.0)+tanhf(tanf(SASAratio*real(M_PI_2))))/real(2.0);
                 return w<real(0.0)?real(1.0):w;
             }
         };
-        
-        struct LQLHK{
-            
-            static constexpr bool SASArequired = false;
-            
-            static constexpr real lambda = 0.1243;
-            static constexpr real epsilon_0 = -1.875;
-            
-            __host__ __device__ inline static real SASAweight(real SASAratio){
-                return real(1.0);
-            }
-        };
     }}
 
-    namespace KimHummerPotential_ns{
-        namespace NonPolar{
-
-            //Force
-            inline __device__ real3 force(const real3& rij, const real& r2, const real& epsilon,const real& sigma,const real& zeroEnergy){
-                
-                if(epsilon == real(0.0) ){
-                    return CommonPotentials::Steric::Steric::force<12>(rij,r2,zeroEnergy,sigma);
-                }
-            
-                real3 f = CommonPotentials::LennardJones::Type1::force(rij,r2,abs(epsilon),sigma);
-                //(2^(1/6)*sigma)^2
-                const real r02 = (real(1.259921)*sigma*sigma);
-
-                if(epsilon > real(0.0) and r2>=r02){
-                    f=-f;
-                }
-
-                return f;
-            }
-            
-            //Virial
-            inline __device__ tensor3 virial(const real3& rij, const real& r2, const real& epsilon,const real& sigma,const real& zeroEnergy){
-                return tensor3(0);
-            }
-            
-            //Energy
-            inline __device__ real energy(const real3& rij, const real& r2, const real& epsilon,const real& sigma,const real& zeroEnergy){
-                
-                if(epsilon == real(0.0) ){
-                    return CommonPotentials::Steric::Steric::energy<12>(rij,r2,zeroEnergy,sigma);
-                }
-                
-                real e  = CommonPotentials::LennardJones::Type1::energy(rij,r2,abs(epsilon),sigma);
-            
-                //(2^(1/6)*sigma)^2
-                const real r02 = (real(1.259921)*sigma*sigma);
-
-                if(epsilon > real(0.0)){
-                       
-                    if(r2<r02){
-                        e+=epsilon; //Implicit 1/2
-                    } else {
-                        e=-e;
-                    }
-                }
-            
-                return e;
-            }
-
-        }
-    }
-
-    template<typename Units_>
-    struct KimHummerPotential: public ParameterUpdatable{
+    template<class Topology>
+    struct KimHummer_: public ParameterUpdatable{
         
-        using InteractionParameters = typename CommonParameters::StatisticalPotential::InteractionParameters;
-        using ParameterPairsHandler = typename structured::PairParameterHandler<InteractionParameters>;
+        using ParametersType        = typename CommonParameters::StatisticalPotential::StatisticalPotential<Topology>;
+        using ParameterPairsHandler = typename structured::PairParameterHandler<typename ParametersType::InteractionParameters>;
         
-        std::shared_ptr<ParticleData> pd;
-        
-        std::shared_ptr<ParameterPairsHandler> paramPairsHandler;
+        std::shared_ptr<System>        sys;
+        std::shared_ptr<ParticleData>  pd;
+        std::shared_ptr<ParticleGroup> pg;
+        std::shared_ptr<Topology>      top;
+
+        std::shared_ptr<ParametersType> statParam;
         
         Box box;
 
         real dielectricConstant;
         real debyeLenght;
         
+        real refTemperature;
+        real epsilon_0;
+        real lambda;
+        std::string sasaModel;
+        
+        std::string label;
+        std::string sasaLabel;
+        
         real cutOffDstNP;
         real cutOffDstDH;
-
+        
         real zeroEnergy;
         
         struct Parameters{
             
-            std::shared_ptr<ParameterPairsHandler> paramPairsHandler;
-            
             real dielectricConstant;
             real debyeLenght;
+            
+            real refTemperature;
+            real epsilon_0;
+            real lambda;
+            std::string sasaModel;
+            
+            std::string label;
+            std::string sasaLabel;
             
             real cutOffDstNP;
             real cutOffDstDH;
         
-            real zeroEnergy = real(0.01);
+            real zeroEnergy;
         
         };
 
-        KimHummerPotential(std::shared_ptr<ParticleData> pd,
-                  Parameters par):pd(pd),
-                                  dielectricConstant(par.dielectricConstant),
-                                  debyeLenght(par.debyeLenght),
-                                  cutOffDstNP(par.cutOffDstNP),
-                                  cutOffDstDH(par.cutOffDstDH),
-                                  zeroEnergy(par.zeroEnergy),
-                                  paramPairsHandler(par.paramPairsHandler){}
+        KimHummer_(std::shared_ptr<System>       sys,
+                   std::shared_ptr<ParticleData>  pd,
+                   std::shared_ptr<ParticleGroup> pg,
+                   std::shared_ptr<Topology>     top,
+                   Parameters par):sys(sys),
+                                   pd(pd),
+                                   pg(pg),
+                                   top(top),
+                                   dielectricConstant(par.dielectricConstant),
+                                   debyeLenght(par.debyeLenght),
+                                   refTemperature(par.refTemperature),
+                                   epsilon_0(par.epsilon_0),
+                                   lambda(par.lambda),
+                                   sasaModel(par.sasaModel),
+                                   label(par.label),
+                                   sasaLabel(par.sasaLabel),
+                                   cutOffDstNP(par.cutOffDstNP),
+                                   cutOffDstDH(par.cutOffDstDH),
+                                   zeroEnergy(par.zeroEnergy){
+            
+            typename ParametersType::Parameters param;
 
-        ~KimHummerPotential(){}
+            param.label          = label;
+            param.refTemperature = refTemperature;
+            param.epsilon_0      = epsilon_0;
+            param.lambda         = lambda;
 
-        void setZeroEnergy(real newZeroEnergy){
-            zeroEnergy = newZeroEnergy;
+            statParam = std::make_shared<ParametersType>(sys,pd,pg,top,param);
+
+            //Check sasa model
+            if(sasaModel != "A"){
+                this->top->template loadProperty(pd,sasaLabel,pd->getSASA(access::location::cpu, access::mode::write));
+                {
+                    auto groupIndex = this->pg->getIndexIterator(access::location::cpu);
+                    auto SASA = this->pd->getSASA(access::location::cpu, access::mode::readwrite);
+                    
+                    fori(0,this->pg->getNumberParticles()){
+                        int  index = groupIndex[i];
+                        
+                        if(SASA[index] > real(1.0)){
+                            SASA[index] = real(1.0);
+                        }
+
+                        if        (sasaModel == "B"){
+                            SASA[index]=KimHummer_ns::SasaModel::B::SASAweight(SASA[index]);
+                        } else if (sasaModel == "C"){
+                            SASA[index]=KimHummer_ns::SasaModel::C::SASAweight(SASA[index]);
+                        } else if (sasaModel == "D"){
+                            SASA[index]=KimHummer_ns::SasaModel::D::SASAweight(SASA[index]);
+                        } else if (sasaModel == "E"){
+                            SASA[index]=KimHummer_ns::SasaModel::E::SASAweight(SASA[index]);
+                        } else if (sasaModel == "F"){
+                            SASA[index]=KimHummer_ns::SasaModel::F::SASAweight(SASA[index]);
+                        } else {
+                            this->sys->template log<System::CRITICAL>("[KimHummerPotential] Sasa model: %s is no available ",sasaModel.c_str());
+                        }
+                    }
+                }
+            } else {
+                    
+                auto groupIndex = this->pg->getIndexIterator(access::location::cpu);
+                auto SASA = this->pd->getSASA(access::location::cpu, access::mode::readwrite);
+                    
+                fori(0,this->pg->getNumberParticles()){
+                    int  index = groupIndex[i];
+                    SASA[index]=real(1.0);
+                }
+            }
         }
+        
+        real getCutOffDst(){
+            return std::max(cutOffDstNP,cutOffDstDH);
+        }
+
+        ~KimHummer_(){}
 
         struct forceTransverser{
 
@@ -262,15 +239,15 @@ namespace UnBound{
                     const real sigma = radius[index_i]+radius[index_j];
                     const real eps   = paramPairIterator(int(posi.w),int(posj.w)).epsilon;
 
-                    f+=KimHummerPotential_ns::NonPolar::force(rij,r2,eps,sigma,zeroEnergy);
+                    f+=CommonPotentials::NonPolar::force(rij,r2,eps,sigma,zeroEnergy);
                 } 
                 
                 const real chgProduct = charge[index_i]*charge[index_j];
                 if(r2>0 and r2<=cutOffDstDH2 and chgProduct != real(0.0)){
                     
-                    f+=CommonPotentials::DebyeHuckel::DebyeHuckel::force<Units_>(rij,r2,
-                                                                                 chgProduct,
-                                                                                 dielectricConstant,debyeLenght);
+                    f+=CommonPotentials::DebyeHuckel::DebyeHuckel::force<Topology::Units>(rij,r2,
+                                                                                         chgProduct,
+                                                                                         dielectricConstant,debyeLenght);
                 }
 
                 return make_real4(sasa[index_j]*f,real(0.0));
@@ -290,7 +267,7 @@ namespace UnBound{
                                                          
             return forceTransverser(force,
                                     radius,charge,sasa,
-                                    paramPairsHandler->getPairIterator(),
+                                    statParam->getParameters()->getPairIterator(),
                                     box,
                                     dielectricConstant,
                                     debyeLenght,
@@ -368,7 +345,7 @@ namespace UnBound{
                                                          
             return virialTransverser(virial,
                                      radius,charge,sasa,
-                                     paramPairsHandler->getPairIterator(),
+                                     statParam->getParameters()->getPairIterator(),
                                      box,
                                      dielectricConstant,
                                      debyeLenght,
@@ -437,15 +414,15 @@ namespace UnBound{
                     const real sigma = radius[index_i]+radius[index_j];
                     const real eps   = paramPairIterator(int(posi.w),int(posj.w)).epsilon;
 
-                    e+=KimHummerPotential_ns::NonPolar::energy(rij,r2,eps,sigma,zeroEnergy);
+                    e+=CommonPotentials::NonPolar::energy(rij,r2,eps,sigma,zeroEnergy);
                 } 
                 
                 const real chgProduct = charge[index_i]*charge[index_j];
                 if(r2>0 and r2<=cutOffDstDH2 and chgProduct != real(0.0)){
                     
-                    e+=CommonPotentials::DebyeHuckel::DebyeHuckel::energy<Units_>(rij,r2,
-                                                                                  chgProduct,
-                                                                                  dielectricConstant,debyeLenght);
+                    e+=CommonPotentials::DebyeHuckel::DebyeHuckel::energy<Topology::Units>(rij,r2,
+                                                                                           chgProduct,
+                                                                                           dielectricConstant,debyeLenght);
                 }
 
                 return sasa[index_j]*e;
@@ -465,7 +442,7 @@ namespace UnBound{
                                                          
             return energyTransverser(energy,
                                      radius,charge,sasa,
-                                     paramPairsHandler->getPairIterator(),
+                                     statParam->getParameters()->getPairIterator(),
                                      box,
                                      dielectricConstant,
                                      debyeLenght,
@@ -478,6 +455,9 @@ namespace UnBound{
             box=newBox;
         }
     };
+   
+    template<class Topology>
+    using KimHummer = KimHummer_<Topology>;
 
 }}}}
 

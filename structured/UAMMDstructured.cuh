@@ -8,6 +8,8 @@
 
 #include <limits>
 
+#include"ThirdParty/json.hpp"
+
 #include"uammd.cuh"
 
 #include"misc/ParameterUpdatable.h"
@@ -16,6 +18,7 @@
 
 #include"Interactor/ExternalForces.cuh"
 
+#include"Utils/misc.cuh"
 #include"Utils/parameterHandler.cuh"
 
 #include"InputOutput/psf.cuh"

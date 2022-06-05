@@ -9,9 +9,9 @@ namespace Bond2{
     struct Fene_{
 
         struct BondInfo{
+            real r0;
             real K;
             real R02;
-            real r0;
         };
         
         Box box;
@@ -30,15 +30,17 @@ namespace Bond2{
         
             const real3 rij = box.apply_pbc(posj-posi);
             
+            const real r0  = bi.r0;
             const real K   = bi.K;
             const real R02 = bi.R02;
-            const real r0  = bi.r0;
 
             const real  r  = sqrt(dot(rij, rij));
             const real dr  = r-r0;
             const real dr2 = dr*dr;
 
             const real fmod = K*dr/(real(1.0)-dr2/R02);
+
+            //printf("r:%f r0:%f, K:%f, R0:%f fmod:%f\n",r,r0,K,sqrt(R02),fmod);
 
             real3 f = fmod*rij/r;
             
@@ -58,9 +60,9 @@ namespace Bond2{
             
             real3 rij = box.apply_pbc(posj-posi);
             
+            const real r0  = bi.r0;
             const real K   = bi.K;
             const real R02 = bi.R02;
-            const real r0  = bi.r0;
             
             real  r  = sqrt(dot(rij, rij));
             real dr  = r-r0;
@@ -73,7 +75,7 @@ namespace Bond2{
         
         static __host__ BondInfo readBond(std::istream &in){
             BondInfo bi;
-            in>>bi.K>>bi.R02>>bi.r0;
+            in>>bi.r0>>bi.K>>bi.R02;
             bi.R02=bi.R02*bi.R02;
             return bi;
         }
@@ -103,7 +105,7 @@ namespace Bond2{
                                       const real3 &posj,
                                       const BondInfo &bi){
 
-            const Fene_::BondInfo biB = {K,R02,bi.r0};
+            const Fene_::BondInfo biB = {bi.r0,K,R02};
 
             return Fene_::force(i,j,bond_index,posi,posj,biB);
         }
@@ -114,7 +116,7 @@ namespace Bond2{
                                       const real3 &posj,
                                       const BondInfo &bi) {            
             
-            const Fene_::BondInfo biB = {K,R02,bi.r0};
+            const Fene_::BondInfo biB = {bi.r0,K,R02};
 
             return Fene_::energy(i,j,bond_index,posi,posj,biB);
         }
@@ -126,9 +128,58 @@ namespace Bond2{
         }
 
     };
+    
+    struct FeneConst_r0_K_R0_ : public Fene_{
+        
+        struct BondInfo{};
+        
+        real r0;
+        real K;
+        real R02;
 
-    using Fene           = Bond2<addVirial<Fene_>>;
-    using FeneConst_K_R0 = Bond2<addVirial<FeneConst_K_R0_>>;
+        struct Parameters : Fene_::Parameters{
+            real r0;
+            real K;
+            real R0;
+        };
+
+        FeneConst_r0_K_R0_(Parameters par):Fene_(par),
+                                           r0(par.r0),
+                                           K(par.K),
+                                           R02(par.R0*par.R0){}
+        
+        inline __device__ real3 force(int i, int j,
+                                      int bond_index,
+                                      const real3 &posi,
+                                      const real3 &posj,
+                                      const BondInfo &bi){
+
+            const Fene_::BondInfo biB = {r0,K,R02};
+
+            return Fene_::force(i,j,bond_index,posi,posj,biB);
+        }
+        
+        inline __device__ real energy(int i, int j,
+                                      int bond_index,
+                                      const real3 &posi,
+                                      const real3 &posj,
+                                      const BondInfo &bi) {            
+            
+            const Fene_::BondInfo biB = {r0,K,R02};
+
+            return Fene_::energy(i,j,bond_index,posi,posj,biB);
+        }
+        
+        static __host__ BondInfo readBond(std::istream &in){
+            BondInfo bi;
+            return bi;
+        }
+
+    };
+
+    using Fene              = Bond2<addVirial<Fene_>>;
+    using FeneConst_K_R0    = Bond2<addVirial<FeneConst_K_R0_>>;
+    using FeneConst_r0_K_R0 = Bond2<addVirial<FeneConst_r0_K_R0_>>;
 
 }}}}
 

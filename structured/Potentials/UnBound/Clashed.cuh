@@ -6,9 +6,13 @@ namespace structured{
 namespace Potentials{
 namespace UnBound{
     
-    struct Clashed: public ParameterUpdatable{
+    template<class Topology>
+    struct Clashed_: public ParameterUpdatable{
         
-        std::shared_ptr<ParticleData> pd;
+        std::shared_ptr<System>        sys;
+        std::shared_ptr<ParticleData>  pd;
+        std::shared_ptr<ParticleGroup> pg;
+        std::shared_ptr<Topology>     top;
 
         Box box;
 
@@ -26,13 +30,20 @@ namespace UnBound{
         
         };
 
-        Clashed(std::shared_ptr<ParticleData> pd,
-                Parameters par):pd(pd),
-                                lambda(par.lambda),
-                                gamma(par.gamma),
-                                cutOffDst(par.cutOffDst){}
+        Clashed_(std::shared_ptr<System>       sys,
+                 std::shared_ptr<ParticleData>  pd,
+                 std::shared_ptr<ParticleGroup> pg,
+                 std::shared_ptr<Topology>     top,
+                 Parameters par):pd(pd),
+                                 lambda(par.lambda),
+                                 gamma(par.gamma),
+                                 cutOffDst(par.cutOffDst){}
 
-        ~Clashed(){}
+        real getCutOffDst(){
+            return cutOffDst;
+        }
+
+        ~Clashed_(){}
 
         struct forceTransverser{
 
@@ -52,11 +63,11 @@ namespace UnBound{
                              real gamma,
                              Box  box,
                              real cutOffDst2):force(force),
-                                           radius(radius),
-                                           lambda(lambda),
-                                           gamma(gamma),
-                                           box(box),
-                                           cutOffDst2(cutOffDst2){}
+                                              radius(radius),
+                                              lambda(lambda),
+                                              gamma(gamma),
+                                              box(box),
+                                              cutOffDst2(cutOffDst2){}
 
             using resultType=real4;
 
@@ -174,11 +185,11 @@ namespace UnBound{
                               real gamma,
                               Box  box,
                               real cutOffDst2):energy(energy),
-                                            radius(radius),
-                                            lambda(lambda),
-                                            gamma(gamma),
-                                            box(box),
-                                            cutOffDst2(cutOffDst2){}
+                                               radius(radius),
+                                               lambda(lambda),
+                                               gamma(gamma),
+                                               box(box),
+                                               cutOffDst2(cutOffDst2){}
 
 
             using resultType=real;
@@ -226,6 +237,9 @@ namespace UnBound{
         }
 
     };
+
+    template<class Topology>
+    using Clashed = Clashed_<Topology>;
 
 }}}}
 

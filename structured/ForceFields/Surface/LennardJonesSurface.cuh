@@ -15,7 +15,7 @@ namespace LennardJonesSurface{
             
         protected:
 
-            using SurfaceType           = Potentials::Surface::GenericSurfacePotential;
+            using SurfaceType           = Potentials::Surface::LennardJonesSurface<typename Base::Topology>;
             using InteractorSurfaceType = ExternalForces<SurfaceType>;
             
             std::shared_ptr<SurfaceType>  surfacePotential;
@@ -23,8 +23,8 @@ namespace LennardJonesSurface{
 
         private:
 
-            real epsilonSurf;
-            real sigmaSurf;
+            real epsilon;
+            real sigma;
             real surfacePosition;
 
         public:
@@ -33,19 +33,15 @@ namespace LennardJonesSurface{
                                 std::shared_ptr<ParticleData>  pd,
                                 std::shared_ptr<ParticleGroup> pg,
                                 InputFile&                     in):Base(sys,pd,pg,in),
-                                                                    epsilonSurf(std::stof(in.getOption("epsilonSurf",InputFile::Required).str())),
-                                                                    sigmaSurf(std::stof(in.getOption("sigmaSurf",InputFile::Required).str())),
+                                                                    epsilon(std::stof(in.getOption("epsilonSurf",InputFile::Required).str())),
+                                                                    sigma(std::stof(in.getOption("sigmaSurf",InputFile::Required).str())),
                                                                     surfacePosition(std::stof(in.getOption("surfacePosition",InputFile::Required).str())){
                 
                 {
-                    SurfaceType::Parameters surfaceParameters;
+                    typename SurfaceType::Parameters surfaceParameters;
 
-                    surfaceParameters.epsilonSurf     = epsilonSurf;
-                    surfaceParameters.sigmaSurf       = sigmaSurf;
-                    surfaceParameters.Asurf           = real( 1.0);
-                    surfaceParameters.Bsurf           = real(-2.0);
-                    surfaceParameters.offSetSurf      = real(0.0);
-                    surfaceParameters.cutOffSurf      = INFINITY;
+                    surfaceParameters.epsilon     = epsilon;
+                    surfaceParameters.sigma       = sigma;
                     surfaceParameters.surfacePosition = surfacePosition;
 
                     surfacePotential = std::make_shared<SurfaceType>(surfaceParameters);
@@ -57,11 +53,11 @@ namespace LennardJonesSurface{
                 }
                 
                 this->sys->template log<System::MESSAGE>("[LennardJonesSurface] "
-                                                         "Parameter epsilonSurf added: %f",
-                                                          epsilonSurf);
+                                                         "Parameter epsilon added: %f",
+                                                          epsilon);
                 this->sys->template log<System::MESSAGE>("[LennardJonesSurface] "
-                                                         "Parameter sigmaSurf added: %f",
-                                                         sigmaSurf);
+                                                         "Parameter sigma added: %f",
+                                                         sigma);
 
                 this->sys->template log<System::MESSAGE>("[LennardJonesSurface] "
                                                          "Surface position added: %f",
@@ -69,19 +65,20 @@ namespace LennardJonesSurface{
             }
             
             void sum(Computables comp,cudaStream_t st) override {
-                surface->sum(comp,st);
                 Base::sum(comp,st);
+                surface->sum(comp,st);
             }
             
-            void sum(std::string potName,Computables comp,cudaStream_t st){
-                if(potName == "surface"){
+            void sum(std::string component,Computables comp,cudaStream_t st){
+                if(component == "surface"){
                     surface->sum(comp,st);
                     return;
                 }  
+                Base::sum(component,comp,st);
 
                 this->sys->template log<System::CRITICAL>("[LennardJonesSurface] Requested potential %s to sum. "
                                                             "But %s is not present in the force field",
-                                                            potName.c_str(),potName.c_str());
+                                                            component.c_str(),component.c_str());
             }
             
             void updateBox(Box box){

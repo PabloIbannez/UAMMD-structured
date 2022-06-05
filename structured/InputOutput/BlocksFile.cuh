@@ -32,6 +32,7 @@ class InputBlocksFile{
         std::shared_ptr<std::ifstream> blocksFile;
 
         struct labeledBlock{
+
             std::ifstream::pos_type blockBegin;
             std::ifstream::pos_type blockEnd;
         };
@@ -90,7 +91,7 @@ class InputBlocksFile{
                     sys->log<System::MESSAGE>("[Blocks file] Blocks file %s opened.", blocksFilePath.c_str());
             }
 
-            std::regex rgx("\\[\\s*(\\w*)\\s*\\]");
+            std::regex rgx("\\[\\s*(.*)\\s*\\]");
 
             std::string previousLabel;
             for(std::string line ; std::getline(*blocksFile,line);){
@@ -99,22 +100,31 @@ class InputBlocksFile{
 
                 if(std::regex_search(line,match,rgx)){
 
-                    if(labeledBlocks.count(match[1])>0){
+                    std::string label = match[1];
+                    label.erase(
+                    std::remove_if(
+                        std::begin(label), std::end(label),
+                        [l = std::locale{}](auto ch) { return std::isspace(ch, l); }
+                        ),end(label)
+                    );
+
+                    if(labeledBlocks.count(label)>0){
                         sys->log<System::CRITICAL>("[Blocks file] Block %s in blocks file %s is repeated.",
-                                                    match[1].str().c_str(),blocksFilePath.c_str());
+                                                    label.c_str(),blocksFilePath.c_str());
                     } else {
-                        labeledBlocks[match[1]].blockBegin=blocksFile->tellg();
+
+                        labeledBlocks[label].blockBegin=blocksFile->tellg();
 
                         if(!previousLabel.empty()){
-                            labeledBlocks[previousLabel].blockEnd=labeledBlocks[match[1]].blockBegin;
+                            labeledBlocks[previousLabel].blockEnd=labeledBlocks[label].blockBegin;
                         }
                         
-                        previousLabel = match[1];
+                        previousLabel = label;
                     }
                 }
             
             }
-            
+
             labeledBlocks[previousLabel].blockEnd=blocksFile->tellg();
         }
 
@@ -128,6 +138,16 @@ class InputBlocksFile{
                 return false;
             }
             return true;
+        }
+        
+        std::vector<std::string> getBlocksList(){
+
+            std::vector<std::string> blocksList;
+            for(auto l : labeledBlocks){
+                blocksList.push_back(l.first);
+            }
+
+            return blocksList;
         }
         
         fileBlockIterator getFileBlockIterator(std::string blockName){

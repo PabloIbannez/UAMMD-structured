@@ -349,6 +349,50 @@ namespace CommonPotentials{
 
             return e/real(2.0);
         }
+        
+        struct Steric6{
+            //Force
+            static inline __device__ real3 force(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+                
+                return Steric::force<6>(rij,r2,epsilon,sigma);
+            }
+            
+            //Virial
+            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+                                                    const real& epsilon,const real& sigma){
+                return Steric::virial<6>(rij,r2,epsilon,sigma);
+            }
+            
+            //Energy
+            static inline __device__ real energy(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+                return Steric::energy<6>(rij,r2,epsilon,sigma);
+            }
+        };
+        
+        struct Steric12{
+            //Force
+            static inline __device__ real3 force(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+                
+                return Steric::force<12>(rij,r2,epsilon,sigma);
+            }
+            
+            //Virial
+            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+                                                    const real& epsilon,const real& sigma){
+                return Steric::virial<12>(rij,r2,epsilon,sigma);
+            }
+            
+            //Energy
+            static inline __device__ real energy(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+                return Steric::energy<12>(rij,r2,epsilon,sigma);
+            }
+        };
+
+
     }
     
     namespace WCA{
@@ -406,6 +450,128 @@ namespace CommonPotentials{
                 return LennardJones::Type2::energy(rij,r2,epsilon,sigma)+epsilon;
             }
         };
+        
+        struct Type3{
+            //Force
+            static inline __device__ real3 force(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+                
+                if(r2 > sigma*sigma) return make_real3(0);
+
+                return LennardJones::Type3::force(rij,r2,epsilon,sigma);
+            }
+            
+            //Virial
+            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+                                                    const real& epsilon,const real& sigma){
+                return tensor3(0);
+            }
+            
+            //Energy
+            static inline __device__ real energy(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+
+                if(r2 > sigma*sigma) return real(0);
+
+                return LennardJones::Type3::energy(rij,r2,epsilon,sigma)+epsilon;
+            }
+        };
+    }
+    
+    namespace GeneralLennardJones{
+        
+        struct Type1{
+            //Force
+            static inline __device__ real3 force(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+                
+                if(epsilon >= real(0.0)){
+                    return WCA::Type1::force(rij,r2,epsilon,sigma);
+                }
+                    
+                return LennardJones::Type1::force(rij,r2,fabs(epsilon),sigma);
+
+            }
+            
+            //Virial
+            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+                                                    const real& epsilon,const real& sigma){
+                return tensor3(0);
+            }
+            
+            //Energy
+            static inline __device__ real energy(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+
+                if(epsilon >= real(0.0)){
+                    return WCA::Type1::energy(rij,r2,epsilon,sigma);
+                }
+                    
+                return LennardJones::Type1::energy(rij,r2,fabs(epsilon),sigma);
+            }
+        };
+        
+        struct Type2{
+            //Force
+            static inline __device__ real3 force(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+                
+                if(epsilon >= real(0.0)){
+                    return WCA::Type2::force(rij,r2,epsilon,sigma);
+                }
+                    
+                return LennardJones::Type2::force(rij,r2,fabs(epsilon),sigma);
+
+            }
+            
+            //Virial
+            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+                                                    const real& epsilon,const real& sigma){
+                return tensor3(0);
+            }
+            
+            //Energy
+            static inline __device__ real energy(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+
+                if(epsilon >= real(0.0)){
+                    return WCA::Type2::energy(rij,r2,epsilon,sigma);
+                }
+                    
+                return LennardJones::Type2::energy(rij,r2,fabs(epsilon),sigma);
+            }
+        };
+        
+        struct Type3{
+            //Force
+            static inline __device__ real3 force(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+                
+                if(epsilon >= real(0.0)){
+                    return WCA::Type3::force(rij,r2,epsilon,sigma);
+                }
+                    
+                return LennardJones::Type3::force(rij,r2,fabs(epsilon),sigma);
+
+            }
+            
+            //Virial
+            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+                                                    const real& epsilon,const real& sigma){
+                return tensor3(0);
+            }
+            
+            //Energy
+            static inline __device__ real energy(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+
+                if(epsilon >= real(0.0)){
+                    return WCA::Type3::energy(rij,r2,epsilon,sigma);
+                }
+                    
+                return LennardJones::Type3::energy(rij,r2,fabs(epsilon),sigma);
+            }
+        };
     }
         
     namespace ModifiedLennardJones{
@@ -435,7 +601,60 @@ namespace CommonPotentials{
 
         };
     }
+        
+    struct NonPolar{
 
+        //Force
+        static inline __device__ real3 force(const real3& rij, const real& r2, 
+                                             const real& epsilon,const real& sigma,const real& zeroEnergy){
+            
+            if(epsilon == real(0.0) ){
+                return CommonPotentials::Steric::Steric::force<12>(rij,r2,zeroEnergy,sigma);
+            }
+        
+            real3 f = CommonPotentials::LennardJones::Type1::force(rij,r2,abs(epsilon),sigma);
+            //(2^(1/6)*sigma)^2
+            const real r02 = (real(1.259921)*sigma*sigma);
+
+            if(epsilon > real(0.0) and r2>=r02){
+                f=-f;
+            }
+
+            return f;
+        }
+        
+        //Virial
+        static inline __device__ tensor3 virial(const real3& rij, const real& r2, 
+                                                const real& epsilon,const real& sigma,const real& zeroEnergy){
+            return tensor3(0);
+        }
+        
+        //Energy
+        static inline __device__ real energy(const real3& rij, const real& r2, 
+                                             const real& epsilon,const real& sigma,const real& zeroEnergy){
+            
+            if(epsilon == real(0.0) ){
+                return CommonPotentials::Steric::Steric::energy<12>(rij,r2,zeroEnergy,sigma);
+            }
+            
+            real e  = CommonPotentials::LennardJones::Type1::energy(rij,r2,abs(epsilon),sigma);
+        
+            //(2^(1/6)*sigma)^2
+            const real r02 = (real(1.259921)*sigma*sigma);
+
+            if(epsilon > real(0.0)){
+                   
+                if(r2<r02){
+                    e+=epsilon; //Implicit 1/2
+                } else {
+                    e=-e;
+                }
+            }
+        
+            return e;
+        }
+
+    };
 
     namespace DebyeHuckel{
         
@@ -590,7 +809,6 @@ namespace CommonPotentials{
                                                  const real& k, const real lmd){
 
                 const real      r  = sqrt(r2);
-                const real  invr2  = real(1.0)/r2;
 
                 const real dielectricConstant = distanceDependentDielectric(r,A,B,k,lmd);
                 

@@ -5,64 +5,61 @@ namespace uammd{
 namespace structured{ 
 namespace Potentials{
 namespace Surface{
-
-    namespace GenericSurface_ns{
-    namespace GenericSurfaceModel{
-
-        struct Steric{
-            static constexpr real A = 1.0;
-            static constexpr real B = 0.0;
-            static constexpr real energyOffSet = 0.0;
-            static constexpr real cutOff = INFINITY;
-        };
-        
-        struct LennardJones{
-            static constexpr real A =  1.0;
-            static constexpr real B = -2.0;
-            static constexpr real energyOffSet = 0.0;
-            static constexpr real cutOff = INFINITY;
-        };
-
-
-    }}
     
-    template<class Topology,class SurfaceType> 
-    class GenericSurface: public ParameterUpdatable{
+    class GenericSurfacePotential: public ParameterUpdatable{
     	
         private:
             
-            real epsilon;
-            real sigma;
+            real epsilonSurf;
+            real sigmaSurf;
             
+            real Asurf;
+            real Bsurf;
+
+            real offSetSurf;
+            real cutOffSurf;
+    	    
             real surfacePosition;
     	        
         public:
 
             struct Parameters{
             
-                real epsilon;
-                real sigma;
+                real epsilonSurf;
+                real sigmaSurf;
 
+                real Asurf;
+                real Bsurf;
+            
+                real offSetSurf;
+                real cutOffSurf;
+    	        
                 real surfacePosition;
             };
     	    
-    	    GenericSurface(Parameters par):epsilon(par.epsilon),
-                                           sigma(par.sigma),
-                                           surfacePosition(par.surfacePosition){}     
+    	    GenericSurfacePotential(Parameters par):epsilonSurf(par.epsilonSurf),
+                                                    sigmaSurf(par.sigmaSurf),
+                                                    Asurf(par.Asurf),
+                                                    Bsurf(par.Bsurf),      
+                                                    offSetSurf(par.offSetSurf),
+                                                    cutOffSurf(par.cutOffSurf),
+                                                    surfacePosition(par.surfacePosition){}     
     	    
     	    __device__ __forceinline__ real3 force(const real4 &pos){
                 
+                //const int type = int(pos.w);
+    	    	
                 const real dz = abs(surfacePosition-pos.z);
 
-                if(dz<=SurfaceType::cutOff){
+                if(dz<=cutOffSurf){
 
                     const real invdz2  = real(1.0)/(dz*dz);
                     
-                    const real sinvdz2  = sigma*sigma*invdz2;
+                    const real sinvdz2  = sigmaSurf*sigmaSurf*invdz2;
                     const real sinvdz6  = sinvdz2*sinvdz2*sinvdz2;
                     const real sinvdz12 = sinvdz6*sinvdz6;
 
-                    real fmod = epsilon*real(6.0)*(real(2.0)*SurfaceType::A*sinvdz12+SurfaceType::B*sinvdz6)*invdz2; 
+                    real fmod = epsilonSurf*real(6.0)*(real(2.0)*Asurf*sinvdz12+Bsurf*sinvdz6)*invdz2; 
 
                     return {real(0),
                             real(0),
@@ -79,13 +76,13 @@ namespace Surface{
     	    	
                 const real dz = abs(surfacePosition-pos.z);
 
-                if(dz<=SurfaceType::cutOff){
+                if(dz<=cutOffSurf){
 
-                    const real sinvdz2  = sigma*sigma/(dz*dz);
+                    const real sinvdz2  = sigmaSurf*sigmaSurf/(dz*dz);
                     const real sinvdz6  = sinvdz2*sinvdz2*sinvdz2;
                     const real sinvdz12 = sinvdz6*sinvdz6;
 
-                    real e = epsilon*(SurfaceType::A*sinvdz12+SurfaceType::B*sinvdz6)+SurfaceType::energyOffSet; 
+                    real e = epsilonSurf*(Asurf*sinvdz12+Bsurf*sinvdz6)+offSetSurf; 
 
                     return e;
                 }
@@ -101,11 +98,6 @@ namespace Surface{
                 return std::make_tuple(pos.raw());
     	    }
     };
-    
-    template<class Topology>
-    using StericSurface       = GenericSurface<Topology,GenericSurface_ns::GenericSurfaceModel::Steric>; 
-    template<class Topology>
-    using LennardJonesSurface = GenericSurface<Topology,GenericSurface_ns::GenericSurfaceModel::LennardJones>; 
     
 }}}}
 

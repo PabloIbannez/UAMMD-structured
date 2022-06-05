@@ -6,73 +6,53 @@ namespace structured{
 namespace Potentials{
 namespace UnBound{
     
-    namespace LennardJones_ns{
-    
-        struct InteractionParameters{
+    template<class Topology,class LennardJonesType>
+    struct LennardJones_: public ParameterUpdatable{
         
-            struct InputPairParameters{
-                real epsilon;
-                real sigma;
-            };
+        using ParametersType        = typename CommonParameters::LennardJones::LennardJones<Topology>;
+        using ParameterPairsHandler = typename structured::PairParameterHandler<typename ParametersType::InteractionParameters>;
         
-            struct PairParameters{
-                real epsilon;
-                real sigma;
-            };
-        
-            static inline __host__ InputPairParameters readPairParameters(std::string& line){
-            
-                std::stringstream ss;
-                
-                InputPairParameters param;
+        std::shared_ptr<System>        sys;
+        std::shared_ptr<ParticleData>  pd;
+        std::shared_ptr<ParticleGroup> pg;
+        std::shared_ptr<Topology>      top;
 
-                ss.str(line);
-
-                ss  >> param.epsilon >> param.sigma;
-                
-                return param;
-            
-            }
-        
-            static inline __host__ PairParameters processPairParameters(InputPairParameters in_par){
-        
-                PairParameters params;
-        
-                params.epsilon = in_par.epsilon;
-                params.sigma   = in_par.sigma;
-        
-                return params;
-            }
-        };
-    }
-    
-    struct LennardJones: public ParameterUpdatable{
-        
-        using InteractionParameters = typename LennardJones_ns::InteractionParameters;
-        using ParameterPairsHandler = typename structured::PairParameterHandler<InteractionParameters>;
-        
-        std::shared_ptr<ParticleData> pd;
-        
-        std::shared_ptr<ParameterPairsHandler> paramPairsHandler;
+        std::shared_ptr<ParametersType> ljParam;
         
         Box box;
 
-        real cutOffDstLJ;
-            
+        std::string label;
+        real cutOffDst;
+        
         struct Parameters{
             
-            std::shared_ptr<ParameterPairsHandler> paramPairsHandler;
-            
-            real cutOffDstLJ;
-        
+            std::string label;
+            real cutOffDst;
         };
 
-        LennardJones(std::shared_ptr<ParticleData> pd,
-                     Parameters par):pd(pd),
-                                     cutOffDstLJ(par.cutOffDstLJ),
-                                     paramPairsHandler(par.paramPairsHandler){}
+        LennardJones_(std::shared_ptr<System>       sys,
+                      std::shared_ptr<ParticleData>  pd,
+                      std::shared_ptr<ParticleGroup> pg,
+                      std::shared_ptr<Topology>     top,
+                      Parameters par):sys(sys),
+                                      pd(pd),
+                                      pg(pg),
+                                      top(top),
+                                      label(par.label),
+                                      cutOffDst(par.cutOffDst){
+            
+            typename ParametersType::Parameters param;
 
-        ~LennardJones(){}
+            param.label = label;
+
+            ljParam = std::make_shared<ParametersType>(sys,pd,pg,top,param);
+        }
+
+        real getCutOffDst(){
+            return cutOffDst;
+        }
+
+        ~LennardJones_(){}
 
         struct forceTransverser{
             
@@ -82,15 +62,15 @@ namespace UnBound{
 
             Box box;
             
-            real cutOffDstLJ2;
+            real cutOffDst2;
             
             forceTransverser(real4* force,
                              typename ParameterPairsHandler::PairIterator paramPairIterator,
                              Box  box,
-                             real cutOffDstLJ2):force(force),
+                             real cutOffDst2):force(force),
                                              paramPairIterator(paramPairIterator),
                                              box(box),
-                                             cutOffDstLJ2(cutOffDstLJ2){}
+                                             cutOffDst2(cutOffDst2){}
 
             using resultType=real4;
 
@@ -109,8 +89,8 @@ namespace UnBound{
                 
                 real3 f = make_real3(0.0);
 
-                if(r2<=cutOffDstLJ2){
-                    f = CommonPotentials::LennardJones::Type1::force(rij,r2,epsilon,sigma);
+                if(r2<=cutOffDst2){
+                    f = LennardJonesType::force(rij,r2,epsilon,sigma);
                 }
 
                 return make_real4(f,0.0);
@@ -126,9 +106,9 @@ namespace UnBound{
             real4* force = this->pd->getForce(access::location::gpu, access::mode::readwrite).raw();     
             
             return forceTransverser(force,
-                                    paramPairsHandler->getPairIterator(),
+                                    ljParam->getParameters()->getPairIterator(),
                                     box,
-                                    cutOffDstLJ*cutOffDstLJ);
+                                    cutOffDst*cutOffDst);
         }
         
         struct virialTransverser{
@@ -139,15 +119,15 @@ namespace UnBound{
 
             Box box;
             
-            real cutOffDstLJ2;
+            real cutOffDst2;
             
             virialTransverser(tensor3* virial,
                               typename ParameterPairsHandler::PairIterator paramPairIterator,
                               Box  box,
-                              real cutOffDstLJ2):virial(virial),
+                              real cutOffDst2):virial(virial),
                                                        paramPairIterator(paramPairIterator),
                                                        box(box),
-                                                       cutOffDstLJ2(cutOffDstLJ2){}
+                                                       cutOffDst2(cutOffDst2){}
             using resultType=tensor3;
 
             inline __device__ resultType zero(){return tensor3(0);}
@@ -159,8 +139,6 @@ namespace UnBound{
                 tensor3 v(0.0);
 
                 return v;
-
-                
             }
             
             inline __device__ void set(const int& index_i,const resultType& quantity){virial[index_i]+=quantity;}
@@ -172,9 +150,9 @@ namespace UnBound{
             tensor3* virial = this->pd->getVirial(access::location::gpu, access::mode::readwrite).raw();     
             
             return virialTransverser(virial,
-                                     paramPairsHandler->getPairIterator(),
+                                     ljParam->getParameters()->getPairIterator(),
                                      box,
-                                     cutOffDstLJ*cutOffDstLJ);
+                                     cutOffDst*cutOffDst);
         }
         
         struct energyTransverser{
@@ -185,15 +163,15 @@ namespace UnBound{
 
             Box box;
             
-            real cutOffDstLJ2;
+            real cutOffDst2;
             
             energyTransverser(real* energy,
                               typename ParameterPairsHandler::PairIterator paramPairIterator,
                               Box  box,
-                              real cutOffDstLJ2):energy(energy),
+                              real cutOffDst2):energy(energy),
                                                        paramPairIterator(paramPairIterator),
                                                        box(box),
-                                                       cutOffDstLJ2(cutOffDstLJ2){}
+                                                       cutOffDst2(cutOffDst2){}
 
             using resultType=real;
 
@@ -212,8 +190,8 @@ namespace UnBound{
                 
                 real e = real(0.0);
 
-                if(r2<=cutOffDstLJ2){
-                    e = CommonPotentials::LennardJones::Type1::energy(rij,r2,epsilon,sigma);
+                if(r2<=cutOffDst2){
+                    e = LennardJonesType::energy(rij,r2,epsilon,sigma);
                 }
 
                 return e;
@@ -229,9 +207,9 @@ namespace UnBound{
             real* energy = this->pd->getEnergy(access::location::gpu, access::mode::readwrite).raw();     
                                                          
             return energyTransverser(energy,
-                                     paramPairsHandler->getPairIterator(),
+                                     ljParam->getParameters()->getPairIterator(),
                                      box,
-                                     cutOffDstLJ*cutOffDstLJ);
+                                     cutOffDst*cutOffDst);
         }
         
         void updateBox(Box newBox) override {
@@ -239,6 +217,32 @@ namespace UnBound{
         }
 
     };
+    
+    template<class Topology>
+    using LennardJonesType1 = LennardJones_<Topology,CommonPotentials::LennardJones::Type1>;
+    template<class Topology>
+    using LennardJonesType2 = LennardJones_<Topology,CommonPotentials::LennardJones::Type2>;
+    template<class Topology>
+    using LennardJonesType3 = LennardJones_<Topology,CommonPotentials::LennardJones::Type3>;
+    
+    template<class Topology>
+    using WCAType1 = LennardJones_<Topology,CommonPotentials::WCA::Type1>;
+    template<class Topology>
+    using WCAType2 = LennardJones_<Topology,CommonPotentials::WCA::Type2>;
+    template<class Topology>
+    using WCAType3 = LennardJones_<Topology,CommonPotentials::WCA::Type3>;
+    
+    template<class Topology>
+    using GeneralLennardJonesType1 = LennardJones_<Topology,CommonPotentials::GeneralLennardJones::Type1>;
+    template<class Topology>
+    using GeneralLennardJonesType2 = LennardJones_<Topology,CommonPotentials::GeneralLennardJones::Type2>;
+    template<class Topology>
+    using GeneralLennardJonesType3 = LennardJones_<Topology,CommonPotentials::GeneralLennardJones::Type3>;
+    
+    template<class Topology>
+    using Steric6  = LennardJones_<Topology,CommonPotentials::Steric::Steric6>;
+    template<class Topology>
+    using Steric12 = LennardJones_<Topology,CommonPotentials::Steric::Steric12>;
 
 }}}}
 

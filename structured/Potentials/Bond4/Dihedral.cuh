@@ -147,7 +147,7 @@ namespace Bond4{
 
     };
             
-    struct DihedralConstant_n_K_phi0_ : public Dihedral_{
+    struct DihedralConst_n_K_phi0_ : public Dihedral_{
         
         private:
 
@@ -165,10 +165,10 @@ namespace Bond4{
             
             struct BondInfo{};
 
-            DihedralConstant_n_K_phi0_(Parameters par): Dihedral_(par),
-                                                        n(par.n),
-                                                        K(par.K),
-                                                        phi0(par.phi0){}
+            DihedralConst_n_K_phi0_(Parameters par): Dihedral_(par),
+                                                     n(par.n),
+                                                     K(par.K),
+                                                     phi0(par.phi0){}
 
             inline __device__ real3 force(int i, int j, int k, int l,
                                           int bond_index,
@@ -222,7 +222,7 @@ namespace Bond4{
     
     
     using Dihedral                  = Bond4<Dihedral_>;
-    using DihedralConstant_n_K_phi0 = Bond4<DihedralConstant_n_K_phi0_>;
+    using DihedralConst_n_K_phi0 = Bond4<DihedralConst_n_K_phi0_>;
 
 }}}}
 

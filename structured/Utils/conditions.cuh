@@ -1023,9 +1023,9 @@ namespace conditions{
         
         int getConditionIndexOf(std::string& conditionName){
 
-            if     (conditionName=="intra")  {return INTRA;}
-            if     (conditionName=="inter")  {return INTER;}
-            if     (conditionName=="charged"){return CHARGED;}
+            if     (conditionName=="intra")       {return INTRA;}
+            if     (conditionName=="inter")       {return INTER;}
+            if     (conditionName=="chargedInter"){return CHARGED;}
             else   {
                 sys->log<System::CRITICAL>("[Condition]  Requested a condition that is not present, %s",conditionName.c_str());
                 return -1;
