@@ -6,11 +6,12 @@ namespace structured{
 namespace InputOutput{
 namespace Output{
 
-void WriteCoord(std::shared_ptr<System>       sys,
-                std::shared_ptr<ParticleData>  pd,
-                std::shared_ptr<ParticleGroup> pg,
+void WriteCoord(std::shared_ptr<ParticleGroup> pg,
                 Box box,
                 std::ofstream& out){
+    
+    auto pd  = pg->getParticleData(); 
+    auto sys = pd->getSystem();
     
     auto id = pd->getId(access::location::cpu, 
                         access::mode::read);
@@ -58,11 +59,12 @@ void WriteCoord(std::shared_ptr<System>       sys,
     }
 }
         
-void WriteSP(std::shared_ptr<System>       sys,
-             std::shared_ptr<ParticleData>  pd,
-             std::shared_ptr<ParticleGroup> pg,
+void WriteSP(std::shared_ptr<ParticleGroup> pg,
              Box box,
              std::ofstream& out){
+    
+    auto pd  = pg->getParticleData(); 
+    auto sys = pd->getSystem();
     
     auto id   = pd->getId(access::location::cpu, 
                           access::mode::read);
@@ -134,10 +136,11 @@ void WriteSP(std::shared_ptr<System>       sys,
     }
 }
 
-void WriteVelocity(std::shared_ptr<System>       sys,
-                   std::shared_ptr<ParticleData>  pd,
-                   std::shared_ptr<ParticleGroup> pg,
+void WriteVelocity(std::shared_ptr<ParticleGroup> pg,
                    std::ofstream& out){
+    
+    auto pd  = pg->getParticleData(); 
+    auto sys = pd->getSystem();
     
     auto id   = pd->getId(access::location::cpu, 
                           access::mode::read);
@@ -174,11 +177,12 @@ void WriteVelocity(std::shared_ptr<System>       sys,
     }
 }
         
-void WriteXYZ(std::shared_ptr<System>       sys,
-              std::shared_ptr<ParticleData>  pd,
-              std::shared_ptr<ParticleGroup> pg,
+void WriteXYZ(std::shared_ptr<ParticleGroup> pg,
               Box box,
               std::ofstream& out){
+    
+    auto pd  = pg->getParticleData(); 
+    auto sys = pd->getSystem();
     
     auto id   = pd->getId(access::location::cpu, 
                           access::mode::read);
@@ -214,12 +218,12 @@ void WriteXYZ(std::shared_ptr<System>       sys,
 
 }
         
-void WriteITPV(std::shared_ptr<System>       sys,
-               std::shared_ptr<ParticleData>  pd,
-               std::shared_ptr<ParticleGroup> pg,
+void WriteITPV(std::shared_ptr<ParticleGroup> pg,
                Box box,
                std::ofstream& out){
-
+    
+    auto pd  = pg->getParticleData(); 
+    auto sys = pd->getSystem();
 
     auto id  = pd->getId(access::location::cpu, 
                          access::mode::read);
@@ -260,12 +264,12 @@ void WriteITPV(std::shared_ptr<System>       sys,
     }
 }
 
-void WriteITPD(std::shared_ptr<System>       sys,
-               std::shared_ptr<ParticleData>  pd,
-               std::shared_ptr<ParticleGroup> pg,
+void WriteITPD(std::shared_ptr<ParticleGroup> pg,
                Box box,
                std::ofstream& out){
-
+    
+    auto pd  = pg->getParticleData(); 
+    auto sys = pd->getSystem();
 
     auto id  = pd->getId(access::location::cpu, 
                          access::mode::read);
@@ -306,12 +310,13 @@ void WriteITPD(std::shared_ptr<System>       sys,
     }
 }
 
-void WritePDB(std::shared_ptr<System>       sys,
-              std::shared_ptr<ParticleData>  pd,
-              std::shared_ptr<ParticleGroup> pg,
+void WritePDB(std::shared_ptr<ParticleGroup> pg,
               Box box,
               int frame,
               std::ofstream& out){
+    
+    auto pd  = pg->getParticleData(); 
+    auto sys = pd->getSystem();
 
     auto id   = pd->getId(access::location::cpu, 
                           access::mode::read);
@@ -402,46 +407,38 @@ void WritePDB(std::shared_ptr<System>       sys,
         std::endl;
 }
 
-void WritePDB(std::shared_ptr<System>       sys,
-              std::shared_ptr<ParticleData>  pd,
-              std::shared_ptr<ParticleGroup> pg,
+void WritePDB(std::shared_ptr<ParticleGroup> pg,
               Box box,
               std::ofstream& out){
 
-    WritePDB(sys,pd,pg,box,0,out);
+    WritePDB(pg,box,0,out);
 
 }
         
         
-void WriteDCDheader(std::shared_ptr<System>       sys,
-                    std::shared_ptr<ParticleData>  pd,
-                    std::shared_ptr<ParticleGroup> pg,
+void WriteDCDheader(std::shared_ptr<ParticleGroup> pg,
                     int start,
                     int interval,
                     std::ofstream& out){
     
-    dcd::WriteDCDheader(sys,pd,pg,
+    dcd::WriteDCDheader(pg,
                         start,
                         interval,
                         out);
 }
 
-void WriteDCD(std::shared_ptr<System>       sys,
-              std::shared_ptr<ParticleData>  pd,
-              std::shared_ptr<ParticleGroup> pg,
+void WriteDCD(std::shared_ptr<ParticleGroup> pg,
               Box box,
               int frame,int step,
               std::ofstream& out){
 
-            dcd::WriteDCDstep(sys,pd,pg,
+            dcd::WriteDCDstep(pg,
                               box,
                               frame,step,
                               out); 
 }
 
-void WriteLAMMPS(std::shared_ptr<System>       sys,
-                 std::shared_ptr<ParticleData>  pd,
-                 std::shared_ptr<ParticleGroup> pg,
+void WriteLAMMPS(std::shared_ptr<ParticleGroup> pg,
                  Box box,
                  real t,
                  std::ofstream& out){
@@ -509,8 +506,6 @@ void WriteLAMMPS(std::shared_ptr<System>       sys,
     }
 
 }
-
-
 
 }}}}
 

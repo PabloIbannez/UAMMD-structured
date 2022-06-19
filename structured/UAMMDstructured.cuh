@@ -115,15 +115,12 @@ SFINAE_DEFINE_HAS_MEMBER(isConstrained);
 #include"Interactor/PairInteractor.cuh"
 
 #include"Interactor/AFMInteractor.cuh"
-#include"Interactor/QCMInteractor.cuh"
 #include"Interactor/PlatesInteractor.cuh"
 
 #include"Interactor/SetsInteractor.cuh"
 
 #include"Interactor/CenterOfMassInteractor.cuh"
 #include"Interactor/UmbrellaInteractor.cuh"
-
-#include"Interactor/GAMD.cuh"
 
 #include"Constraint/Constraint.cuh"
 
@@ -133,8 +130,6 @@ SFINAE_DEFINE_HAS_MEMBER(isConstrained);
 #include"Integrator/steepestDescent.cuh"
 #include"Integrator/langevinNVT.cuh"
 #include"Integrator/brownianNVT.cuh"
-
-//#include"Integrator/ICM.cuh"
 
 #include"Simulation/SimulationStep.cuh"
 

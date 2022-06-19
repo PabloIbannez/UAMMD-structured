@@ -5,10 +5,11 @@ namespace uammd{
 namespace structured{
 namespace psf{
 
-    void WritePSF(std::shared_ptr<System>       sys,
-                  std::shared_ptr<ParticleData>  pd,
-                  std::shared_ptr<ParticleGroup> pg,
+    void WritePSF(std::shared_ptr<ParticleGroup> pg,
                   std::ofstream& out){
+        
+        auto pd  = pg->getParticleData(); 
+        auto sys = pd->getSystem();
 
         int N = pg->getNumberParticles();
         

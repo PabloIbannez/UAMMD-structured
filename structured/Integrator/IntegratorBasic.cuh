@@ -9,10 +9,11 @@ namespace structured{
     namespace IntegratorBasic_ns{
 
         template<class PropItr,class PropType>
-        void loadProperty(shared_ptr<ParticleData>  pd,
-                          shared_ptr<ParticleGroup> pg,
+        void loadProperty(shared_ptr<ParticleGroup> pg,
                           PropItr&             propItr,
                           PropType           propValue){
+
+            auto pd = pg->getParticleData();
             
             auto id = pd->getId(access::location::cpu, 
                                 access::mode::read);
@@ -27,9 +28,10 @@ namespace structured{
 
         }
 
-        void loadFrictionConstant(shared_ptr<ParticleData>  pd,
-                                  shared_ptr<ParticleGroup> pg,
+        void loadFrictionConstant(shared_ptr<ParticleGroup> pg,
                                   real frictionConstant){
+            
+            auto pd = pg->getParticleData();
 
             auto fricConst = pd->getFrictionConstant(access::location::cpu, 
                                                      access::mode::write);
@@ -37,13 +39,15 @@ namespace structured{
             loadProperty<decltype(fricConst),real>(pd,pg,fricConst,frictionConstant);
         }
         
-        void generateVelocity(shared_ptr<ParticleData>  pd,
-                              shared_ptr<ParticleGroup> pg,
-                              shared_ptr<System>       sys,
-                              int  N,
+        void generateVelocity(shared_ptr<ParticleGroup> pg,
                               real kBT,
                               std::string name,
                               cudaStream_t stream){
+
+            auto pd  = pg->getParticleData();
+            auto sys = pd->getSystem();
+            
+            int N = pg->getNumberParticles();
 
             if(pd->isVelAllocated()){
                 sys->log<System::WARNING>("[%s] Velocity overwritten!", name.c_str());

@@ -28,12 +28,13 @@ namespace dcd{
         }
     }
 
-    void WriteDCDheader(std::shared_ptr<System>       sys,
-                        std::shared_ptr<ParticleData>  pd,
-                        std::shared_ptr<ParticleGroup> pg,
+    void WriteDCDheader(std::shared_ptr<ParticleGroup> pg,
                         int start,
                         int interval,
                         std::ofstream& out){
+
+        auto pd  = pg->getParticleData(); 
+        auto sys = pd->getSystem();
         
         int N = pg->getNumberParticles();
 
@@ -90,13 +91,14 @@ namespace dcd{
         dcd_ns::write_int(out, 4);
     }
 
-    void WriteDCDstep(std::shared_ptr<System>       sys,
-                      std::shared_ptr<ParticleData>  pd,
-                      std::shared_ptr<ParticleGroup> pg,
+    void WriteDCDstep(std::shared_ptr<ParticleGroup> pg,
                       Box box,
                       int frame,
                       int step,
                       std::ofstream& out){
+        
+        auto pd  = pg->getParticleData(); 
+        auto sys = pd->getSystem();
         
         int N = pg->getNumberParticles();
         

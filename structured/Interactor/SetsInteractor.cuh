@@ -53,14 +53,12 @@ namespace Sets{
 
         public:
             
-            ExternalForceOverCOM(std::shared_ptr<System>       sys,
-                                 std::shared_ptr<ParticleData>  pd,
-                                 std::shared_ptr<ParticleGroup> pg,
+            ExternalForceOverCOM(std::shared_ptr<ParticleGroup> pg,
                                  int setSize,
                                  int nSets,
                                  thrust::host_vector<int>   set2id,
                                  thrust::host_vector<real3> externalForce,
-                                 Parameters par):Interactor(pd,pg,sys,std::string("ExternalForceOverCOM")),
+                                 Parameters par):Interactor(pg,std::string("ExternalForceOverCOM")),
                                                  setSize(setSize),
                                                  nSets(nSets),
                                                  set2id(set2id),
@@ -163,14 +161,12 @@ namespace Sets{
 
         public:
             
-            ExternalTorqueOverCOM(std::shared_ptr<System>       sys,
-                                  std::shared_ptr<ParticleData>  pd,
-                                  std::shared_ptr<ParticleGroup> pg,
+            ExternalTorqueOverCOM(std::shared_ptr<ParticleGroup> pg,
                                   int setSize,
                                   int nSets,
                                   thrust::host_vector<int>   set2id,
                                   thrust::host_vector<real3> externalTorque,
-                                  Parameters par):Interactor(pd,pg,sys,std::string("ExternalTorqueOverCOM")),
+                                  Parameters par):Interactor(pg,std::string("ExternalTorqueOverCOM")),
                                                   setSize(setSize),
                                                   nSets(nSets),
                                                   set2id(set2id),
@@ -293,24 +289,22 @@ namespace Sets{
             
         public:
             
-            HarmonicBondBtwCOM(std::shared_ptr<System>       sys,
-                                std::shared_ptr<ParticleData>  pd,
-                                std::shared_ptr<ParticleGroup> pg,
-                                int setSize1,
-                                int setSize2,
-                                int nSets,
-                                thrust::host_vector<int> set2id1,
-                                thrust::host_vector<int> set2id2,
-                                thrust::host_vector<real> r0,
-                                thrust::host_vector<real> K,
-                                Parameters par):Interactor(pd,pg,sys,std::string("HarmonicBondBtwCOM")),
-                                                setSize1(setSize1),
-                                                setSize2(setSize2),
-                                                nSets(nSets),
-                                                set2id1(set2id1),
-                                                set2id2(set2id2),
-                                                r0(r0),
-                                                K(K){}
+            HarmonicBondBtwCOM(std::shared_ptr<ParticleGroup> pg,
+                               int setSize1,
+                               int setSize2,
+                               int nSets,
+                               thrust::host_vector<int> set2id1,
+                               thrust::host_vector<int> set2id2,
+                               thrust::host_vector<real> r0,
+                               thrust::host_vector<real> K,
+                               Parameters par):Interactor(pg,std::string("HarmonicBondBtwCOM")),
+                                               setSize1(setSize1),
+                                               setSize2(setSize2),
+                                               nSets(nSets),
+                                               set2id1(set2id1),
+                                               set2id2(set2id2),
+                                               r0(r0),
+                                               K(K){}
             
             void sum(Computables comp,cudaStream_t st) override {
 
@@ -406,15 +400,13 @@ namespace Sets{
 
         public:
             
-            HarmonicFixedCOM(std::shared_ptr<System>       sys,
-                             std::shared_ptr<ParticleData>  pd,
-                             std::shared_ptr<ParticleGroup> pg,
+            HarmonicFixedCOM(std::shared_ptr<ParticleGroup> pg,
                              int setSize,
                              int nSets,
                              thrust::host_vector<int> set2id,
                              thrust::host_vector<real3> fixedPoint,
                              thrust::host_vector<real3> K,
-                             Parameters par):Interactor(pd,pg,sys,std::string("HarmonicFixedCOM")),
+                             Parameters par):Interactor(pg,std::string("HarmonicFixedCOM")),
                                              setSize(setSize),
                                              nSets(nSets),
                                              set2id(set2id),
@@ -535,22 +527,20 @@ namespace Sets{
 
             struct Parameters{};
             
-            ConstantForceBtwCOM(std::shared_ptr<System>       sys,
-                                 std::shared_ptr<ParticleData>  pd,
-                                 std::shared_ptr<ParticleGroup> pg,
-                                 int setSize1,
-                                 int setSize2,
-                                 int nSets,
-                                 thrust::host_vector<int> set2id1,
-                                 thrust::host_vector<int> set2id2,
-                                 thrust::host_vector<real> F,
-                                 Parameters par):Interactor(pd,pg,sys,std::string("ConstantForceBtwCOM")),
-                                                 setSize1(setSize1),
-                                                 setSize2(setSize2),
-                                                 nSets(nSets),
-                                                 set2id1(set2id1),
-                                                 set2id2(set2id2),
-                                                 F(F){}
+            ConstantForceBtwCOM(std::shared_ptr<ParticleGroup> pg,
+                                int setSize1,
+                                int setSize2,
+                                int nSets,
+                                thrust::host_vector<int> set2id1,
+                                thrust::host_vector<int> set2id2,
+                                thrust::host_vector<real> F,
+                                Parameters par):Interactor(pg,std::string("ConstantForceBtwCOM")),
+                                                setSize1(setSize1),
+                                                setSize2(setSize2),
+                                                nSets(nSets),
+                                                set2id1(set2id1),
+                                                set2id2(set2id2),
+                                                F(F){}
             
             void sum(Computables comp,cudaStream_t st) override {
 
@@ -704,16 +694,14 @@ namespace Sets{
 
             struct Parameters{};
             
-            ConstantTorqueBtwCOM(std::shared_ptr<System>       sys,
-                                 std::shared_ptr<ParticleData>  pd,
-                                 std::shared_ptr<ParticleGroup> pg,
+            ConstantTorqueBtwCOM(std::shared_ptr<ParticleGroup> pg,
                                  int setSize1,
                                  int setSize2,
                                  int nSets,
                                  thrust::host_vector<int> set2id1,
                                  thrust::host_vector<int> set2id2,
                                  thrust::host_vector<real> T,
-                                 Parameters par):Interactor(pd,pg,sys,std::string("ConstantTorqueBtwCOM")),
+                                 Parameters par):Interactor(pg,std::string("ConstantTorqueBtwCOM")),
                                                  setSize1(setSize1),
                                                  setSize2(setSize2),
                                                  nSets(nSets),

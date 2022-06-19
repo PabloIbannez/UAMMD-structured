@@ -135,8 +135,7 @@ namespace Interactor{
           
             public:
             
-            BondProcessor(std::shared_ptr<System>       sys,
-                          std::shared_ptr<ParticleGroup> pg):sys(sys),
+            BondProcessor(std::shared_ptr<ParticleGroup> pg):sys(pg->getParticleData()->getSystem()),
                                                              pg(pg){
                 bondsPerParticle.resize(pg->getNumberParticles());
             }
@@ -296,10 +295,9 @@ namespace Interactor{
                     int*  bondEnd_ptr; 
                 };
 
-                BondList(std::shared_ptr<System>       sys,
-                         std::shared_ptr<ParticleGroup> pg,
+                BondList(std::shared_ptr<ParticleGroup> pg,
                          std::shared_ptr<InputType>  input,
-                         std::string bondName):sys(sys),pg(pg),
+                         std::string bondName):sys(pg->getParticleData()->getSystem()),pg(pg),
                                                input(input),
                                                bondName(bondName){
                     this->initBondProcessor();
@@ -390,18 +388,17 @@ namespace Interactor{
                 std::string bondName;
             };
     
-            BondedInteractor(std::shared_ptr<System>       sys,
-                             std::shared_ptr<ParticleData>  pd,
-                             std::shared_ptr<ParticleGroup> pg, 
+            BondedInteractor(std::shared_ptr<ParticleGroup> pg, 
                              std::shared_ptr<InputType> input,
                              std::shared_ptr<BondType> bondType,
-                             Parameters par):Interactor(pd, pg, sys, "BondedInteractor " + par.bondName),
+                             Parameters par):Interactor(pg, "BondedInteractor " + par.bondName),
                                              input(input),
                                              bondType(bondType),
                                              bondName(par.bondName){
+
                 this->setDelegate(bondType);
 
-                bondList = std::make_shared<BondListType>(sys,pg,input,bondName);
+                bondList = std::make_shared<BondListType>(pg,input,bondName);
             }
     
             void sum(Computables comp,cudaStream_t st) override {

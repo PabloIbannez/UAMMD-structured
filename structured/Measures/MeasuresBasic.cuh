@@ -7,10 +7,11 @@ namespace uammd{
 namespace structured{
 namespace Measures{
     
-    tensor3  totalVirial(std::shared_ptr<System>       sys,
-                         std::shared_ptr<ParticleData>  pd,
-                         std::shared_ptr<ParticleGroup> pg,
+    tensor3  totalVirial(std::shared_ptr<ParticleGroup> pg,
                          cudaStream_t st){
+
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
         
         int N = pg->getNumberParticles();
 
@@ -29,10 +30,11 @@ namespace Measures{
         return tpp;
     }
 
-    tensor3  totalKineticPressure(std::shared_ptr<System> sys,
-                                  std::shared_ptr<ParticleData>  pd,
-                                  std::shared_ptr<ParticleGroup> pg,
+    tensor3  totalKineticPressure(std::shared_ptr<ParticleGroup> pg,
                                   cudaStream_t st){
+        
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
         
         int N = pg->getNumberParticles();
 
@@ -52,10 +54,11 @@ namespace Measures{
         return tkp;
     }
 
-    real  totalKineticEnergy(std::shared_ptr<System> sys,
-                             std::shared_ptr<ParticleData>  pd,
-                             std::shared_ptr<ParticleGroup> pg,
+    real  totalKineticEnergy(std::shared_ptr<ParticleGroup> pg,
                              cudaStream_t st){
+
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
         
         int N = pg->getNumberParticles();
 
@@ -73,10 +76,11 @@ namespace Measures{
         return tke;
     }
     
-    real maxForce(std::shared_ptr<System> sys,
-                  std::shared_ptr<ParticleData>  pd,
-                  std::shared_ptr<ParticleGroup> pg,
+    real maxForce(std::shared_ptr<ParticleGroup> pg,
                   cudaStream_t st){
+
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
 
         int N = pg->getNumberParticles();
         
@@ -93,10 +97,11 @@ namespace Measures{
         return maxForce;
     }
     
-    real totalPotentialEnergy(std::shared_ptr<System> sys,
-                              std::shared_ptr<ParticleData>  pd,
-                              std::shared_ptr<ParticleGroup> pg,
+    real totalPotentialEnergy(std::shared_ptr<ParticleGroup> pg,
                               cudaStream_t st){
+
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
 
         int N = pg->getNumberParticles();
         
@@ -113,10 +118,11 @@ namespace Measures{
         return tEnergy;
     }
     
-    real3 totalForce(std::shared_ptr<System> sys,
-                     std::shared_ptr<ParticleData>  pd,
-                     std::shared_ptr<ParticleGroup> pg,
+    real3 totalForce(std::shared_ptr<ParticleGroup> pg,
                      cudaStream_t st){
+
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
 
         int N = pg->getNumberParticles();
         
@@ -133,10 +139,11 @@ namespace Measures{
         return tForce;
     }
     
-    real3 centroidPos(std::shared_ptr<System> sys,
-                      std::shared_ptr<ParticleData>  pd,
-                      std::shared_ptr<ParticleGroup> pg,
+    real3 centroidPos(std::shared_ptr<ParticleGroup> pg,
                       cudaStream_t st){
+
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
 
         int N = pg->getNumberParticles();
         
@@ -153,10 +160,11 @@ namespace Measures{
         return centroid;
     }
     
-    real totalCharge(std::shared_ptr<System> sys,
-                   std::shared_ptr<ParticleData>  pd,
-                   std::shared_ptr<ParticleGroup> pg,
-                   cudaStream_t st){
+    real totalCharge(std::shared_ptr<ParticleGroup> pg,
+                     cudaStream_t st){
+
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
 
         int N = pg->getNumberParticles();
         
@@ -173,10 +181,11 @@ namespace Measures{
         return tCharge;
     }
 
-    real totalMass(std::shared_ptr<System> sys,
-                   std::shared_ptr<ParticleData>  pd,
-                   std::shared_ptr<ParticleGroup> pg,
+    real totalMass(std::shared_ptr<ParticleGroup> pg,
                    cudaStream_t st){
+
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
 
         int N = pg->getNumberParticles();
         
@@ -193,11 +202,12 @@ namespace Measures{
         return tMass;
     }
     
-    real3 centerOfMassPos(std::shared_ptr<System> sys,
-                          std::shared_ptr<ParticleData>  pd,
-                          std::shared_ptr<ParticleGroup> pg,
+    real3 centerOfMassPos(std::shared_ptr<ParticleGroup> pg,
                           real   totalMass,
                           cudaStream_t st){
+
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
 
         int N = pg->getNumberParticles();
         
@@ -215,23 +225,24 @@ namespace Measures{
         return comp;
     }
     
-    real3 centerOfMassPos(std::shared_ptr<System> sys,
-                          std::shared_ptr<ParticleData>  pd,
-                          std::shared_ptr<ParticleGroup> pg,
+    real3 centerOfMassPos(std::shared_ptr<ParticleGroup> pg,
                           cudaStream_t st){
 
-        real tM = totalMass(sys,pd,pg,st);
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
+
+        real tM = totalMass(pg,st);
 
         return centerOfMassPos(sys,pd,pg,tM,st);
     }
 
     
-    real3 centerOfMassVel(std::shared_ptr<System> sys,
-                          std::shared_ptr<ParticleData>  pd,
-                          std::shared_ptr<ParticleGroup> pg,
+    real3 centerOfMassVel(std::shared_ptr<ParticleGroup> pg,
                           real   totalMass,
                           cudaStream_t st){
 
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
 
         int N = pg->getNumberParticles();
         
@@ -249,13 +260,13 @@ namespace Measures{
         return comv;
     }
     
-    real3 angularMomentum(std::shared_ptr<System> sys,
-                          std::shared_ptr<ParticleData>  pd,
-                          std::shared_ptr<ParticleGroup> pg,
+    real3 angularMomentum(std::shared_ptr<ParticleGroup> pg,
                           real3 refp,
                           real3 refv,
                           cudaStream_t st){
 
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
 
         int N = pg->getNumberParticles();
         
@@ -277,12 +288,12 @@ namespace Measures{
         return angM;
     }
 
-    tensor3 inertiaTensor(std::shared_ptr<System> sys,
-                          std::shared_ptr<ParticleData>  pd,
-                          std::shared_ptr<ParticleGroup> pg,
+    tensor3 inertiaTensor(std::shared_ptr<ParticleGroup> pg,
                           real3 refp,
                           cudaStream_t st){
 
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
 
         int N = pg->getNumberParticles();
         
@@ -300,15 +311,15 @@ namespace Measures{
         return inertia;
     }
     
-    real3 angularVelocity(std::shared_ptr<System> sys,
-                          std::shared_ptr<ParticleData>  pd,
-                          std::shared_ptr<ParticleGroup> pg,
+    real3 angularVelocity(std::shared_ptr<ParticleGroup> pg,
                           real3  refp,
                           real3  refv,
                           cudaStream_t st){
 
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
 
-        tensor3 inertia = inertiaTensor(sys,pd,pg,refp,st);
+        tensor3 inertia = inertiaTensor(pg,refp,st);
 
         real m11 = inertia.xx;
         real m12 = inertia.xy;
@@ -338,7 +349,7 @@ namespace Measures{
 
         invInertia=invInertia/D;
         
-        real3 angm = angularMomentum(sys,pd,pg,refp,refv,st);
+        real3 angm = angularMomentum(pg,refp,refv,st);
 
         real3 angularVelocity;
 

@@ -183,17 +183,13 @@ namespace structured{
 
             }
 
-            SphericalTip(std::shared_ptr<System>       sys,
-                         std::shared_ptr<ParticleData>  pd,
-                         std::shared_ptr<ParticleGroup> pgSample,
+            SphericalTip(std::shared_ptr<ParticleGroup> pgSample,
                          std::shared_ptr<ParticleGroup> pgTip,
-                         InputFile& in):SphericalTip(sys,pd,pgSample,pgTip,inputFileToParam(in)){}
+                         InputFile& in):SphericalTip(pgSample,pgTip,inputFileToParam(in)){}
 
-            SphericalTip(std::shared_ptr<System>       sys,
-                         std::shared_ptr<ParticleData>  pd,
-                         std::shared_ptr<ParticleGroup> pgSample,
+            SphericalTip(std::shared_ptr<ParticleGroup> pgSample,
                          std::shared_ptr<ParticleGroup> pgTip,
-                         Parameters par):Interactor(pd,pgSample,sys,std::string("SphericalTip")),
+                         Parameters par):Interactor(pgSample,std::string("SphericalTip")),
                                          pgTip(pgTip),
                                          epsilonTip(par.epsilonTip),
                                          sigmaTip(par.sigmaTip),

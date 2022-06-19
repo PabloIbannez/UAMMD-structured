@@ -138,13 +138,11 @@ namespace Interactor{
                 real K;
             };
             
-            UmbrellaSetInteractor(std::shared_ptr<System>       sys,
-                                  std::shared_ptr<ParticleData>  pd,
-                                  std::shared_ptr<ParticleGroup> pg,
+            UmbrellaSetInteractor(std::shared_ptr<ParticleGroup> pg,
                                   std::vector<std::shared_ptr<ParticleGroup>> pg1set,
                                   std::vector<std::shared_ptr<ParticleGroup>> pg2set,
                                   std::vector<real> r0,
-                                  Parameters par):Interactor(pd,pg,sys,std::string("UmbrellaSetInteractor")),
+                                  Parameters par):Interactor(pg,std::string("UmbrellaSetInteractor")),
                                                   K(par.K),
                                                   pg1set(pg1set),
                                                   pg2set(pg2set){
@@ -335,12 +333,10 @@ namespace Interactor{
                 real K;
             };
             
-            UmbrellaAlongVectorSetInteractor(std::shared_ptr<System>       sys,
-                                             std::shared_ptr<ParticleData>  pd,
-                                             std::shared_ptr<ParticleGroup> pg,
+            UmbrellaAlongVectorSetInteractor(std::shared_ptr<ParticleGroup> pg,
                                              std::vector<std::shared_ptr<ParticleGroup>> pg1set,
                                              std::vector<real3> equiPos,
-                                             Parameters par):Interactor(pd,pg,sys,std::string("UmbrellaSetInteractor")),
+                                             Parameters par):Interactor(pg,std::string("UmbrellaSetInteractor")),
                                                              K(par.K),
                                                              pg1set(pg1set){
               

@@ -78,15 +78,11 @@ namespace structured{
 
             }
 
-            Plates(std::shared_ptr<System>       sys,
-                   std::shared_ptr<ParticleData>  pd,
-                   std::shared_ptr<ParticleGroup> pg,
-                   InputFile& in):Plates(sys,pd,pg,inputFileToParam(in)){}
+            Plates(std::shared_ptr<ParticleGroup> pg,
+                   InputFile& in):Plates(pg,inputFileToParam(in)){}
 
-            Plates(std::shared_ptr<System>       sys,
-                   std::shared_ptr<ParticleData>  pd,
-                   std::shared_ptr<ParticleGroup> pg,
-                   Parameters par):Interactor(pd,pg,sys,std::string("Plates"))
+            Plates(std::shared_ptr<ParticleGroup> pg,
+                   Parameters par):Interactor(pg,std::string("Plates"))
             {
                 
                 N=pg->getNumberParticles();

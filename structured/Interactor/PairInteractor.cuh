@@ -69,10 +69,8 @@ namespace Interactor{
 
             };
 
-            PairInteractor(std::shared_ptr<System> sys,
-                           std::shared_ptr<ParticleData>  pd,
-                           std::shared_ptr<ParticleGroup> pg, 
-                           Parameters par):Interactor(pd,pg,sys,par.name),
+            PairInteractor(std::shared_ptr<ParticleGroup> pg, 
+                           Parameters par):Interactor(pg,par.name),
                                            pot(par.pot),
                                            nl(par.nl),
                                            conditionInteractionName(par.conditionInteractionName){}

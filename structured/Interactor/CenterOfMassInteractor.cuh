@@ -50,11 +50,9 @@ namespace Interactor{
 
             struct Parameters{};
 
-            ExternalCOM(std::shared_ptr<System>       sys,
-                        std::shared_ptr<ParticleData>  pd,
-                        std::shared_ptr<ParticleGroup> pg,
+            ExternalCOM(std::shared_ptr<ParticleGroup> pg,
                         std::shared_ptr<ParticleGroup> group1,
-                        Parameters par):Interactor(pd,pg,sys,std::string("ExternalCOM")),
+                        Parameters par):Interactor(pg,std::string("ExternalCOM")),
                                         group1(group1)
             {
                 N1=group1->getNumberParticles();
@@ -236,12 +234,10 @@ namespace Interactor{
 
         public:
             
-            HarmonicCOM(std::shared_ptr<System>       sys,
-                        std::shared_ptr<ParticleData>  pd,
-                        std::shared_ptr<ParticleGroup> pg,
+            HarmonicCOM(std::shared_ptr<ParticleGroup> pg,
                         std::shared_ptr<ParticleGroup> group1,
                         std::shared_ptr<ParticleGroup> group2,
-                        Parameters par):Interactor(pd,pg,sys,std::string("HarmonicCOM")),
+                        Parameters par):Interactor(pg,std::string("HarmonicCOM")),
                                         group1(group1),
                                         group2(group2),
                                         K(par.K)
@@ -460,10 +456,8 @@ namespace Interactor{
 
         public:
             
-            HarmonicFixedCOM(std::shared_ptr<System>       sys,
-                             std::shared_ptr<ParticleData>  pd,
-                             std::shared_ptr<ParticleGroup> pg,
-                             Parameters par):Interactor(pd,pg,sys,std::string("HarmonicFixedCOM")),
+            HarmonicFixedCOM(std::shared_ptr<ParticleGroup> pg,
+                             Parameters par):Interactor(pg,std::string("HarmonicFixedCOM")),
                                              K(par.K)
             {
                 N = pg->getNumberParticles();
@@ -648,12 +642,10 @@ namespace Interactor{
 
             struct Parameters{};
             
-            ConstantForceCOM(std::shared_ptr<System>       sys,
-                             std::shared_ptr<ParticleData>  pd,
-                             std::shared_ptr<ParticleGroup> pg,
+            ConstantForceCOM(std::shared_ptr<ParticleGroup> pg,
                              std::shared_ptr<ParticleGroup> group1,
                              std::shared_ptr<ParticleGroup> group2,
-                             Parameters par):Interactor(pd,pg,sys,std::string("ConstantForceCOM")),
+                             Parameters par):Interactor(pg,std::string("ConstantForceCOM")),
                                              group1(group1),
                                              group2(group2),
                                              F(0)
