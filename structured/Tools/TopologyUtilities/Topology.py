@@ -186,6 +186,7 @@ class Topology:
         self.propertiesDict   = {"SASA":1,
                                  "BONDS":2,
                                  "BONDS_PROT":2,
+                                 "BONDS_PROT_HOMO":2,
                                  "BONDS_WLC":2,
                                  "BONDS_DNA":2,
                                  "BONDS_RNA":2,
