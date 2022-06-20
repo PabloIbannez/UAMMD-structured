@@ -141,11 +141,11 @@ namespace structured{
             std::vector<basicListInfo>               condNeigListSet;
             thrust::device_vector<basicListInfo_ptr> condNeigListSet_ptr;
 
-            ConditionedListSetBase(shared_ptr<System> sys,
-                                   shared_ptr<ParticleData> pd,
-                                   shared_ptr<ParticleGroup> pg,
-                                   shared_ptr<condition> cond):sys(sys), pd(pd), pg(pg),
-                                                cond(cond){
+            ConditionedListSetBase(shared_ptr<ParticleGroup> pg,
+                                   shared_ptr<condition> cond):pg(pg),
+                                                               pd(pg->getParticleData()), 
+                                                               sys(pg->getParticleData()->getSystem()), 
+                                                               cond(cond){
                 cudaError_t status = cudaMallocHost((void**)&errorFlagsCPU, sizeof(uint));
                 if (status != cudaSuccess){
                     sys->log<System::CRITICAL>("[ConditionedListSetBase] Error allocating pinned host memory");

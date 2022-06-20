@@ -203,7 +203,7 @@ if __name__=="__main__":
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<Interactor{}>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<Interactor{}>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }}
@@ -285,8 +285,7 @@ if __name__=="__main__":
     
                         {}
                         {}
-                        std::shared_ptr<{}> ubnd = std::make_shared<{}>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<{}> ubnd = std::make_shared<{}>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -310,7 +309,7 @@ if __name__=="__main__":
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<Interactor{}>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<Interactor{}>(this->pg, 
                                                                                    interactorUbndParameters);
                     }}
     
@@ -388,14 +387,14 @@ class Generic : public ForceFieldBase<Units_,Types_>{
             
             VerletListDst = std::stof(in.getOption(\"VerletListDst\",InputFile::Required).str());
 
-            condition = std::make_shared<Condition>(this->sys,this->pd,this->top,in);
+            condition = std::make_shared<Condition>(this->pd,this->top,in);
             
             typename NeighbourList::Parameters NeighbourListParam;
             
             NeighbourListParam.cutOff       = real(0.0);
             NeighbourListParam.cutOffVerlet = VerletListDst;
 
-            nl = std::make_shared<NeighbourList>(this->sys,this->pd,this->pg,
+            nl = std::make_shared<NeighbourList>(this->pg,
                                                  condition,
                                                  NeighbourListParam);
             isNeighbourListInit = true;
@@ -405,10 +404,8 @@ class Generic : public ForceFieldBase<Units_,Types_>{
     public:\n""")
 
     fout.write("""
-        Generic(std::shared_ptr<System>        sys,
-                std::shared_ptr<ParticleData>  pd,
-                std::shared_ptr<ParticleGroup> pg,
-                InputFile&                     in):Base(sys,pd,pg,in){
+        Generic(std::shared_ptr<ParticleGroup> pg,
+                InputFile&                     in):Base(pg,in){
 
                 this->sys->template log<System::MESSAGE>(\"[Generic] Start\");
                 """)

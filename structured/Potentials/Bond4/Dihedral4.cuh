@@ -106,7 +106,19 @@ namespace Bond4{
                 return make_real3(0);
 			}
             
-            inline __device__ tensor3 virial(int i, int j, int k, int l,
+            inline __device__ real virial(int i, int j, int k, int l,
+                                          int bond_index,
+                                          const real3 &posi,
+                                          const real3 &posj,
+                                          const real3 &posk,
+                                          const real3 &posl,
+                                          const BondInfo &bi)
+
+			{
+				return real(0);
+            }
+            
+            inline __device__ tensor3 stress(int i, int j, int k, int l,
                                              int bond_index,
                                              const real3 &posi,
                                              const real3 &posj,

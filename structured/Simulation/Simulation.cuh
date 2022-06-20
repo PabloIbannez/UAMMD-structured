@@ -173,16 +173,16 @@ class Simulation{
             this->loadParticleData();
             
             //Generate group all
-            pg = std::make_shared<ParticleGroup>(pd,sys,"All");
+            pg = std::make_shared<ParticleGroup>(pd,"All");
 
             //Load topology and add structure
-            ff = std::make_shared<ForceField>(sys,pd,pg,in);
+            ff = std::make_shared<ForceField>(pg,in);
             top = ff->getTopology();
             top->loadStructureData(pd);
             top->loadTypes(pd);
             
-            minimization = std::make_shared<Minimization>(pd,pg,sys,in,simulationStream);
-            integrator   = std::make_shared<Integrator>  (pd,pg,sys,in,simulationStream);
+            minimization = std::make_shared<Minimization>(pg,in,simulationStream);
+            integrator   = std::make_shared<Integrator>  (pg,in,simulationStream);
             integrator->template applyUnits<typename Topology::Units>();
             
             minimization->addInteractor(ff);
@@ -193,8 +193,8 @@ class Simulation{
                     integrator->setConstraint(ff->getConstraint());
                 }
             }            
-            this->addSimulationStep(std::make_shared<InfoStep>(sys,pd,pg,nStepsInfoInterval,nSteps));
-            this->addSimulationStep(std::make_shared<SortStep>(sys,pd,pg,nStepsSortInterval));
+            this->addSimulationStep(std::make_shared<InfoStep>(pg,nStepsInfoInterval,nSteps));
+            this->addSimulationStep(std::make_shared<SortStep>(pg,nStepsSortInterval));
             
         }
         

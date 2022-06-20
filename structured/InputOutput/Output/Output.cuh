@@ -442,6 +442,9 @@ void WriteLAMMPS(std::shared_ptr<ParticleGroup> pg,
                  Box box,
                  real t,
                  std::ofstream& out){
+    
+    auto pd  = pg->getParticleData(); 
+    auto sys = pd->getSystem();
 
     out<<"ITEM: TIMESTEP"<<std::endl;
     out<<t<<std::endl;

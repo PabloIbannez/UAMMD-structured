@@ -93,7 +93,7 @@ namespace Bond2{
     };
     
     template<typename Units_>
-    using DebyeHuckel = Bond2<addVirial<DebyeHuckel_<Units_>>>;
+    using DebyeHuckel = Bond2<addVirialStress<DebyeHuckel_<Units_>>>;
 
 }}}}
 

@@ -167,9 +167,9 @@ namespace Bond2{
         }
     };
 
-    using Harmonic           = Bond2<addVirial<Harmonic_>>;
-    using HarmonicConst_K    = Bond2<addVirial<HarmonicConst_K_>>;
-    using HarmonicConst_K_r0 = Bond2<addVirial<HarmonicConst_K_r0_>>;
+    using Harmonic           = Bond2<addVirialStress<Harmonic_>>;
+    using HarmonicConst_K    = Bond2<addVirialStress<HarmonicConst_K_>>;
+    using HarmonicConst_K_r0 = Bond2<addVirialStress<HarmonicConst_K_r0_>>;
 
 }}}}
 

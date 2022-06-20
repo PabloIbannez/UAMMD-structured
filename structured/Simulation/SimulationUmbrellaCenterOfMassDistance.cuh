@@ -108,24 +108,24 @@ class SimulationUmbrellaCenterOfMassDistance: public Simulation<ForceField_,
             this->loadParticleData();
             
             //Generate group all
-            this->pg = std::make_shared<ParticleGroup>(this->pd,this->sys,"All");
+            this->pg = std::make_shared<ParticleGroup>(this->pd,"All");
 
             //Load topology and add structure
-            this->ff = std::make_shared<typename Simulation::ForceField>(this->sys,this->pd,this->pg,in);
+            this->ff = std::make_shared<typename Simulation::ForceField>(this->pg,in);
             this->top = this->ff->getTopology();
             this->top->loadStructureData(this->pd);
             this->top->loadTypes(this->pd);
             
-            this->minimization = std::make_shared<typename Simulation::Minimization>(this->pd,this->pg,this->sys,in,this->simulationStream);
-            this->integrator   = std::make_shared<typename Simulation::Integrator>  (this->pd,this->pg,this->sys,in,this->simulationStream);
+            this->minimization = std::make_shared<typename Simulation::Minimization>(this->pg,in,this->simulationStream);
+            this->integrator   = std::make_shared<typename Simulation::Integrator>  (this->pg,in,this->simulationStream);
             
             this->integrator->template applyUnits<typename Simulation::Topology::Units>();
             
             this->minimization->addInteractor(this->ff);
             this->integrator->addInteractor(this->ff);
             
-            this->addSimulationStep(std::make_shared<InfoStep>(this->sys,this->pd,this->pg,this->nStepsInfoInterval,this->nSteps));
-            this->addSimulationStep(std::make_shared<SortStep>(this->sys,this->pd,this->pg,this->nStepsSortInterval));
+            this->addSimulationStep(std::make_shared<InfoStep>(this->pg,this->nStepsInfoInterval,this->nSteps));
+            this->addSimulationStep(std::make_shared<SortStep>(this->pg,this->nStepsSortInterval));
             
             //Umbrella
             {
@@ -146,7 +146,7 @@ class SimulationUmbrellaCenterOfMassDistance: public Simulation<ForceField_,
             
             this->sys->template log<uammd::System::MESSAGE>("[SimulationUmbrellaCenterOfMassDistance] UmbrellaWindowsSize: %f",umbrellaWindowsSize);
 
-            simulationGroups = groupUtils::getSimGroups(this->sys,this->pd);
+            simulationGroups = groupUtils::getSimGroups(this->pd);
 
             int requiredSystemCopies = umbrellaWindowsNumber*umbrellaCopies;
 
@@ -155,19 +155,19 @@ class SimulationUmbrellaCenterOfMassDistance: public Simulation<ForceField_,
                                                                   simulationGroups.size(),requiredSystemCopies);
             } else {
 
-                if(!groupUtils::checkSimGroupsEqual(this->sys,this->pd,simulationGroups)){
+                if(!groupUtils::checkSimGroupsEqual(this->pd,simulationGroups)){
                     this->sys->template log<uammd::System::CRITICAL>("[SimulationUmbrellaCenterOfMassDistance] Equal simulation groups are required");
                 }
 
-                std::set<int> mdlList = groupUtils::getModelList(this->sys,this->pd);
+                std::set<int> mdlList = groupUtils::getModelList(this->pd);
                 if(mdlList.size() != 2){
                     this->sys->template log<uammd::System::CRITICAL>("[SimulationUmbrellaCenterOfMassDistance] There are %i molecules for simulation but 2 are expected.",mdlList.size());
                 }
 
                 Nsets = simulationGroups.size();
                 
-                this->simulationModelGroups1 = groupUtils::getSimModelGroups(this->sys,this->pd,*(mdlList.begin()));
-                this->simulationModelGroups2 = groupUtils::getSimModelGroups(this->sys,this->pd,*(++mdlList.begin()));
+                this->simulationModelGroups1 = groupUtils::getSimModelGroups(this->pd,*(mdlList.begin()));
+                this->simulationModelGroups2 = groupUtils::getSimModelGroups(this->pd,*(++mdlList.begin()));
             }
             
             r0.resize(Nsets);
@@ -180,14 +180,10 @@ class SimulationUmbrellaCenterOfMassDistance: public Simulation<ForceField_,
                 //r0[setIndex]=fmod(setIndex*umbrellaWindowsSize,umbrellaEnd-umbrellaInit)+umbrellaInit+umbrellaWindowsSize;
                 r0[setIndex]=fmod(setIndex*umbrellaWindowsSize,umbrellaEnd-umbrellaInit)+umbrellaInit;
                 
-                M1[setIndex]=Measures::totalMass(this->sys,
-                                                 this->pd,
-                                                 simulationModelGroups1[setIndex],
+                M1[setIndex]=Measures::totalMass(simulationModelGroups1[setIndex],
                                                  this->simulationStream);
                 
-                M2[setIndex]=Measures::totalMass(this->sys,
-                                                 this->pd,
-                                                 simulationModelGroups2[setIndex],
+                M2[setIndex]=Measures::totalMass(simulationModelGroups2[setIndex],
                                                  this->simulationStream);
             }}
 
@@ -195,9 +191,7 @@ class SimulationUmbrellaCenterOfMassDistance: public Simulation<ForceField_,
 
             umbrellaParam.K = umbrellaK;
             
-            this->umbrellaSetInteractor = std::make_shared<UmbrellaSetInteractor>(this->sys,
-                                                                                  this->pd,
-                                                                                  this->pg,
+            this->umbrellaSetInteractor = std::make_shared<UmbrellaSetInteractor>(this->pg,
                                                                                   this->simulationModelGroups1,
                                                                                   this->simulationModelGroups2,
                                                                                   r0,
@@ -284,14 +278,10 @@ class SimulationUmbrellaCenterOfMassDistance: public Simulation<ForceField_,
                 int setIndex = j+i*umbrellaWindowsNumber;
                 real m1 = M1[setIndex];
                 real m2 = M2[setIndex];
-                real3 com1 = Measures::centerOfMassPos(this->sys,
-                                                       this->pd,
-                                                       simulationModelGroups1[setIndex],
+                real3 com1 = Measures::centerOfMassPos(simulationModelGroups1[setIndex],
                                                        m1,
                                                        this->simulationStream);
-                real3 com2 = Measures::centerOfMassPos(this->sys,
-                                                       this->pd,
-                                                       simulationModelGroups2[setIndex],
+                real3 com2 = Measures::centerOfMassPos(simulationModelGroups2[setIndex],
                                                        m2,
                                                        this->simulationStream);
                 //std::cout << r0[setIndex] << " set: " << setIndex << " " << com2 << " " << com1 << std::endl;

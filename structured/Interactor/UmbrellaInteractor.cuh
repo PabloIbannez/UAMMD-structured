@@ -164,8 +164,8 @@ namespace Interactor{
                     umbInfo_h[i].N1 = pg1set[i]->getNumberParticles();
                     umbInfo_h[i].N2 = pg2set[i]->getNumberParticles();
                     
-                    umbInfo_h[i].M1 = Measures::totalMass(sys,pd,pg1set[i],0);
-                    umbInfo_h[i].M2 = Measures::totalMass(sys,pd,pg2set[i],0);
+                    umbInfo_h[i].M1 = Measures::totalMass(pg1set[i],0);
+                    umbInfo_h[i].M2 = Measures::totalMass(pg2set[i],0);
 
                     umbInfo_h[i].r0 = r0[i];
                 }
@@ -355,7 +355,7 @@ namespace Interactor{
 
                 fori(0,Nsets){
                     umbInfo_h[i].N1 = pg1set[i]->getNumberParticles();
-                    umbInfo_h[i].M1 = Measures::totalMass(sys,pd,pg1set[i],0);
+                    umbInfo_h[i].M1 = Measures::totalMass(pg1set[i],0);
                     umbInfo_h[i].equiPos = equiPos[i];
                 }
 

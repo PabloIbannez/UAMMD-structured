@@ -102,13 +102,11 @@ namespace UnBound{
         
         };
 
-        KimHummer_(std::shared_ptr<System>       sys,
-                   std::shared_ptr<ParticleData>  pd,
-                   std::shared_ptr<ParticleGroup> pg,
+        KimHummer_(std::shared_ptr<ParticleGroup> pg,
                    std::shared_ptr<Topology>     top,
-                   Parameters par):sys(sys),
-                                   pd(pd),
-                                   pg(pg),
+                   Parameters par):pg(pg),
+                                   pd(pg->getParticleData()),
+                                   sys(pg->getParticleData()->getSystem()),
                                    top(top),
                                    dielectricConstant(par.dielectricConstant),
                                    debyeLenght(par.debyeLenght),
@@ -274,84 +272,6 @@ namespace UnBound{
                                     cutOffDstNP*cutOffDstNP,
                                     cutOffDstDH*cutOffDstDH,
                                     zeroEnergy);
-        }
-        
-        struct virialTransverser{
-
-            tensor3* virial;
-            
-            real* radius;
-            real* charge;
-            real*   sasa;
-
-            typename ParameterPairsHandler::PairIterator paramPairIterator;
-
-            Box box;
-            
-            real dielectricConstant;
-            real debyeLenght;
-
-            real cutOffDstNP2;
-            real cutOffDstDH2;
-
-            real zeroEnergy;
-            
-            virialTransverser(tensor3* virial,
-                              real* radius,
-                              real* charge,
-                              real* sasa,
-                              typename ParameterPairsHandler::PairIterator paramPairIterator,
-                              Box  box,
-                              real dielectricConstant,
-                              real debyeLenght,
-                              real cutOffDstNP2,
-                              real cutOffDstDH2,
-                              real zeroEnergy):virial(virial),
-                                               radius(radius),
-                                               charge(charge),
-                                               sasa(sasa),
-                                               paramPairIterator(paramPairIterator),
-                                               box(box),
-                                               dielectricConstant(dielectricConstant),
-                                               debyeLenght(debyeLenght),
-                                               cutOffDstNP2(cutOffDstNP2),
-                                               cutOffDstDH2(cutOffDstDH2),
-                                               zeroEnergy(zeroEnergy){}
-
-            using resultType=tensor3;
-
-            inline __device__ resultType zero(){return tensor3(0);}
-            
-            inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
-            
-            inline __device__ resultType compute(const int index_i,const int index_j,const real4 posi,const real4 posj){
-                
-                tensor3 v = tensor3(real(0.0));
-
-                return v;
-            }
-            
-            inline __device__ void set(const int& index_i,const resultType& quantity){virial[index_i]+=quantity;}
-
-        };
-
-        virialTransverser getVirialTransverser(){
-            
-            tensor3* virial = this->pd->getVirial(access::location::gpu, access::mode::readwrite).raw();     
-            
-            real* radius = this->pd->getRadius(access::location::gpu, access::mode::readwrite).raw();     
-            real* charge = this->pd->getCharge(access::location::gpu, access::mode::readwrite).raw();     
-            real* sasa   = this->pd->getSASA(access::location::gpu, access::mode::readwrite).raw();     
-                                                         
-            return virialTransverser(virial,
-                                     radius,charge,sasa,
-                                     statParam->getParameters()->getPairIterator(),
-                                     box,
-                                     dielectricConstant,
-                                     debyeLenght,
-                                     cutOffDstNP*cutOffDstNP,
-                                     cutOffDstDH*cutOffDstDH,
-                                     zeroEnergy);
         }
         
         struct energyTransverser{

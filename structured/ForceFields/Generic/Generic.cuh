@@ -55,11 +55,6 @@ class Generic : public ForceFieldBase<Units_,Types_>{
         using Bond2GaussianType = Potentials::Bond2::Gaussian;
         using Bond2GaussianConst_E_r0_DType = Potentials::Bond2::GaussianConst_E_r0_D;
         using Bond2OrientedHarmonicType = Potentials::Bond2::OrientedHarmonic;
-        using Bond2OrientedHarmonicConst_K_rhType = Potentials::Bond2::OrientedHarmonicConst_K_rh;
-        using Bond2OrientedAngularType = Potentials::Bond2::OrientedAngular;
-        using Bond2OrientedAngularConst_K_theta0Type = Potentials::Bond2::OrientedAngularConst_K_theta0;
-        using Bond2OrientedDihedralType = Potentials::Bond2::OrientedDihedral;
-        using Bond2OrientedDihedralConst_K_phi0Type = Potentials::Bond2::OrientedDihedralConst_K_phi0;
         using Bond3BestChenHummerAngularType = Potentials::Bond3::BestChenHummerAngular;
         using Bond3KratkyPorodType = Potentials::Bond3::KratkyPorod;
         using Bond3KratkyPorodConst_KType = Potentials::Bond3::KratkyPorodConst_K;
@@ -72,6 +67,9 @@ class Generic : public ForceFieldBase<Units_,Types_>{
         using UnBoundDebyeHuckelType = Potentials::UnBound::DebyeHuckel<typename Base::Topology>;
         using UnBoundDebyeHuckelSpheresType = Potentials::UnBound::DebyeHuckelSpheres<typename Base::Topology>;
         using UnBoundDebyeHuckelDistanceDependentDielectricType = Potentials::UnBound::DebyeHuckelDistanceDependentDielectric<typename Base::Topology>;
+        using UnBoundDLVOType1Type = Potentials::UnBound::DLVOType1<typename Base::Topology>;
+        using UnBoundDLVOType2Type = Potentials::UnBound::DLVOType2<typename Base::Topology>;
+        using UnBoundDLVOType3Type = Potentials::UnBound::DLVOType3<typename Base::Topology>;
         using UnBoundClashedType = Potentials::UnBound::Clashed<typename Base::Topology>;
         using UnBoundKimHummerType = Potentials::UnBound::KimHummer<typename Base::Topology>;
         using UnBoundLennardJonesType1Type = Potentials::UnBound::LennardJonesType1<typename Base::Topology>;
@@ -207,26 +205,6 @@ class Generic : public ForceFieldBase<Units_,Types_>{
         Interactor::BondedInteractor_ns::BondProcessor<Bond2OrientedHarmonicType>,
         Interactor::BondedInteractor_ns::BondReaderFromFile<typename Base::Topology,Bond2OrientedHarmonicType>>;
 
-        using InteractorBond2OrientedHarmonicConst_K_rhType   = Interactor::BondedInteractor<Bond2OrientedHarmonicConst_K_rhType,
-        Interactor::BondedInteractor_ns::BondProcessor<Bond2OrientedHarmonicConst_K_rhType>,
-        Interactor::BondedInteractor_ns::BondReaderFromFile<typename Base::Topology,Bond2OrientedHarmonicConst_K_rhType>>;
-
-        using InteractorBond2OrientedAngularType   = Interactor::BondedInteractor<Bond2OrientedAngularType,
-        Interactor::BondedInteractor_ns::BondProcessor<Bond2OrientedAngularType>,
-        Interactor::BondedInteractor_ns::BondReaderFromFile<typename Base::Topology,Bond2OrientedAngularType>>;
-
-        using InteractorBond2OrientedAngularConst_K_theta0Type   = Interactor::BondedInteractor<Bond2OrientedAngularConst_K_theta0Type,
-        Interactor::BondedInteractor_ns::BondProcessor<Bond2OrientedAngularConst_K_theta0Type>,
-        Interactor::BondedInteractor_ns::BondReaderFromFile<typename Base::Topology,Bond2OrientedAngularConst_K_theta0Type>>;
-
-        using InteractorBond2OrientedDihedralType   = Interactor::BondedInteractor<Bond2OrientedDihedralType,
-        Interactor::BondedInteractor_ns::BondProcessor<Bond2OrientedDihedralType>,
-        Interactor::BondedInteractor_ns::BondReaderFromFile<typename Base::Topology,Bond2OrientedDihedralType>>;
-
-        using InteractorBond2OrientedDihedralConst_K_phi0Type   = Interactor::BondedInteractor<Bond2OrientedDihedralConst_K_phi0Type,
-        Interactor::BondedInteractor_ns::BondProcessor<Bond2OrientedDihedralConst_K_phi0Type>,
-        Interactor::BondedInteractor_ns::BondReaderFromFile<typename Base::Topology,Bond2OrientedDihedralConst_K_phi0Type>>;
-
         using InteractorBond3BestChenHummerAngularType   = Interactor::BondedInteractor<Bond3BestChenHummerAngularType,
         Interactor::BondedInteractor_ns::BondProcessor<Bond3BestChenHummerAngularType>,
         Interactor::BondedInteractor_ns::BondReaderFromFile<typename Base::Topology,Bond3BestChenHummerAngularType>>;
@@ -269,6 +247,12 @@ class Generic : public ForceFieldBase<Units_,Types_>{
 
         using InteractorUnBoundDebyeHuckelDistanceDependentDielectricType   = Interactor::PairInteractor<UnBoundDebyeHuckelDistanceDependentDielectricType,NeighbourList>;
 
+        using InteractorUnBoundDLVOType1Type   = Interactor::PairInteractor<UnBoundDLVOType1Type,NeighbourList>;
+
+        using InteractorUnBoundDLVOType2Type   = Interactor::PairInteractor<UnBoundDLVOType2Type,NeighbourList>;
+
+        using InteractorUnBoundDLVOType3Type   = Interactor::PairInteractor<UnBoundDLVOType3Type,NeighbourList>;
+
         using InteractorUnBoundClashedType   = Interactor::PairInteractor<UnBoundClashedType,NeighbourList>;
 
         using InteractorUnBoundKimHummerType   = Interactor::PairInteractor<UnBoundKimHummerType,NeighbourList>;
@@ -308,14 +292,14 @@ class Generic : public ForceFieldBase<Units_,Types_>{
             
             VerletListDst = std::stof(in.getOption("VerletListDst",InputFile::Required).str());
 
-            condition = std::make_shared<Condition>(this->sys,this->pd,this->top,in);
+            condition = std::make_shared<Condition>(this->pd,this->top,in);
             
             typename NeighbourList::Parameters NeighbourListParam;
             
             NeighbourListParam.cutOff       = real(0.0);
             NeighbourListParam.cutOffVerlet = VerletListDst;
 
-            nl = std::make_shared<NeighbourList>(this->sys,this->pd,this->pg,
+            nl = std::make_shared<NeighbourList>(this->pg,
                                                  condition,
                                                  NeighbourListParam);
             isNeighbourListInit = true;
@@ -323,10 +307,8 @@ class Generic : public ForceFieldBase<Units_,Types_>{
 
     public:
 
-        Generic(std::shared_ptr<System>        sys,
-                std::shared_ptr<ParticleData>  pd,
-                std::shared_ptr<ParticleGroup> pg,
-                InputFile&                     in):Base(sys,pd,pg,in){
+        Generic(std::shared_ptr<ParticleGroup> pg,
+                InputFile&                     in):Base(pg,in){
 
                 this->sys->template log<System::MESSAGE>("[Generic] Start");
                 
@@ -355,7 +337,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond1HarmonicType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond1HarmonicType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -390,7 +372,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond1HarmonicConst_r0Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond1HarmonicConst_r0Type>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -428,7 +410,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond1HarmonicConst_K_r0Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond1HarmonicConst_K_r0Type>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -460,7 +442,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond1HarmonicCommon_K_r0Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond1HarmonicCommon_K_r0Type>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -498,7 +480,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond1HarmonicConstCommon_K_r0Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond1HarmonicConstCommon_K_r0Type>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -530,7 +512,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2FeneType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2FeneType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -568,7 +550,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2FeneConst_K_R0Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2FeneConst_K_R0Type>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -609,7 +591,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2FeneConst_r0_K_R0Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2FeneConst_r0_K_R0Type>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -641,7 +623,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2DebyeHuckelType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2DebyeHuckelType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -673,7 +655,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2HarmonicType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2HarmonicType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -708,7 +690,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2HarmonicConst_KType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2HarmonicConst_KType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -746,7 +728,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2HarmonicConst_K_r0Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2HarmonicConst_K_r0Type>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -781,7 +763,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2Steric6Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2Steric6Type>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -822,7 +804,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2Steric6Const_epsilon_sigmaType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2Steric6Const_epsilon_sigmaType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -857,7 +839,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2Steric12Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2Steric12Type>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -898,7 +880,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2Steric12Const_epsilon_sigmaType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2Steric12Const_epsilon_sigmaType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -930,7 +912,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2MorseType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2MorseType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -965,7 +947,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2MorseConst_DType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2MorseConst_DType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1006,7 +988,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2MorseConst_r0_E_DType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2MorseConst_r0_E_DType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1041,7 +1023,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2MorseWCAType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2MorseWCAType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1073,7 +1055,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2LennardJonesType2Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2LennardJonesType2Type>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1108,7 +1090,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2LennardJonesType2Const_eType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2LennardJonesType2Const_eType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1140,7 +1122,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2LennardJonesType3Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2LennardJonesType3Type>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1175,7 +1157,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2LennardJonesType3Const_eType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2LennardJonesType3Const_eType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1207,7 +1189,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2LennardJonesKaranicolasBrooksType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2LennardJonesKaranicolasBrooksType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1239,7 +1221,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2LennardJonesGaussianType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2LennardJonesGaussianType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1277,7 +1259,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2LennardJonesGaussianConst_e_DType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2LennardJonesGaussianConst_e_DType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1309,7 +1291,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2GaussianType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2GaussianType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1350,7 +1332,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2GaussianConst_E_r0_DType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2GaussianConst_E_r0_DType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1382,185 +1364,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond2OrientedHarmonicType>(this->sys, this->pd, this->pg, 
-                                                                           this->top, bnd,
-                                                                           interactorBndParameters);
-                    }
-    
-                }
-
-                if(this->top->isEntryPresent("Bond2","OrientedHarmonicConst_K_rh")){
-
-                    auto entryInfo = this->top->getEntryInfo("Bond2","OrientedHarmonicConst_K_rh");
-
-                    for(uint i=0;i<entryInfo.size();i++){
-                
-                        this->sys->template log<System::MESSAGE>("[Generic] "
-                                                                 "Detected interactor : OrientedHarmonicConst_K_rh");
-                        
-                        typename Bond2OrientedHarmonicConst_K_rhType::Parameters bndParam;
-    
-                        bndParam.K=Miscellany::str2real(entryInfo[i].param["K"],this->sys);
-                        bndParam.rh=Miscellany::str2real(entryInfo[i].param["rh"],this->sys);
-                        
-                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: K with value %s, to interactor: Bond2::OrientedHarmonicConst_K_rh",                                  
-                                                              entryInfo[i].param["K"].c_str());
-                    this->sys->template log<System::MESSAGE>("[Generic] Added parameter: rh with value %s, to interactor: Bond2::OrientedHarmonicConst_K_rh",                                  
-                                                              entryInfo[i].param["rh"].c_str());
-                    
-                        std::shared_ptr<Bond2OrientedHarmonicConst_K_rhType> bnd = std::make_shared<Bond2OrientedHarmonicConst_K_rhType>(this->pd,
-                                                                       bndParam);
-                        
-                        typename InteractorBond2OrientedHarmonicConst_K_rhType::Parameters interactorBndParameters;
-                        
-                        interactorBndParameters.bondName = entryInfo[i].label;
-                        
-                        std::string interactorName = entryInfo[i].alias;
-                        
-                        this->sys->template log<System::MESSAGE>("[Generic] "
-                                                                 "Adding interactor : %s",interactorName.c_str());
-
-                        interactors[interactorName]=std::make_shared<InteractorBond2OrientedHarmonicConst_K_rhType>(this->sys, this->pd, this->pg, 
-                                                                           this->top, bnd,
-                                                                           interactorBndParameters);
-                    }
-    
-                }
-
-                if(this->top->isEntryPresent("Bond2","OrientedAngular")){
-
-                    auto entryInfo = this->top->getEntryInfo("Bond2","OrientedAngular");
-
-                    for(uint i=0;i<entryInfo.size();i++){
-                
-                        this->sys->template log<System::MESSAGE>("[Generic] "
-                                                                 "Detected interactor : OrientedAngular");
-                        
-                        typename Bond2OrientedAngularType::Parameters bndParam;
-    
-                        
-                        
-                        std::shared_ptr<Bond2OrientedAngularType> bnd = std::make_shared<Bond2OrientedAngularType>(this->pd,
-                                                                       bndParam);
-                        
-                        typename InteractorBond2OrientedAngularType::Parameters interactorBndParameters;
-                        
-                        interactorBndParameters.bondName = entryInfo[i].label;
-                        
-                        std::string interactorName = entryInfo[i].alias;
-                        
-                        this->sys->template log<System::MESSAGE>("[Generic] "
-                                                                 "Adding interactor : %s",interactorName.c_str());
-
-                        interactors[interactorName]=std::make_shared<InteractorBond2OrientedAngularType>(this->sys, this->pd, this->pg, 
-                                                                           this->top, bnd,
-                                                                           interactorBndParameters);
-                    }
-    
-                }
-
-                if(this->top->isEntryPresent("Bond2","OrientedAngularConst_K_theta0")){
-
-                    auto entryInfo = this->top->getEntryInfo("Bond2","OrientedAngularConst_K_theta0");
-
-                    for(uint i=0;i<entryInfo.size();i++){
-                
-                        this->sys->template log<System::MESSAGE>("[Generic] "
-                                                                 "Detected interactor : OrientedAngularConst_K_theta0");
-                        
-                        typename Bond2OrientedAngularConst_K_theta0Type::Parameters bndParam;
-    
-                        bndParam.K=Miscellany::str2real(entryInfo[i].param["K"],this->sys);
-                        bndParam.theta0=Miscellany::str2real(entryInfo[i].param["theta0"],this->sys);
-                        
-                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: K with value %s, to interactor: Bond2::OrientedAngularConst_K_theta0",                                  
-                                                              entryInfo[i].param["K"].c_str());
-                    this->sys->template log<System::MESSAGE>("[Generic] Added parameter: theta0 with value %s, to interactor: Bond2::OrientedAngularConst_K_theta0",                                  
-                                                              entryInfo[i].param["theta0"].c_str());
-                    
-                        std::shared_ptr<Bond2OrientedAngularConst_K_theta0Type> bnd = std::make_shared<Bond2OrientedAngularConst_K_theta0Type>(this->pd,
-                                                                       bndParam);
-                        
-                        typename InteractorBond2OrientedAngularConst_K_theta0Type::Parameters interactorBndParameters;
-                        
-                        interactorBndParameters.bondName = entryInfo[i].label;
-                        
-                        std::string interactorName = entryInfo[i].alias;
-                        
-                        this->sys->template log<System::MESSAGE>("[Generic] "
-                                                                 "Adding interactor : %s",interactorName.c_str());
-
-                        interactors[interactorName]=std::make_shared<InteractorBond2OrientedAngularConst_K_theta0Type>(this->sys, this->pd, this->pg, 
-                                                                           this->top, bnd,
-                                                                           interactorBndParameters);
-                    }
-    
-                }
-
-                if(this->top->isEntryPresent("Bond2","OrientedDihedral")){
-
-                    auto entryInfo = this->top->getEntryInfo("Bond2","OrientedDihedral");
-
-                    for(uint i=0;i<entryInfo.size();i++){
-                
-                        this->sys->template log<System::MESSAGE>("[Generic] "
-                                                                 "Detected interactor : OrientedDihedral");
-                        
-                        typename Bond2OrientedDihedralType::Parameters bndParam;
-    
-                        
-                        
-                        std::shared_ptr<Bond2OrientedDihedralType> bnd = std::make_shared<Bond2OrientedDihedralType>(this->pd,
-                                                                       bndParam);
-                        
-                        typename InteractorBond2OrientedDihedralType::Parameters interactorBndParameters;
-                        
-                        interactorBndParameters.bondName = entryInfo[i].label;
-                        
-                        std::string interactorName = entryInfo[i].alias;
-                        
-                        this->sys->template log<System::MESSAGE>("[Generic] "
-                                                                 "Adding interactor : %s",interactorName.c_str());
-
-                        interactors[interactorName]=std::make_shared<InteractorBond2OrientedDihedralType>(this->sys, this->pd, this->pg, 
-                                                                           this->top, bnd,
-                                                                           interactorBndParameters);
-                    }
-    
-                }
-
-                if(this->top->isEntryPresent("Bond2","OrientedDihedralConst_K_phi0")){
-
-                    auto entryInfo = this->top->getEntryInfo("Bond2","OrientedDihedralConst_K_phi0");
-
-                    for(uint i=0;i<entryInfo.size();i++){
-                
-                        this->sys->template log<System::MESSAGE>("[Generic] "
-                                                                 "Detected interactor : OrientedDihedralConst_K_phi0");
-                        
-                        typename Bond2OrientedDihedralConst_K_phi0Type::Parameters bndParam;
-    
-                        bndParam.K=Miscellany::str2real(entryInfo[i].param["K"],this->sys);
-                        bndParam.phi0=Miscellany::str2real(entryInfo[i].param["phi0"],this->sys);
-                        
-                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: K with value %s, to interactor: Bond2::OrientedDihedralConst_K_phi0",                                  
-                                                              entryInfo[i].param["K"].c_str());
-                    this->sys->template log<System::MESSAGE>("[Generic] Added parameter: phi0 with value %s, to interactor: Bond2::OrientedDihedralConst_K_phi0",                                  
-                                                              entryInfo[i].param["phi0"].c_str());
-                    
-                        std::shared_ptr<Bond2OrientedDihedralConst_K_phi0Type> bnd = std::make_shared<Bond2OrientedDihedralConst_K_phi0Type>(this->pd,
-                                                                       bndParam);
-                        
-                        typename InteractorBond2OrientedDihedralConst_K_phi0Type::Parameters interactorBndParameters;
-                        
-                        interactorBndParameters.bondName = entryInfo[i].label;
-                        
-                        std::string interactorName = entryInfo[i].alias;
-                        
-                        this->sys->template log<System::MESSAGE>("[Generic] "
-                                                                 "Adding interactor : %s",interactorName.c_str());
-
-                        interactors[interactorName]=std::make_shared<InteractorBond2OrientedDihedralConst_K_phi0Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond2OrientedHarmonicType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1592,7 +1396,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond3BestChenHummerAngularType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond3BestChenHummerAngularType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1624,7 +1428,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond3KratkyPorodType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond3KratkyPorodType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1659,7 +1463,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond3KratkyPorodConst_KType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond3KratkyPorodConst_KType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1691,7 +1495,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond3HarmonicAngularType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond3HarmonicAngularType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1726,7 +1530,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond3HarmonicAngularConst_KType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond3HarmonicAngularConst_KType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1764,7 +1568,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond3HarmonicAngularConst_K_ang0Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond3HarmonicAngularConst_K_ang0Type>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1796,7 +1600,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond4Dihedral4Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond4Dihedral4Type>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1828,7 +1632,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond4DihedralType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond4DihedralType>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1869,7 +1673,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorBond4DihedralConst_n_K_phi0Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorBond4DihedralConst_n_K_phi0Type>(this->pg, 
                                                                            this->top, bnd,
                                                                            interactorBndParameters);
                     }
@@ -1902,8 +1706,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::DebyeHuckel",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundDebyeHuckelType> ubnd = std::make_shared<UnBoundDebyeHuckelType>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundDebyeHuckelType> ubnd = std::make_shared<UnBoundDebyeHuckelType>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -1927,7 +1730,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundDebyeHuckelType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundDebyeHuckelType>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -1959,8 +1762,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::DebyeHuckelSpheres",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundDebyeHuckelSpheresType> ubnd = std::make_shared<UnBoundDebyeHuckelSpheresType>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundDebyeHuckelSpheresType> ubnd = std::make_shared<UnBoundDebyeHuckelSpheresType>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -1984,7 +1786,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundDebyeHuckelSpheresType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundDebyeHuckelSpheresType>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -2013,8 +1815,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::DebyeHuckelDistanceDependentDielectric",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundDebyeHuckelDistanceDependentDielectricType> ubnd = std::make_shared<UnBoundDebyeHuckelDistanceDependentDielectricType>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundDebyeHuckelDistanceDependentDielectricType> ubnd = std::make_shared<UnBoundDebyeHuckelDistanceDependentDielectricType>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -2038,7 +1839,193 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundDebyeHuckelDistanceDependentDielectricType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundDebyeHuckelDistanceDependentDielectricType>(this->pg, 
+                                                                                   interactorUbndParameters);
+                    }
+    
+                }
+
+                if(this->top->isEntryPresent("UnBound","DLVOType1")){
+                    
+                    if(!isNeighbourListInit){
+                        this->initNeighbourList(in);
+                    }
+                    
+                    auto entryInfo = this->top->getEntryInfo("UnBound","DLVOType1");
+
+                    for(uint i=0;i<entryInfo.size();i++){
+                
+                        this->sys->template log<System::MESSAGE>("[Generic] "
+                                                                 "Detected interactor : DLVOType1");
+                        
+                        typename UnBoundDLVOType1Type::Parameters ubndParam;
+    
+                        ubndParam.dielectricConstant=Miscellany::str2real(entryInfo[i].param["dielectricConstant"],this->sys);
+                        ubndParam.debyeLength=Miscellany::str2real(entryInfo[i].param["debyeLength"],this->sys);
+                        ubndParam.cutOffDstPolar=Miscellany::str2real(entryInfo[i].param["cutOffDstPolar"],this->sys);
+                        ubndParam.label=entryInfo[i].label;
+                        ubndParam.cutOffDstNonPolar=Miscellany::str2real(entryInfo[i].param["cutOffDstNonPolar"],this->sys);
+                        
+                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: dielectricConstant with value %s, to interactor: UnBound::DLVOType1",                                  
+                                                              entryInfo[i].param["dielectricConstant"].c_str());
+                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: debyeLength with value %s, to interactor: UnBound::DLVOType1",                                  
+                                                              entryInfo[i].param["debyeLength"].c_str());
+                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDstPolar with value %s, to interactor: UnBound::DLVOType1",                                  
+                                                              entryInfo[i].param["cutOffDstPolar"].c_str());
+                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: label with value %s, to interactor: UnBound::DLVOType1",                                  
+                                                              entryInfo[i].label.c_str());
+                    this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDstNonPolar with value %s, to interactor: UnBound::DLVOType1",                                  
+                                                              entryInfo[i].param["cutOffDstNonPolar"].c_str());
+                        
+                        std::shared_ptr<UnBoundDLVOType1Type> ubnd = std::make_shared<UnBoundDLVOType1Type>(this->pg,
+                                                                        this->top,
+                                                                        ubndParam);
+                        
+                        if(ubnd->getCutOffDst() >= this->nl->getCutOffVerlet()){
+                            this->sys->template log<System::CRITICAL>("[Generic] Error in potential UnBoundDLVOType1, cutOffDst (%f) "
+                                                                      "has to be smaller than VerletListDst (%f)",
+                                                                       ubnd->getCutOffDst(),this->nl->getCutOffVerlet());
+                        }
+                        
+                        this->nl->setCutOff(std::max(this->nl->getCutOff(),ubnd->getCutOffDst()));
+                
+                        typename InteractorUnBoundDLVOType1Type::Parameters interactorUbndParameters;
+                        
+                        interactorUbndParameters.name                     = "UnBoundDLVOType1";
+                        interactorUbndParameters.pot                      = ubnd;
+                        interactorUbndParameters.nl                       = this->nl;
+                        interactorUbndParameters.conditionInteractionName = Miscellany::str2str(entryInfo[i].param["condition"],this->sys);
+                        
+                        std::string interactorName = entryInfo[i].alias;
+
+                        this->sys->template log<System::MESSAGE>("[Generic] "
+                                                                 "Adding interactor : %s",interactorName.c_str());
+
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundDLVOType1Type>(this->pg, 
+                                                                                   interactorUbndParameters);
+                    }
+    
+                }
+
+                if(this->top->isEntryPresent("UnBound","DLVOType2")){
+                    
+                    if(!isNeighbourListInit){
+                        this->initNeighbourList(in);
+                    }
+                    
+                    auto entryInfo = this->top->getEntryInfo("UnBound","DLVOType2");
+
+                    for(uint i=0;i<entryInfo.size();i++){
+                
+                        this->sys->template log<System::MESSAGE>("[Generic] "
+                                                                 "Detected interactor : DLVOType2");
+                        
+                        typename UnBoundDLVOType2Type::Parameters ubndParam;
+    
+                        ubndParam.dielectricConstant=Miscellany::str2real(entryInfo[i].param["dielectricConstant"],this->sys);
+                        ubndParam.debyeLength=Miscellany::str2real(entryInfo[i].param["debyeLength"],this->sys);
+                        ubndParam.cutOffDstPolar=Miscellany::str2real(entryInfo[i].param["cutOffDstPolar"],this->sys);
+                        ubndParam.label=entryInfo[i].label;
+                        ubndParam.cutOffDstNonPolar=Miscellany::str2real(entryInfo[i].param["cutOffDstNonPolar"],this->sys);
+                        
+                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: dielectricConstant with value %s, to interactor: UnBound::DLVOType2",                                  
+                                                              entryInfo[i].param["dielectricConstant"].c_str());
+                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: debyeLength with value %s, to interactor: UnBound::DLVOType2",                                  
+                                                              entryInfo[i].param["debyeLength"].c_str());
+                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDstPolar with value %s, to interactor: UnBound::DLVOType2",                                  
+                                                              entryInfo[i].param["cutOffDstPolar"].c_str());
+                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: label with value %s, to interactor: UnBound::DLVOType2",                                  
+                                                              entryInfo[i].label.c_str());
+                    this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDstNonPolar with value %s, to interactor: UnBound::DLVOType2",                                  
+                                                              entryInfo[i].param["cutOffDstNonPolar"].c_str());
+                        
+                        std::shared_ptr<UnBoundDLVOType2Type> ubnd = std::make_shared<UnBoundDLVOType2Type>(this->pg,
+                                                                        this->top,
+                                                                        ubndParam);
+                        
+                        if(ubnd->getCutOffDst() >= this->nl->getCutOffVerlet()){
+                            this->sys->template log<System::CRITICAL>("[Generic] Error in potential UnBoundDLVOType2, cutOffDst (%f) "
+                                                                      "has to be smaller than VerletListDst (%f)",
+                                                                       ubnd->getCutOffDst(),this->nl->getCutOffVerlet());
+                        }
+                        
+                        this->nl->setCutOff(std::max(this->nl->getCutOff(),ubnd->getCutOffDst()));
+                
+                        typename InteractorUnBoundDLVOType2Type::Parameters interactorUbndParameters;
+                        
+                        interactorUbndParameters.name                     = "UnBoundDLVOType2";
+                        interactorUbndParameters.pot                      = ubnd;
+                        interactorUbndParameters.nl                       = this->nl;
+                        interactorUbndParameters.conditionInteractionName = Miscellany::str2str(entryInfo[i].param["condition"],this->sys);
+                        
+                        std::string interactorName = entryInfo[i].alias;
+
+                        this->sys->template log<System::MESSAGE>("[Generic] "
+                                                                 "Adding interactor : %s",interactorName.c_str());
+
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundDLVOType2Type>(this->pg, 
+                                                                                   interactorUbndParameters);
+                    }
+    
+                }
+
+                if(this->top->isEntryPresent("UnBound","DLVOType3")){
+                    
+                    if(!isNeighbourListInit){
+                        this->initNeighbourList(in);
+                    }
+                    
+                    auto entryInfo = this->top->getEntryInfo("UnBound","DLVOType3");
+
+                    for(uint i=0;i<entryInfo.size();i++){
+                
+                        this->sys->template log<System::MESSAGE>("[Generic] "
+                                                                 "Detected interactor : DLVOType3");
+                        
+                        typename UnBoundDLVOType3Type::Parameters ubndParam;
+    
+                        ubndParam.dielectricConstant=Miscellany::str2real(entryInfo[i].param["dielectricConstant"],this->sys);
+                        ubndParam.debyeLength=Miscellany::str2real(entryInfo[i].param["debyeLength"],this->sys);
+                        ubndParam.cutOffDstPolar=Miscellany::str2real(entryInfo[i].param["cutOffDstPolar"],this->sys);
+                        ubndParam.label=entryInfo[i].label;
+                        ubndParam.cutOffDstNonPolar=Miscellany::str2real(entryInfo[i].param["cutOffDstNonPolar"],this->sys);
+                        
+                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: dielectricConstant with value %s, to interactor: UnBound::DLVOType3",                                  
+                                                              entryInfo[i].param["dielectricConstant"].c_str());
+                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: debyeLength with value %s, to interactor: UnBound::DLVOType3",                                  
+                                                              entryInfo[i].param["debyeLength"].c_str());
+                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDstPolar with value %s, to interactor: UnBound::DLVOType3",                                  
+                                                              entryInfo[i].param["cutOffDstPolar"].c_str());
+                        this->sys->template log<System::MESSAGE>("[Generic] Added parameter: label with value %s, to interactor: UnBound::DLVOType3",                                  
+                                                              entryInfo[i].label.c_str());
+                    this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDstNonPolar with value %s, to interactor: UnBound::DLVOType3",                                  
+                                                              entryInfo[i].param["cutOffDstNonPolar"].c_str());
+                        
+                        std::shared_ptr<UnBoundDLVOType3Type> ubnd = std::make_shared<UnBoundDLVOType3Type>(this->pg,
+                                                                        this->top,
+                                                                        ubndParam);
+                        
+                        if(ubnd->getCutOffDst() >= this->nl->getCutOffVerlet()){
+                            this->sys->template log<System::CRITICAL>("[Generic] Error in potential UnBoundDLVOType3, cutOffDst (%f) "
+                                                                      "has to be smaller than VerletListDst (%f)",
+                                                                       ubnd->getCutOffDst(),this->nl->getCutOffVerlet());
+                        }
+                        
+                        this->nl->setCutOff(std::max(this->nl->getCutOff(),ubnd->getCutOffDst()));
+                
+                        typename InteractorUnBoundDLVOType3Type::Parameters interactorUbndParameters;
+                        
+                        interactorUbndParameters.name                     = "UnBoundDLVOType3";
+                        interactorUbndParameters.pot                      = ubnd;
+                        interactorUbndParameters.nl                       = this->nl;
+                        interactorUbndParameters.conditionInteractionName = Miscellany::str2str(entryInfo[i].param["condition"],this->sys);
+                        
+                        std::string interactorName = entryInfo[i].alias;
+
+                        this->sys->template log<System::MESSAGE>("[Generic] "
+                                                                 "Adding interactor : %s",interactorName.c_str());
+
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundDLVOType3Type>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -2070,8 +2057,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::Clashed",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundClashedType> ubnd = std::make_shared<UnBoundClashedType>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundClashedType> ubnd = std::make_shared<UnBoundClashedType>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -2095,7 +2081,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundClashedType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundClashedType>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -2151,8 +2137,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] Added parameter: zeroEnergy with value %s, to interactor: UnBound::KimHummer",                                  
                                                               entryInfo[i].param["zeroEnergy"].c_str());
                         
-                        std::shared_ptr<UnBoundKimHummerType> ubnd = std::make_shared<UnBoundKimHummerType>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundKimHummerType> ubnd = std::make_shared<UnBoundKimHummerType>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -2176,7 +2161,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundKimHummerType>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundKimHummerType>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -2205,8 +2190,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                     this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::LennardJonesType1",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundLennardJonesType1Type> ubnd = std::make_shared<UnBoundLennardJonesType1Type>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundLennardJonesType1Type> ubnd = std::make_shared<UnBoundLennardJonesType1Type>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -2230,7 +2214,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundLennardJonesType1Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundLennardJonesType1Type>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -2259,8 +2243,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                     this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::LennardJonesType2",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundLennardJonesType2Type> ubnd = std::make_shared<UnBoundLennardJonesType2Type>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundLennardJonesType2Type> ubnd = std::make_shared<UnBoundLennardJonesType2Type>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -2284,7 +2267,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundLennardJonesType2Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundLennardJonesType2Type>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -2313,8 +2296,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                     this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::LennardJonesType3",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundLennardJonesType3Type> ubnd = std::make_shared<UnBoundLennardJonesType3Type>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundLennardJonesType3Type> ubnd = std::make_shared<UnBoundLennardJonesType3Type>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -2338,7 +2320,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundLennardJonesType3Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundLennardJonesType3Type>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -2367,8 +2349,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                     this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::WCAType1",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundWCAType1Type> ubnd = std::make_shared<UnBoundWCAType1Type>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundWCAType1Type> ubnd = std::make_shared<UnBoundWCAType1Type>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -2392,7 +2373,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundWCAType1Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundWCAType1Type>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -2421,8 +2402,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                     this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::WCAType2",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundWCAType2Type> ubnd = std::make_shared<UnBoundWCAType2Type>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundWCAType2Type> ubnd = std::make_shared<UnBoundWCAType2Type>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -2446,7 +2426,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundWCAType2Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundWCAType2Type>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -2475,8 +2455,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                     this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::WCAType3",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundWCAType3Type> ubnd = std::make_shared<UnBoundWCAType3Type>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundWCAType3Type> ubnd = std::make_shared<UnBoundWCAType3Type>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -2500,7 +2479,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundWCAType3Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundWCAType3Type>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -2529,8 +2508,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                     this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::GeneralLennardJonesType1",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundGeneralLennardJonesType1Type> ubnd = std::make_shared<UnBoundGeneralLennardJonesType1Type>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundGeneralLennardJonesType1Type> ubnd = std::make_shared<UnBoundGeneralLennardJonesType1Type>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -2554,7 +2532,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundGeneralLennardJonesType1Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundGeneralLennardJonesType1Type>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -2583,8 +2561,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                     this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::GeneralLennardJonesType2",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundGeneralLennardJonesType2Type> ubnd = std::make_shared<UnBoundGeneralLennardJonesType2Type>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundGeneralLennardJonesType2Type> ubnd = std::make_shared<UnBoundGeneralLennardJonesType2Type>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -2608,7 +2585,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundGeneralLennardJonesType2Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundGeneralLennardJonesType2Type>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -2637,8 +2614,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                     this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::GeneralLennardJonesType3",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundGeneralLennardJonesType3Type> ubnd = std::make_shared<UnBoundGeneralLennardJonesType3Type>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundGeneralLennardJonesType3Type> ubnd = std::make_shared<UnBoundGeneralLennardJonesType3Type>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -2662,7 +2638,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundGeneralLennardJonesType3Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundGeneralLennardJonesType3Type>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -2691,8 +2667,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                     this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::Steric6",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundSteric6Type> ubnd = std::make_shared<UnBoundSteric6Type>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundSteric6Type> ubnd = std::make_shared<UnBoundSteric6Type>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -2716,7 +2691,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundSteric6Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundSteric6Type>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     
@@ -2745,8 +2720,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                     this->sys->template log<System::MESSAGE>("[Generic] Added parameter: cutOffDst with value %s, to interactor: UnBound::Steric12",                                  
                                                               entryInfo[i].param["cutOffDst"].c_str());
                         
-                        std::shared_ptr<UnBoundSteric12Type> ubnd = std::make_shared<UnBoundSteric12Type>(this->sys,
-                                                                        this->pd,this->pg,
+                        std::shared_ptr<UnBoundSteric12Type> ubnd = std::make_shared<UnBoundSteric12Type>(this->pg,
                                                                         this->top,
                                                                         ubndParam);
                         
@@ -2770,7 +2744,7 @@ class Generic : public ForceFieldBase<Units_,Types_>{
                         this->sys->template log<System::MESSAGE>("[Generic] "
                                                                  "Adding interactor : %s",interactorName.c_str());
 
-                        interactors[interactorName]=std::make_shared<InteractorUnBoundSteric12Type>(this->sys, this->pd, this->pg, 
+                        interactors[interactorName]=std::make_shared<InteractorUnBoundSteric12Type>(this->pg, 
                                                                                    interactorUbndParameters);
                     }
     

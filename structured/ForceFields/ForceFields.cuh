@@ -24,10 +24,8 @@ class ForceFieldBase: public Interactor{
 
     public:
 
-        ForceFieldBase(std::shared_ptr<System>        sys,
-                       std::shared_ptr<ParticleData>  pd,
-                       std::shared_ptr<ParticleGroup> pg,
-                       InputFile&                     in):Interactor(pd,pg,sys,"ForceField"){
+        ForceFieldBase(std::shared_ptr<ParticleGroup> pg,
+                       InputFile&                     in):Interactor(pg,"ForceField"){
             top = std::make_shared<Topology>(sys,in);                                     
         }
         
@@ -58,10 +56,8 @@ class ForceFieldNeighbourBase : public ForceFieldBase<Units_,Types_>{
 
     public:
 
-        ForceFieldNeighbourBase(std::shared_ptr<System>        sys,
-                                std::shared_ptr<ParticleData>  pd,
-                                std::shared_ptr<ParticleGroup> pg,
-                                InputFile&                     in):Base(sys,pd,pg,in),
+        ForceFieldNeighbourBase(std::shared_ptr<ParticleGroup> pg,
+                                InputFile&                     in):Base(pg,in),
                                                                    VerletListDst(std::stof(in.getOption("VerletListDst",InputFile::Required).str())){
             
             this->sys->template log<System::MESSAGE>("[ForceFieldNeighbourBase] "
@@ -100,10 +96,8 @@ class none : public ForceFieldBase<Units_,Types_>{
 
     public:
 
-        none(std::shared_ptr<System>        sys,
-             std::shared_ptr<ParticleData>  pd,
-             std::shared_ptr<ParticleGroup> pg,
-             InputFile&                     in):Base(sys,pd,pg,in){}
+        none(std::shared_ptr<ParticleGroup> pg,
+             InputFile&                     in):Base(pg,in){}
         
         std::vector<std::string> getComponentsList(){return componentsList;}
 

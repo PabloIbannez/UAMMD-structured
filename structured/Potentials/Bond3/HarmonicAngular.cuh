@@ -65,7 +65,17 @@ namespace Bond3{
                 return make_real3(0);
             }
             
-            inline __device__ tensor3 virial(int i, int j, int k,
+            inline __device__ real virial(int i, int j, int k,
+                                          int bond_index,
+                                          const real3 &posi,
+                                          const real3 &posj,
+                                          const real3 &posk,
+                                          const BondInfo &bi){
+
+                return real(0);
+            }
+            
+            inline __device__ tensor3 stress(int i, int j, int k,
                                              int bond_index,
                                              const real3 &posi,
                                              const real3 &posj,
@@ -144,6 +154,16 @@ namespace Bond3{
 
                 return tensor3(0);
             }
+            
+            inline __device__ tensor3 stress(int i, int j, int k,
+                                             int bond_index,
+                                             const real3 &posi,
+                                             const real3 &posj,
+                                             const real3 &posk,
+                                             const BondInfo &bi){
+
+                return tensor3(0);
+            }
 
             inline __device__ real energy(int i, int j, int k,
                                           int bond_index,
@@ -208,6 +228,16 @@ namespace Bond3{
             }
             
             inline __device__ tensor3 virial(int i, int j, int k,
+                                             int bond_index,
+                                             const real3 &posi,
+                                             const real3 &posj,
+                                             const real3 &posk,
+                                             const BondInfo &bi){
+
+                return tensor3(0);
+            }
+            
+            inline __device__ tensor3 stress(int i, int j, int k,
                                              int bond_index,
                                              const real3 &posi,
                                              const real3 &posj,

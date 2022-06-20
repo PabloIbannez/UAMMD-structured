@@ -92,7 +92,8 @@ namespace Surface{
 
                 return 0;
             }
-            __device__ __forceinline__ real3 virial(const real4 &pos){return make_real3(0);}
+            __device__ __forceinline__ real virial(const real4 &pos){return real(0);}
+            __device__ __forceinline__ tensor3 stress(const real4 &pos){return tensor3(0);}
     	    
     	    std::tuple<const real4 *> getArrays(ParticleData *pd){
     	    	

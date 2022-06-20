@@ -26,23 +26,20 @@ class SimulationStep: public ParameterUpdatable{
             
     public:
 
-        SimulationStep(std::shared_ptr<System>       sys,
-                       std::shared_ptr<ParticleData>  pd,
-                       std::shared_ptr<ParticleGroup> pg,
+        SimulationStep(std::shared_ptr<ParticleGroup> pg,
                        std::string name,
                        int interval,
-                       int skip):sys(sys),
-                                 pd(pd),pg(pg),
+                       int skip):pg(pg),
+                                 pd(pg->getParticleData()),
+                                 sys(pg->getParticleData()->getSystem()),
                                  name(name),
                                  interval(interval),
                                  skip(skip),
                                  lastStepApplied(-1){}
         
-        SimulationStep(std::shared_ptr<System>       sys,
-                       std::shared_ptr<ParticleData>  pd,
-                       std::shared_ptr<ParticleGroup> pg,
+        SimulationStep(std::shared_ptr<ParticleGroup> pg,
                        std::string name,
-                       int interval):SimulationStep(sys,pd,pg,name,interval,0){}
+                       int interval):SimulationStep(pg,name,interval,0){}
 
         ~SimulationStep(){}
 
@@ -72,10 +69,8 @@ class SortStep: public SimulationStep {
 
     public:
         
-    SortStep(std::shared_ptr<System>       sys,
-             std::shared_ptr<ParticleData>  pd,
-             std::shared_ptr<ParticleGroup> pg,
-             int interval):SimulationStep(sys,pd,pg,"SortStep",interval){}
+    SortStep(std::shared_ptr<ParticleGroup> pg,
+             int interval):SimulationStep(pg,"SortStep",interval){}
 
         void init(cudaStream_t st) override {}
 
@@ -93,11 +88,9 @@ class InfoStep: public SimulationStep {
 
     int nSteps;
 
-    InfoStep(std::shared_ptr<System>       sys,
-             std::shared_ptr<ParticleData>  pd,
-             std::shared_ptr<ParticleGroup> pg,
+    InfoStep(std::shared_ptr<ParticleGroup> pg,
              int interval,
-             int nSteps):SimulationStep(sys,pd,pg,"InfoStep",interval),nSteps(nSteps){}
+             int nSteps):SimulationStep(pg,"InfoStep",interval),nSteps(nSteps){}
 
     void init(cudaStream_t st) override{
         tim = Timer();
@@ -177,33 +170,25 @@ class WriteStep: public SimulationStep{
             return param;
         }
         
-        WriteStep(std::shared_ptr<System>       sys,
-                  std::shared_ptr<ParticleData>  pd,
-                  std::shared_ptr<ParticleGroup> pg,
+        WriteStep(std::shared_ptr<ParticleGroup> pg,
                   int interval,
                   bool pbc,
                   bool append,
                   std::string outPutFormat,
-                  std::string outPutFilePath):WriteStep(sys,pd,pg,interval,{pbc,append,outPutFormat,outPutFilePath}){}
+                  std::string outPutFilePath):WriteStep(pg,interval,{pbc,append,outPutFormat,outPutFilePath}){}
         
-        WriteStep(std::shared_ptr<System>       sys,
-                  std::shared_ptr<ParticleData>  pd,
-                  std::shared_ptr<ParticleGroup> pg,
+        WriteStep(std::shared_ptr<ParticleGroup> pg,
                   int interval,
-                  InputFile& in):WriteStep(sys,pd,pg,interval,inputFileToParam(in)){}
+                  InputFile& in):WriteStep(pg,interval,inputFileToParam(in)){}
         
-        WriteStep(std::shared_ptr<System>       sys,
-                  std::shared_ptr<ParticleData>  pd,
-                  std::shared_ptr<ParticleGroup> pg,
-                  InputFile& in):WriteStep(sys,pd,pg,
+        WriteStep(std::shared_ptr<ParticleGroup> pg,
+                  InputFile& in):WriteStep(pg,
                                            std::stoi(in.getOption("nStepsWriteInterval",InputFile::Required).str()),
                                            inputFileToParam(in)){}
 
-        WriteStep(std::shared_ptr<System>       sys,
-                  std::shared_ptr<ParticleData>  pd,
-                  std::shared_ptr<ParticleGroup> pg,
+        WriteStep(std::shared_ptr<ParticleGroup> pg,
                   int interval,
-                  Parameters param):SimulationStep(sys,pd,pg,"Output",interval),
+                  Parameters param):SimulationStep(pg,"Output",interval),
                                     pbc(param.pbc),
                                     append(param.append),
                                     outPutFileName(param.outPutFilePath),
@@ -242,12 +227,12 @@ class WriteStep: public SimulationStep{
                         if(!append){
                             std::ofstream outPSF(outPutFilePath + ".psf");
                             
-                            psf::WritePSF(sys,pd,pg,outPSF);
+                            psf::WritePSF(pg,outPSF);
 
                             outPutFilePath = outPutFilePath + "." + outPutFormat;
                             outPutFile.open(outPutFilePath,std::ios::binary);
                     
-                            InputOutput::Output::WriteDCDheader(sys,pd,pg,
+                            InputOutput::Output::WriteDCDheader(pg,
                                                                 frame,
                                                                 this->interval,
                                                                 outPutFile);
@@ -282,39 +267,39 @@ class WriteStep: public SimulationStep{
 
             if(outPutFormat == 
                std::string("coord")){
-                InputOutput::Output::WriteCoord(sys,pd,pg,box,outPutFile);
+                InputOutput::Output::WriteCoord(pg,box,outPutFile);
             } else if(outPutFormat == 
                       std::string("sp")){
-                InputOutput::Output::WriteSP(sys,pd,pg,box,outPutFile);
+                InputOutput::Output::WriteSP(pg,box,outPutFile);
             } else if (outPutFormat == 
                        std::string("xyz")){
-                InputOutput::Output::WriteXYZ(sys,pd,pg,box,outPutFile);
+                InputOutput::Output::WriteXYZ(pg,box,outPutFile);
             } else if (outPutFormat == 
                        std::string("pdb")){
-                InputOutput::Output::WritePDB(sys,pd,pg,box,frame,outPutFile);
+                InputOutput::Output::WritePDB(pg,box,frame,outPutFile);
             } else if (outPutFormat == 
                        std::string("itpv")){
-                InputOutput::Output::WriteITPV(sys,pd,pg,box,outPutFile);
+                InputOutput::Output::WriteITPV(pg,box,outPutFile);
             } else if (outPutFormat == 
                        std::string("itpd")){
-                InputOutput::Output::WriteITPD(sys,pd,pg,box,outPutFile);
+                InputOutput::Output::WriteITPD(pg,box,outPutFile);
             } else if (outPutFormat == 
                        std::string("dcd")){
-                InputOutput::Output::WriteDCD(sys,pd,pg,
+                InputOutput::Output::WriteDCD(pg,
                                               box,
                                               frame,step,
                                               outPutFile);
             } else if (outPutFormat == 
                        std::string("lammpstrj")){
-                InputOutput::Output::WriteLAMMPS(sys,pd,pg,box,time,outPutFile);
+                InputOutput::Output::WriteLAMMPS(pg,box,time,outPutFile);
             } else if (outPutFormat == 
                        std::string("vel")){
-                InputOutput::Output::WriteVelocity(sys,pd,pg,outPutFile);
+                InputOutput::Output::WriteVelocity(pg,outPutFile);
             } else if (outPutFormat == 
                        std::string("back")){
                 outPutFile.close();
                 outPutFile.open(outPutFilePath);
-                InputOutput::Output::WriteCoord(sys,pd,pg,box,outPutFile);
+                InputOutput::Output::WriteCoord(pg,box,outPutFile);
             } else {
                 sys->log<System::CRITICAL>("[WriteStep] It should not have happen,"
                                            "have the output format changed ?");
@@ -351,12 +336,10 @@ class EnergyMeasure: public SimulationStep{
 
     public:
         
-        EnergyMeasure(std::shared_ptr<System>       sys,
-                      std::shared_ptr<ParticleData>  pd,
-                      std::shared_ptr<ParticleGroup> pg,
+        EnergyMeasure(std::shared_ptr<ParticleGroup> pg,
                       int interval,
                       std::string outPutFileName,
-                      std::shared_ptr<ForceField> ff):SimulationStep(sys,pd,pg,"EnergyMeasure",interval),
+                      std::shared_ptr<ForceField> ff):SimulationStep(pg,"EnergyMeasure",interval),
                                                       ff(ff){
             outPutFile = std::ofstream(outPutFileName);
         }
@@ -376,12 +359,8 @@ class EnergyMeasure: public SimulationStep{
 
             ff->sum(comp,st);
 
-            real kE = Measures::totalKineticEnergy(this->sys,
-                                                   this->pd,
-                                                   this->pg,st);
-            real pE = Measures::totalPotentialEnergy(this->sys,
-                                                     this->pd,
-                                                     this->pg,st);
+            real kE = Measures::totalKineticEnergy(this->pg,st);
+            real pE = Measures::totalPotentialEnergy(this->pg,st);
 
             this->outPutFile << step << " " << kE << " " << pE << " " << kE+pE << std::endl;
         }
@@ -396,11 +375,9 @@ class TemperatureMeasure: public SimulationStep{
        
     public:
 
-        TemperatureMeasure(std::shared_ptr<System>       sys,
-                           std::shared_ptr<ParticleData>  pd,
-                           std::shared_ptr<ParticleGroup> pg,
+        TemperatureMeasure(std::shared_ptr<ParticleGroup> pg,
                            int interval,
-                           std::string outPutFileName):SimulationStep(sys,pd,pg,"Temperature",interval){
+                           std::string outPutFileName):SimulationStep(pg,"Temperature",interval){
 
             outPutFile = std::ofstream(outPutFileName);
         }
@@ -409,9 +386,7 @@ class TemperatureMeasure: public SimulationStep{
 
         void applyStep(int step, cudaStream_t st) override{
             
-            real kE = Measures::totalKineticEnergy(this->sys,
-                                                   this->pd,
-                                                   this->pg,st);
+            real kE = Measures::totalKineticEnergy(this->pg,st);
             
             int N = this->pg->getNumberParticles();
 
@@ -433,12 +408,10 @@ class TemperaturePressureMeasure: public SimulationStep{
        
     public:
 
-        TemperaturePressureMeasure(std::shared_ptr<System>       sys,
-                                   std::shared_ptr<ParticleData>  pd,
-                                   std::shared_ptr<ParticleGroup> pg,
+        TemperaturePressureMeasure(std::shared_ptr<ParticleGroup> pg,
                                    int interval,
                                    std::string outPutFileName,
-                                   real Kb,Box box):SimulationStep(sys,pd,pg,"TemperaturePressure",interval),
+                                   real Kb,Box box):SimulationStep(pg,"TemperaturePressure",interval),
                                                     Kb(Kb),
                                                     box(box){
             outPutFile = std::ofstream(outPutFileName);
@@ -448,16 +421,10 @@ class TemperaturePressureMeasure: public SimulationStep{
 
         void applyStep(int step, cudaStream_t st) override{
             
-            real kE = Measures::totalKineticEnergy(this->sys,
-                                                   this->pd,
-                                                   this->pg,st);
+            real kE = Measures::totalKineticEnergy(this->pg,st);
             
-            tensor3 Pk = Measures::totalKineticPressure(this->sys,
-                                                        this->pd,
-                                                        this->pg,st);
-            tensor3 Pv = Measures::totalVirial(this->sys,
-                                               this->pd,
-                                               this->pg,st);
+            tensor3 Pk = Measures::totalKineticPressure(this->pg,st);
+            tensor3 Pv = Measures::totalStress(this->pg,st);
 
             int N = this->pg->getNumberParticles();
 
@@ -487,12 +454,10 @@ class StressMeasure: public SimulationStep{
 
     public:
         
-        StressMeasure(std::shared_ptr<System>       sys,
-                      std::shared_ptr<ParticleData>  pd,
-                      std::shared_ptr<ParticleGroup> pg,
+        StressMeasure(std::shared_ptr<ParticleGroup> pg,
                       int interval,
                       std::string outPutFileName,
-                      std::shared_ptr<ForceField> ff):SimulationStep(sys,pd,pg,"StressMeasure",interval),
+                      std::shared_ptr<ForceField> ff):SimulationStep(pg,"StressMeasure",interval),
                                                       ff(ff){
             outPutFile = std::ofstream(outPutFileName);
         }
@@ -502,13 +467,13 @@ class StressMeasure: public SimulationStep{
         void applyStep(int step, cudaStream_t st) override{
             
             {
-                auto virial = pd->getVirial(access::location::gpu, access::mode::write);     
-                thrust::fill(thrust::cuda::par.on(st), virial.begin(), virial.end(), real(0));
+                auto stress = pd->getStress(access::location::gpu, access::mode::write);     
+                thrust::fill(thrust::cuda::par.on(st), stress.begin(), stress.end(), real(0));
             }
 
             uammd::Interactor::Computables comp;
 
-            comp.virial = true;
+            comp.stress = true;
 
             ff->sum(comp,st);
 
@@ -520,7 +485,7 @@ class StressMeasure: public SimulationStep{
             auto pos   = pd->getPos(access::location::cpu, 
                                     access::mode::read);
             
-            auto virial = pd->getVirial(access::location::cpu, 
+            auto stress = pd->getStress(access::location::cpu, 
                                         access::mode::read);     
 
             auto groupIndex  = pg->getIndexIterator(access::location::cpu);
@@ -543,7 +508,7 @@ class StressMeasure: public SimulationStep{
 
                 this->outPutFile << id[index]     << " " 
                                  << p             << " "
-                                 << virial[index] << std::endl;
+                                 << stress[index] << std::endl;
             }
         }
 };
@@ -567,15 +532,13 @@ class NativeContactsMeasure: public SimulationStep{
        
     public:
 
-        NativeContactsMeasure(std::shared_ptr<System>       sys,
-                              std::shared_ptr<ParticleData>  pd,
-                              std::shared_ptr<ParticleGroup> pg,
+        NativeContactsMeasure(std::shared_ptr<ParticleGroup> pg,
                               int interval,
                               std::string fileNativeContacts,
                               std::string labelNativeContacts,
                               std::string ncOutPutFileName,
                               std::string comncOutPutFileName,
-                              std::shared_ptr<NativeContactDefinition> ncd):SimulationStep(sys,pd,pg,"NaticeContactsMeasure",interval),
+                              std::shared_ptr<NativeContactDefinition> ncd):SimulationStep(pg,"NaticeContactsMeasure",interval),
                                                                             fileNativeContacts(fileNativeContacts),
                                                                             labelNativeContacts(labelNativeContacts),
                                                                             ncd(ncd){

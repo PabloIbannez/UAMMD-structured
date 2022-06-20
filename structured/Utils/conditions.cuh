@@ -32,21 +32,19 @@ namespace conditions{
             return param;
         }
 
-        all(std::shared_ptr<System>       sys,
-            std::shared_ptr<ParticleData>  pd,
+        all(std::shared_ptr<ParticleData>  pd,
             std::shared_ptr<Topology>     top,
             Parameters param):
-            sys(sys),pd(pd),
+            sys(pd->getSystem()),pd(pd),
             top(top)
            {
              sys->log<System::MESSAGE>("[Condition] Condition \"all\" initialized");
            }
 
         
-        all(std::shared_ptr<System>       sys,
-            std::shared_ptr<ParticleData>  pd,
+        all(std::shared_ptr<ParticleData>  pd,
             std::shared_ptr<Topology>     top,
-            InputFile&                     in):all(sys,pd,top,inputFileToParam(in)){}
+            InputFile&                     in):all(pd,top,inputFileToParam(in)){}
 
         struct conditionChecker{
             
@@ -97,21 +95,19 @@ namespace conditions{
             return param;
         }
 
-        allInter(std::shared_ptr<System>       sys,
-                 std::shared_ptr<ParticleData>  pd,
+        allInter(std::shared_ptr<ParticleData>  pd,
                  std::shared_ptr<Topology>     top,
                  Parameters param):
-                 sys(sys),pd(pd),
+                 sys(pd->getSystem()),pd(pd),
                  top(top)
                 {
                   sys->log<System::MESSAGE>("[Condition] Condition \"allInter\" initialized");
                 }
 
         
-        allInter(std::shared_ptr<System>       sys,
-                 std::shared_ptr<ParticleData>  pd,
+        allInter(std::shared_ptr<ParticleData>  pd,
                  std::shared_ptr<Topology>     top,
-                 InputFile&                     in):allInter(sys,pd,top,inputFileToParam(in)){}
+                 InputFile&                     in):allInter(pd,top,inputFileToParam(in)){}
 
         struct conditionChecker{
             
@@ -172,26 +168,24 @@ namespace conditions{
         std::string exclusionsLabel;
         std::shared_ptr<exclusions>   exclusionList;
 
-        excluded(std::shared_ptr<System>       sys,
-                 std::shared_ptr<ParticleData>  pd,
+        excluded(std::shared_ptr<ParticleData>  pd,
                  std::shared_ptr<Topology>     top,
                  Parameters param):
-                 sys(sys),pd(pd),
+                 sys(pd->getSystem()),pd(pd),
                  top(top),
                  exclusionsLabel(param.exclusionsLabel)
                 {
                   sys->log<System::MESSAGE>("[Condition] Condition \"excluded\" initialized");
 
-                  exclusionList = std::make_shared<exclusions>(this->sys, this->pd);
+                  exclusionList = std::make_shared<exclusions>(this->pd);
                   exclusionList->loadExclusionListFromTopology(this->top,"EXCLUSIONS");
 
                 }
 
         
-        excluded(std::shared_ptr<System>       sys,
-                 std::shared_ptr<ParticleData>  pd,
+        excluded(std::shared_ptr<ParticleData>  pd,
                  std::shared_ptr<Topology>     top,
-                 InputFile&                     in):excluded(sys,pd,top,inputFileToParam(in)){}
+                 InputFile&                     in):excluded(pd,top,inputFileToParam(in)){}
 
         struct conditionChecker{
             
@@ -276,26 +270,24 @@ namespace conditions{
         std::string exclusionsLabel;
         std::shared_ptr<exclusions>   exclusionList;
 
-        chargedExcluded(std::shared_ptr<System>       sys,
-                        std::shared_ptr<ParticleData>  pd,
+        chargedExcluded(std::shared_ptr<ParticleData>  pd,
                         std::shared_ptr<Topology>     top,
                         Parameters param):
-                        sys(sys),pd(pd),
+                        sys(pd->getSystem()),pd(pd),
                         top(top),
                         exclusionsLabel(param.exclusionsLabel)
                        {
                          sys->log<System::MESSAGE>("[Condition] Condition \"chargedExcluded\" initialized");
 
-                         exclusionList = std::make_shared<exclusions>(this->sys, this->pd);
+                         exclusionList = std::make_shared<exclusions>(this->pd);
                          exclusionList->loadExclusionListFromTopology(this->top,"EXCLUSIONS");
 
                        }
 
         
-        chargedExcluded(std::shared_ptr<System>       sys,
-                        std::shared_ptr<ParticleData>  pd,
+        chargedExcluded(std::shared_ptr<ParticleData>  pd,
                         std::shared_ptr<Topology>     top,
-                        InputFile&                     in):chargedExcluded(sys,pd,top,inputFileToParam(in)){}
+                        InputFile&                     in):chargedExcluded(pd,top,inputFileToParam(in)){}
 
         struct conditionChecker{
             
@@ -394,26 +386,24 @@ namespace conditions{
         std::string exclusionsLabel;
         std::shared_ptr<exclusions>   exclusionList;
 
-        excludedIntra(std::shared_ptr<System>       sys,
-                      std::shared_ptr<ParticleData>  pd,
+        excludedIntra(std::shared_ptr<ParticleData>  pd,
                       std::shared_ptr<Topology>     top,
                       Parameters param):
-                      sys(sys),pd(pd),
+                      sys(pd->getSystem()),pd(pd),
                       top(top),
                       exclusionsLabel(param.exclusionsLabel)
                      {
                        sys->log<System::MESSAGE>("[Condition] Condition \"excludedIntra\" initialized");
 
-                       exclusionList = std::make_shared<exclusions>(this->sys, this->pd);
+                       exclusionList = std::make_shared<exclusions>(this->pd);
                        exclusionList->loadExclusionListFromTopology(this->top,"EXCLUSIONS");
 
                      }
 
         
-        excludedIntra(std::shared_ptr<System>       sys,
-                      std::shared_ptr<ParticleData>  pd,
+        excludedIntra(std::shared_ptr<ParticleData>  pd,
                       std::shared_ptr<Topology>     top,
-                      InputFile&                     in):excludedIntra(sys,pd,top,inputFileToParam(in)){}
+                      InputFile&                     in):excludedIntra(pd,top,inputFileToParam(in)){}
         
         struct conditionChecker{
             
@@ -501,26 +491,24 @@ namespace conditions{
         std::string exclusionsLabel;
         std::shared_ptr<exclusions>   exclusionList;
 
-        excludedInter(std::shared_ptr<System>       sys,
-                      std::shared_ptr<ParticleData>  pd,
+        excludedInter(std::shared_ptr<ParticleData>  pd,
                       std::shared_ptr<Topology>     top,
                       Parameters param):
-                      sys(sys),pd(pd),
+                      sys(pd->getSystem()),pd(pd),
                       top(top),
                       exclusionsLabel(param.exclusionsLabel)
                      {
                        sys->log<System::MESSAGE>("[Condition] Condition \"excludedInter\" initialized");
 
-                       exclusionList = std::make_shared<exclusions>(this->sys, this->pd);
+                       exclusionList = std::make_shared<exclusions>(this->pd);
                        exclusionList->loadExclusionListFromTopology(this->top,"EXCLUSIONS");
 
                      }
 
         
-        excludedInter(std::shared_ptr<System>       sys,
-                      std::shared_ptr<ParticleData>  pd,
+        excludedInter(std::shared_ptr<ParticleData>  pd,
                       std::shared_ptr<Topology>     top,
-                      InputFile&                     in):excludedInter(sys,pd,top,inputFileToParam(in)){}
+                      InputFile&                     in):excludedInter(pd,top,inputFileToParam(in)){}
 
         struct conditionChecker{
             
@@ -600,21 +588,19 @@ namespace conditions{
             return param;
         }
         
-        intraInter(std::shared_ptr<System>       sys,
-                   std::shared_ptr<ParticleData>  pd,
+        intraInter(std::shared_ptr<ParticleData>  pd,
                    std::shared_ptr<Topology>     top,
                    Parameters param):
-                   sys(sys),pd(pd),
+                   sys(pd->getSystem()),pd(pd),
                    top(top)
                   {
                     sys->log<System::MESSAGE>("[Condition] Condition \"intraInter\" initialized");
                   }
 
         
-        intraInter(std::shared_ptr<System>       sys,
-                   std::shared_ptr<ParticleData>  pd,
+        intraInter(std::shared_ptr<ParticleData>  pd,
                    std::shared_ptr<Topology>     top,
-                   InputFile&                     in):intraInter(sys,pd,top,inputFileToParam(in)){}
+                   InputFile&                     in):intraInter(pd,top,inputFileToParam(in)){}
 
 
         struct conditionChecker{
@@ -690,26 +676,24 @@ namespace conditions{
         std::string exclusionsLabel;
         std::shared_ptr<exclusions>   exclusionList;
 
-        excludedIntraInter(std::shared_ptr<System>       sys,
-                           std::shared_ptr<ParticleData>  pd,
+        excludedIntraInter(std::shared_ptr<ParticleData>  pd,
                            std::shared_ptr<Topology>     top,
                            Parameters param):
-                           sys(sys),pd(pd),
+                           sys(pd->getSystem()),pd(pd),
                            top(top),
                            exclusionsLabel(param.exclusionsLabel)
                           {
                             sys->log<System::MESSAGE>("[Condition] Condition \"excludedIntraInter\" initialized");
 
-                            exclusionList = std::make_shared<exclusions>(this->sys, this->pd);
+                            exclusionList = std::make_shared<exclusions>(this->pd);
                             exclusionList->loadExclusionListFromTopology(this->top,"EXCLUSIONS");
 
                           }
 
         
-        excludedIntraInter(std::shared_ptr<System>       sys,
-                           std::shared_ptr<ParticleData>  pd,
+        excludedIntraInter(std::shared_ptr<ParticleData>  pd,
                            std::shared_ptr<Topology>     top,
-                           InputFile&                     in):excludedIntraInter(sys,pd,top,inputFileToParam(in)){}
+                           InputFile&                     in):excludedIntraInter(pd,top,inputFileToParam(in)){}
 
         struct conditionChecker{
             
@@ -801,26 +785,24 @@ namespace conditions{
         std::string exclusionsLabel;
         std::shared_ptr<exclusions>   exclusionList;
 
-        excludedIntraInterCharged(std::shared_ptr<System>       sys,
-                                  std::shared_ptr<ParticleData>  pd,
+        excludedIntraInterCharged(std::shared_ptr<ParticleData>  pd,
                                   std::shared_ptr<Topology>     top,
                                   Parameters param):
-                                  sys(sys),pd(pd),
+                                  sys(pd->getSystem()),pd(pd),
                                   top(top),
                                   exclusionsLabel(param.exclusionsLabel)
                                  {
                                    sys->log<System::MESSAGE>("[Condition] Condition \"excludedIntraInterCharged\" initialized");
 
-                                   exclusionList = std::make_shared<exclusions>(this->sys, this->pd);
+                                   exclusionList = std::make_shared<exclusions>(this->pd);
                                    exclusionList->loadExclusionListFromTopology(this->top,"EXCLUSIONS");
 
                                  }
 
         
-        excludedIntraInterCharged(std::shared_ptr<System>       sys,
-                                  std::shared_ptr<ParticleData>  pd,
+        excludedIntraInterCharged(std::shared_ptr<ParticleData>  pd,
                                   std::shared_ptr<Topology>     top,
-                                  InputFile&                     in):excludedIntraInterCharged(sys,pd,top,inputFileToParam(in)){}
+                                  InputFile&                     in):excludedIntraInterCharged(pd,top,inputFileToParam(in)){}
 
         struct conditionChecker{
             
@@ -924,26 +906,24 @@ namespace conditions{
         std::string exclusionsLabel;
         std::shared_ptr<exclusions>   exclusionList;
 
-        excludedIntraInterSASAThreshold(std::shared_ptr<System>       sys,
-                                        std::shared_ptr<ParticleData>  pd,
+        excludedIntraInterSASAThreshold(std::shared_ptr<ParticleData>  pd,
                                         std::shared_ptr<Topology>     top,
                                         Parameters param):
-                                        sys(sys),pd(pd),
+                                        sys(pd->getSystem()),pd(pd),
                                         top(top),
                                         exclusionsLabel(param.exclusionsLabel)
                                        {
                                          sys->log<System::MESSAGE>("[Condition] Condition \"excludedIntraInterSASAThreshold\" initialized");
 
-                                         exclusionList = std::make_shared<exclusions>(this->sys, this->pd);
+                                         exclusionList = std::make_shared<exclusions>(this->pd);
                                          exclusionList->loadExclusionListFromTopology(this->top,"EXCLUSIONS");
 
                                        }
 
         
-        excludedIntraInterSASAThreshold(std::shared_ptr<System>       sys,
-                                        std::shared_ptr<ParticleData>  pd,
+        excludedIntraInterSASAThreshold(std::shared_ptr<ParticleData>  pd,
                                         std::shared_ptr<Topology>     top,
-                                        InputFile&                     in):excludedIntraInterSASAThreshold(sys,pd,top,inputFileToParam(in)){}
+                                        InputFile&                     in):excludedIntraInterSASAThreshold(pd,top,inputFileToParam(in)){}
 
         void setSASAThreshold(real newSASAThreshold){
             SASAThreshold = newSASAThreshold;
@@ -1053,26 +1033,24 @@ namespace conditions{
         std::string exclusionsLabel;
         std::shared_ptr<exclusions>   exclusionList;
 
-        excludedIntraInterChargedInter(std::shared_ptr<System>       sys,
-                                       std::shared_ptr<ParticleData>  pd,
+        excludedIntraInterChargedInter(std::shared_ptr<ParticleData>  pd,
                                        std::shared_ptr<Topology>     top,
                                        Parameters param):
-                                       sys(sys),pd(pd),
+                                       sys(pd->getSystem()),pd(pd),
                                        top(top),
                                        exclusionsLabel(param.exclusionsLabel)
                                       {
                                         sys->log<System::MESSAGE>("[Condition] Condition \"excludedIntraInterChargedInter\" initialized");
 
-                                        exclusionList = std::make_shared<exclusions>(this->sys, this->pd);
+                                        exclusionList = std::make_shared<exclusions>(this->pd);
                                         exclusionList->loadExclusionListFromTopology(this->top,"EXCLUSIONS");
 
                                       }
 
         
-        excludedIntraInterChargedInter(std::shared_ptr<System>       sys,
-                                       std::shared_ptr<ParticleData>  pd,
+        excludedIntraInterChargedInter(std::shared_ptr<ParticleData>  pd,
                                        std::shared_ptr<Topology>     top,
-                                       InputFile&                     in):excludedIntraInterChargedInter(sys,pd,top,inputFileToParam(in)){}
+                                       InputFile&                     in):excludedIntraInterChargedInter(pd,top,inputFileToParam(in)){}
 
         struct conditionChecker{
             

@@ -339,16 +339,16 @@ namespace Bond2{
 
     };
         
-    using LennardJonesType2        = Bond2<addVirial<LennardJones_<CommonPotentials::LennardJones::Type2>>>;
-    using LennardJonesType2Const_e = Bond2<addVirial<LennardJonesConst_e_<CommonPotentials::LennardJones::Type2>>>;
+    using LennardJonesType2        = Bond2<addVirialStress<LennardJones_<CommonPotentials::LennardJones::Type2>>>;
+    using LennardJonesType2Const_e = Bond2<addVirialStress<LennardJonesConst_e_<CommonPotentials::LennardJones::Type2>>>;
     
-    using LennardJonesType3        = Bond2<addVirial<LennardJones_<CommonPotentials::LennardJones::Type3>>>;
-    using LennardJonesType3Const_e = Bond2<addVirial<LennardJonesConst_e_<CommonPotentials::LennardJones::Type3>>>;
+    using LennardJonesType3        = Bond2<addVirialStress<LennardJones_<CommonPotentials::LennardJones::Type3>>>;
+    using LennardJonesType3Const_e = Bond2<addVirialStress<LennardJonesConst_e_<CommonPotentials::LennardJones::Type3>>>;
     
-    using LennardJonesKaranicolasBrooks = Bond2<addVirial<LennardJonesKaranicolasBrooks_>>;
+    using LennardJonesKaranicolasBrooks = Bond2<addVirialStress<LennardJonesKaranicolasBrooks_>>;
     
-    using LennardJonesGaussian = Bond2<addVirial<LennardJonesGaussian_>>;
-    using LennardJonesGaussianConst_e_D = Bond2<addVirial<LennardJonesGaussianConst_e_D_>>;
+    using LennardJonesGaussian = Bond2<addVirialStress<LennardJonesGaussian_>>;
+    using LennardJonesGaussianConst_e_D = Bond2<addVirialStress<LennardJonesGaussianConst_e_D_>>;
 
 }}}}
 

@@ -6,16 +6,29 @@ namespace structured{
 namespace Measures{
 namespace MeasuresTransforms{
     
-    struct totalVirial : public thrust::unary_function<int,tensor3>
+    struct totalVirial : public thrust::unary_function<int,real>
     {
-        tensor3* virial;
+        real* virial;
 
-        totalVirial(tensor3* virial):virial(virial){}
+        totalVirial(real* virial):virial(virial){}
+
+        __host__ __device__
+        real operator()(int index) const
+        {
+            return virial[index];
+        }
+    };
+    
+    struct totalStress : public thrust::unary_function<int,tensor3>
+    {
+        tensor3* stress;
+
+        totalStress(tensor3* stress):stress(stress){}
 
         __host__ __device__
         tensor3 operator()(int index) const
         {
-            return virial[index];
+            return stress[index];
         }
     };
     

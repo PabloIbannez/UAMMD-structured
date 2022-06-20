@@ -177,9 +177,9 @@ namespace Bond2{
 
     };
 
-    using Fene              = Bond2<addVirial<Fene_>>;
-    using FeneConst_K_R0    = Bond2<addVirial<FeneConst_K_R0_>>;
-    using FeneConst_r0_K_R0 = Bond2<addVirial<FeneConst_r0_K_R0_>>;
+    using Fene              = Bond2<addVirialStress<Fene_>>;
+    using FeneConst_K_R0    = Bond2<addVirialStress<FeneConst_K_R0_>>;
+    using FeneConst_r0_K_R0 = Bond2<addVirialStress<FeneConst_r0_K_R0_>>;
 
 }}}}
 

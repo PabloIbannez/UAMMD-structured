@@ -57,7 +57,7 @@ namespace Interactor{
             {
                 N1=group1->getNumberParticles();
 
-                M1 = Measures::totalMass(sys,pd,group1,0);
+                M1 = Measures::totalMass(group1,0);
 
                 this->setState({0.0,0.0,0.0});
 
@@ -245,8 +245,8 @@ namespace Interactor{
                 N1=group1->getNumberParticles();
                 N2=group2->getNumberParticles();
 
-                M1 = Measures::totalMass(sys,pd,group1,0);
-                M2 = Measures::totalMass(sys,pd,group2,0);
+                M1 = Measures::totalMass(group1,0);
+                M2 = Measures::totalMass(group2,0);
 
                 com1M1.resize(1);
                 com2M2.resize(1);
@@ -462,7 +462,7 @@ namespace Interactor{
             {
                 N = pg->getNumberParticles();
 
-                M = Measures::totalMass(sys,pd,pg,0);
+                M = Measures::totalMass(pg,0);
 
                 comM.resize(1);
 
@@ -653,8 +653,8 @@ namespace Interactor{
                 N1=group1->getNumberParticles();
                 N2=group2->getNumberParticles();
 
-                M1 = Measures::totalMass(sys,pd,group1,0);
-                M2 = Measures::totalMass(sys,pd,group2,0);
+                M1 = Measures::totalMass(group1,0);
+                M2 = Measures::totalMass(group2,0);
 
                 com1M1.resize(1);
                 com2M2.resize(1);

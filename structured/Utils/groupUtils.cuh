@@ -5,8 +5,7 @@ namespace uammd{
 namespace structured{
 namespace groupUtils{
 
-std::set<int> getModelList(std::shared_ptr<System>      sys,
-                           std::shared_ptr<ParticleData> pd){
+std::set<int> getModelList(std::shared_ptr<ParticleData> pd){
     
     std::set<int> mdlList;
     {
@@ -20,8 +19,7 @@ std::set<int> getModelList(std::shared_ptr<System>      sys,
     return mdlList;
 }
 
-std::set<int> getSimList(std::shared_ptr<System>      sys,
-                         std::shared_ptr<ParticleData> pd){
+std::set<int> getSimList(std::shared_ptr<ParticleData> pd){
     
     std::set<int> simList;
     {
@@ -35,12 +33,11 @@ std::set<int> getSimList(std::shared_ptr<System>      sys,
     return simList;
 }
 
-std::vector<std::shared_ptr<uammd::ParticleGroup>> getSimGroups(std::shared_ptr<System>      sys,
-                                                                std::shared_ptr<ParticleData> pd){
+std::vector<std::shared_ptr<uammd::ParticleGroup>> getSimGroups(std::shared_ptr<ParticleData> pd){
 
     std::vector<std::shared_ptr<uammd::ParticleGroup>> simGroups;
 
-    std::set<int> simList = getSimList(sys,pd);
+    std::set<int> simList = getSimList(pd);
 
     for(const int& s : simList){
 
@@ -48,7 +45,6 @@ std::vector<std::shared_ptr<uammd::ParticleGroup>> getSimGroups(std::shared_ptr<
 
         auto pg = std::make_shared<uammd::ParticleGroup>(selector,
                                                          pd,
-                                                         sys,
                                                          "simId_"+std::to_string(s));
         simGroups.push_back(pg);
         
@@ -57,13 +53,12 @@ std::vector<std::shared_ptr<uammd::ParticleGroup>> getSimGroups(std::shared_ptr<
     return simGroups;
 }
 
-std::vector<std::shared_ptr<uammd::ParticleGroup>> getSimModelGroups(std::shared_ptr<System>      sys,
-                                                                     std::shared_ptr<ParticleData> pd,
+std::vector<std::shared_ptr<uammd::ParticleGroup>> getSimModelGroups(std::shared_ptr<ParticleData> pd,
                                                                      int mdlId){
 
     std::vector<std::shared_ptr<uammd::ParticleGroup>> simMdlGroups;
 
-    std::set<int> simList = getSimList(sys,pd);
+    std::set<int> simList = getSimList(pd);
 
     for(const int& s : simList){
 
@@ -71,7 +66,6 @@ std::vector<std::shared_ptr<uammd::ParticleGroup>> getSimModelGroups(std::shared
 
         auto pg = std::make_shared<uammd::ParticleGroup>(selector,
                                                          pd,
-                                                         sys,
                                                          "simId_"+std::to_string(s)+"_mdl_"+std::to_string(mdlId));
         simMdlGroups.push_back(pg);
         
@@ -80,10 +74,10 @@ std::vector<std::shared_ptr<uammd::ParticleGroup>> getSimModelGroups(std::shared
     return simMdlGroups;
 }
 
-bool checkSimGroupsEqual(std::shared_ptr<System>      sys,
-                         std::shared_ptr<ParticleData> pd,
+bool checkSimGroupsEqual(std::shared_ptr<ParticleData> pd,
                          std::vector<std::shared_ptr<uammd::ParticleGroup>> simGroups){
     
+    auto sys = pd->getSystem();
 
     int N = simGroups[0]->getNumberParticles();
     for(auto& sg : simGroups){

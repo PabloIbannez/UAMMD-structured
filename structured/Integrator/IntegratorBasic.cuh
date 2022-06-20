@@ -36,7 +36,7 @@ namespace structured{
             auto fricConst = pd->getFrictionConstant(access::location::cpu, 
                                                      access::mode::write);
 
-            loadProperty<decltype(fricConst),real>(pd,pg,fricConst,frictionConstant);
+            loadProperty<decltype(fricConst),real>(pg,fricConst,frictionConstant);
         }
         
         void generateVelocity(shared_ptr<ParticleGroup> pg,
@@ -133,12 +133,10 @@ namespace structured{
                 return param;
             }
 
-        IntegratorBasic(shared_ptr<ParticleData>  pd,
-                        shared_ptr<ParticleGroup> pg,
-                        shared_ptr<System>       sys,
+        IntegratorBasic(shared_ptr<ParticleGroup> pg,
                         Parameters param,
                         std::string name,
-                        cudaStream_t stream):Integrator(pd, pg, sys, name),
+                        cudaStream_t stream):Integrator(pg,name),
                                              box(param.box),
                                              dt(param.dt),
                                              stopTransRotSteps(param.stopTransRotSteps),
@@ -210,7 +208,7 @@ namespace structured{
             void resetVirial(cudaStream_t st){
                 
                 auto virial = pd->getVirial(access::location::gpu, access::mode::readwrite);     
-                thrust::fill(thrust::cuda::par.on(st), virial.begin(), virial.end(), tensor3(0));
+                thrust::fill(thrust::cuda::par.on(st), virial.begin(), virial.end(), real(0));
                 
                 CudaCheckError();
             }
@@ -219,36 +217,51 @@ namespace structured{
                 resetVirial(stream);
             }
             
-            void sumForce() {
-                this->sumForce(stream);
+            void updateForce() {
+                this->updateForce(stream);
             }
             
-            void sumForce(cudaStream_t st){
+            void updateForce(cudaStream_t st){
                 for(auto forceComp: interactors) forceComp->sum({.force =true,
                                                                  .energy=false,
-                                                                 .virial=false,},st);
+                                                                 .virial=false,
+                                                                 .stress=false},st);
                 CudaCheckError();
             }
             
-            void sumVirial() {
-                this->sumVirial(stream);
+            void updateVirial() {
+                this->updateVirial(stream);
             }
             
-            void sumVirial(cudaStream_t st){
+            void updateVirial(cudaStream_t st){
                 for(auto virialComp: interactors) virialComp->sum({.force =false,
                                                                    .energy=false,
-                                                                   .virial=true,},st);
+                                                                   .virial=true,
+                                                                   .stress=false},st);
                 CudaCheckError();
             }
             
-            void sumEnergy() override {
-                this->sumEnergy(stream);
+            void updateStress() {
+                this->updateStress(stream);
+            }
+            
+            void updateStress(cudaStream_t st){
+                for(auto stressComp: interactors) stressComp->sum({.force =false,
+                                                                   .energy=false,
+                                                                   .virial=false,
+                                                                   .stress=true},st);
+                CudaCheckError();
+            }
+            
+            void updateEnergy() {
+                this->updateEnergy(stream);
             }
 
-            void sumEnergy(cudaStream_t st){
+            void updateEnergy(cudaStream_t st){
                 for(auto energyComp: interactors) energyComp->sum({.force =false,
                                                                    .energy=true,
-                                                                   .virial=false,},st);
+                                                                   .virial=false,
+                                                                   .stress=false},st);
                 CudaCheckError();
             }
             
@@ -293,12 +306,10 @@ namespace structured{
                 return param;
             }
 
-        IntegratorBasicNVT(shared_ptr<ParticleData>  pd,
-                           shared_ptr<ParticleGroup> pg,
-                           shared_ptr<System>       sys,
+        IntegratorBasicNVT(shared_ptr<ParticleGroup> pg,
                            Parameters param,
                            std::string name,
-                           cudaStream_t stream):IntegratorBasic(pd, pg, sys,param,name,stream),
+                           cudaStream_t stream):IntegratorBasic(pg,param,name,stream),
                                                 kB(param.kB), 
                                                 T(param.T){
                         

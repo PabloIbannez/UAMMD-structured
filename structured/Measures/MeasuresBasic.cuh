@@ -7,7 +7,28 @@ namespace uammd{
 namespace structured{
 namespace Measures{
     
-    tensor3  totalVirial(std::shared_ptr<ParticleGroup> pg,
+    real totalVirial(std::shared_ptr<ParticleGroup> pg,
+                      cudaStream_t st){
+
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
+        
+        int N = pg->getNumberParticles();
+
+        real* virial = pd->getVirial(access::location::gpu, access::mode::read).raw();
+        
+        MeasuresTransforms::totalVirial pp(virial);
+
+        auto pgIter = pg->getIndexIterator(access::location::gpu);
+        
+        real tpp = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
+                                  thrust::make_transform_iterator(pgIter, pp),
+                                  thrust::make_transform_iterator(pgIter + N, pp),real(0.0));
+
+        return tpp;
+    }
+    
+    tensor3  totalStress(std::shared_ptr<ParticleGroup> pg,
                          cudaStream_t st){
 
         auto pd  = pg->getParticleData();
@@ -15,9 +36,9 @@ namespace Measures{
         
         int N = pg->getNumberParticles();
 
-        tensor3* virial = pd->getVirial(access::location::gpu, access::mode::read).raw();
+        tensor3* stress = pd->getStress(access::location::gpu, access::mode::read).raw();
         
-        MeasuresTransforms::totalVirial pp(virial);
+        MeasuresTransforms::totalStress pp(stress);
 
         auto pgIter = pg->getIndexIterator(access::location::gpu);
         
@@ -233,7 +254,7 @@ namespace Measures{
 
         real tM = totalMass(pg,st);
 
-        return centerOfMassPos(sys,pd,pg,tM,st);
+        return centerOfMassPos(pg,tM,st);
     }
 
     

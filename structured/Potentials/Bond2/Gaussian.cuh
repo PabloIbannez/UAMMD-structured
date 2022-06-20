@@ -122,8 +122,8 @@ namespace Bond2{
         }
     };
 
-    using Gaussian             = Bond2<addVirial<Gaussian_>>;
-    using GaussianConst_E_r0_D = Bond2<addVirial<GaussianConst_E_r0_D_>>;
+    using Gaussian             = Bond2<addVirialStress<Gaussian_>>;
+    using GaussianConst_E_r0_D = Bond2<addVirialStress<GaussianConst_E_r0_D_>>;
 
 }}}}
 

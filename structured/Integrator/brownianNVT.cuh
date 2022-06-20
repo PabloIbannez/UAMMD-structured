@@ -36,22 +36,18 @@ namespace structured{
                     return param;
                 }
 
-                Newton(shared_ptr<ParticleData>  pd,
-                       shared_ptr<ParticleGroup> pg,
-                       shared_ptr<System>       sys,
+                Newton(shared_ptr<ParticleGroup> pg,
                        uammd::InputFile& in,
-                       cudaStream_t stream):Newton(pd, pg, sys, inputFileToParam(in),stream){}
+                       cudaStream_t stream):Newton(pg,inputFileToParam(in),stream){}
 
-                Newton(shared_ptr<ParticleData>  pd,
-                       shared_ptr<ParticleGroup> pg,
-                       shared_ptr<System>       sys,
+                Newton(shared_ptr<ParticleGroup> pg,
                        Parameters param,
-                       cudaStream_t stream):IntegratorBasicNVT(pd, pg, sys,param,"BrownianNVT::Newton",stream),
+                       cudaStream_t stream):IntegratorBasicNVT(pg,param,"BrownianNVT::Newton",stream),
                                             frictionConstant(param.frictionConstant){
 
                             sys->log<System::MESSAGE>("[%s] frictionConstant: %f",this->name.c_str(),frictionConstant);
 
-                            IntegratorBasic_ns::loadFrictionConstant(pd,pg,frictionConstant);
+                            IntegratorBasic_ns::loadFrictionConstant(pg,frictionConstant);
                 }
 
                 real getFrictionConstant(){
@@ -65,7 +61,7 @@ namespace structured{
                     IntegratorBasicNVT::applyUnits<UNITS>();
 
                     frictionConstant = frictionConstant/UNITS::TO_INTERNAL_TIME;
-                    IntegratorBasic_ns::loadFrictionConstant(pd,pg,frictionConstant);
+                    IntegratorBasic_ns::loadFrictionConstant(pg,frictionConstant);
                     
                     sys->log<System::MESSAGE>("[%s] FrictionConstant (after units): %f", this->name.c_str(), frictionConstant);
                     
@@ -93,7 +89,7 @@ namespace structured{
                     steps++;
                     sys->log<System::DEBUG1>("[%s] Performing integration step %d", name.c_str(), steps);
                     
-                    this->sumForce();
+                    this->updateForce();
                     this->integrationStep();
                 }
                         
@@ -165,17 +161,13 @@ namespace structured{
                     return param;
                 }
 
-                EulerMaruyama(shared_ptr<ParticleData>  pd,
-                              shared_ptr<ParticleGroup> pg,
-                              shared_ptr<System>       sys,
+                EulerMaruyama(shared_ptr<ParticleGroup> pg,
                               uammd::InputFile& in,
-                              cudaStream_t stream):EulerMaruyama(pd, pg, sys, inputFileToParam(in),stream){}
+                              cudaStream_t stream):EulerMaruyama(pg,inputFileToParam(in),stream){}
 
-                EulerMaruyama(shared_ptr<ParticleData>  pd,
-                              shared_ptr<ParticleGroup> pg,
-                              shared_ptr<System>       sys,
+                EulerMaruyama(shared_ptr<ParticleGroup> pg,
                               Parameters param,
-                              cudaStream_t stream):IntegratorBasicNVT(pd, pg, sys,param,"BrownianNVT::EulerMaruyama",stream),
+                              cudaStream_t stream):IntegratorBasicNVT(pg,param,"BrownianNVT::EulerMaruyama",stream),
                                                    viscosity(param.viscosity){
   
                               sys->log<System::MESSAGE>("[%s] viscosity: %f",this->name.c_str(),viscosity);
@@ -238,7 +230,7 @@ namespace structured{
                     steps++;
                     sys->log<System::DEBUG1>("[%s] Performing integration step %d", name.c_str(), steps);
                     
-                    this->sumForce();
+                    this->updateForce();
                     this->integrationStep();
                 }
                 

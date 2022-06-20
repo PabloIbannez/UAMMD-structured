@@ -128,11 +128,11 @@ namespace Bond2{
         }
     };
 
-    using Steric6                    = Bond2<addVirial<Steric_<6>>>;
-    using Steric6Const_epsilon_sigma = Bond2<addVirial<StericConst_epsilon_sigma_<6>>>;
+    using Steric6                    = Bond2<addVirialStress<Steric_<6>>>;
+    using Steric6Const_epsilon_sigma = Bond2<addVirialStress<StericConst_epsilon_sigma_<6>>>;
     
-    using Steric12                    = Bond2<addVirial<Steric_<12>>>;
-    using Steric12Const_epsilon_sigma = Bond2<addVirial<StericConst_epsilon_sigma_<12>>>;
+    using Steric12                    = Bond2<addVirialStress<Steric_<12>>>;
+    using Steric12Const_epsilon_sigma = Bond2<addVirialStress<StericConst_epsilon_sigma_<12>>>;
 
 }}}}
 

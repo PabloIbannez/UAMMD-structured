@@ -113,9 +113,14 @@ namespace CommonPotentials{
                 return fmod*rij;
             }
             
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+            static inline __device__ real virial(const real3& rij, const real& r2,
                                                     const real& epsilon,const real& sigma){
                 return computeVirial(rij,force(rij,r2,epsilon,sigma));
+            }
+            
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
+                                                    const real& epsilon,const real& sigma){
+                return computeStress(rij,force(rij,r2,epsilon,sigma));
             }
             
             static inline __device__ real energy(const real3& rij, const real& r2,
@@ -148,9 +153,14 @@ namespace CommonPotentials{
                 return fmod*rij;
             }
             
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+            static inline __device__ real virial(const real3& rij, const real& r2,
                                                     const real& epsilon,const real& sigma){
                 return computeVirial(rij,force(rij,r2,epsilon,sigma));
+            }
+            
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
+                                                    const real& epsilon,const real& sigma){
+                return computeStress(rij,force(rij,r2,epsilon,sigma));
             }
             
             static inline __device__ real energy(const real3& rij, const real& r2,
@@ -185,9 +195,14 @@ namespace CommonPotentials{
                 return fmod*rij;
             }
             
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+            static inline __device__ real virial(const real3& rij, const real& r2,
                                                     const real& epsilon,const real& sigma){
                 return computeVirial(rij,force(rij,r2,epsilon,sigma));
+            }
+            
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
+                                                    const real& epsilon,const real& sigma){
+                return computeStress(rij,force(rij,r2,epsilon,sigma));
             }
             
             static inline __device__ real energy(const real3& rij, const real& r2,
@@ -225,9 +240,14 @@ namespace CommonPotentials{
                 return fmod*rij;
             }
             
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+            static inline __device__ real virial(const real3& rij, const real& r2,
                                                     const real& epsilon,const real& sigma){
                 return computeVirial(rij,force(rij,r2,epsilon,sigma));
+            }
+            
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
+                                                    const real& epsilon,const real& sigma){
+                return computeStress(rij,force(rij,r2,epsilon,sigma));
             }
             
             static inline __device__ real energy(const real3& rij, const real& r2,
@@ -263,7 +283,15 @@ namespace CommonPotentials{
             
             //Virial
             template<int power>
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2, 
+            static inline __device__ real virial(const real3& rij, const real& r2, 
+                                                 const real& epsilon,const real& sigma){
+                static_assert(power==6 or power==12,"Steric power has to be 6 or 12");
+                return real(0);
+            }
+            
+            //Stress
+            template<int power>
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2, 
                                              const real& epsilon,const real& sigma){
                 static_assert(power==6 or power==12,"Steric power has to be 6 or 12");
                 return tensor3(0);
@@ -310,17 +338,31 @@ namespace CommonPotentials{
         
         
         template<>
-        inline __device__ tensor3 Steric::virial<6>(const real3& rij, const real& r2, 
-                                            const real& epsilon,const real& sigma){
+        inline __device__ real Steric::virial<6>(const real3& rij, const real& r2, 
+                                                 const real& epsilon,const real& sigma){
             
             return computeVirial(rij,force<6>(rij,r2,epsilon,sigma));
         }
         
         template<>
-        inline __device__ tensor3 Steric::virial<12>(const real3& rij, const real& r2, 
-                                             const real& epsilon,const real& sigma){
+        inline __device__ tensor3 Steric::stress<6>(const real3& rij, const real& r2, 
+                                            const real& epsilon,const real& sigma){
+            
+            return computeStress(rij,force<6>(rij,r2,epsilon,sigma));
+        }
+        
+        template<>
+        inline __device__ real Steric::virial<12>(const real3& rij, const real& r2, 
+                                                  const real& epsilon,const real& sigma){
             
             return computeVirial(rij,force<12>(rij,r2,epsilon,sigma));
+        }
+        
+        template<>
+        inline __device__ tensor3 Steric::stress<12>(const real3& rij, const real& r2, 
+                                             const real& epsilon,const real& sigma){
+            
+            return computeStress(rij,force<12>(rij,r2,epsilon,sigma));
         }
         
         template<>
@@ -359,9 +401,15 @@ namespace CommonPotentials{
             }
             
             //Virial
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
-                                                    const real& epsilon,const real& sigma){
+            static inline __device__ real virial(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
                 return Steric::virial<6>(rij,r2,epsilon,sigma);
+            }
+            
+            //Stress
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
+                                                    const real& epsilon,const real& sigma){
+                return Steric::stress<6>(rij,r2,epsilon,sigma);
             }
             
             //Energy
@@ -380,9 +428,15 @@ namespace CommonPotentials{
             }
             
             //Virial
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
-                                                    const real& epsilon,const real& sigma){
+            static inline __device__ real virial(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
                 return Steric::virial<12>(rij,r2,epsilon,sigma);
+            }
+            
+            //Stress
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
+                                                    const real& epsilon,const real& sigma){
+                return Steric::stress<12>(rij,r2,epsilon,sigma);
             }
             
             //Energy
@@ -409,7 +463,13 @@ namespace CommonPotentials{
             }
             
             //Virial
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+            static inline __device__ real virial(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+                return real(0);
+            }
+            
+            //Stress
+            static inline __device__ tensor3 Stress(const real3& rij, const real& r2,
                                                     const real& epsilon,const real& sigma){
                 return tensor3(0);
             }
@@ -436,7 +496,13 @@ namespace CommonPotentials{
             }
             
             //Virial
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+            static inline __device__ real virial(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+                return real(0);
+            }
+            
+            //Stress
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
                                                     const real& epsilon,const real& sigma){
                 return tensor3(0);
             }
@@ -462,7 +528,13 @@ namespace CommonPotentials{
             }
             
             //Virial
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+            static inline __device__ real virial(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+                return real(0);
+            }
+            
+            //Stress
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
                                                     const real& epsilon,const real& sigma){
                 return tensor3(0);
             }
@@ -494,7 +566,13 @@ namespace CommonPotentials{
             }
             
             //Virial
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+            static inline __device__ real virial(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+                return real(0);
+            }
+            
+            //Stress
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
                                                     const real& epsilon,const real& sigma){
                 return tensor3(0);
             }
@@ -525,7 +603,13 @@ namespace CommonPotentials{
             }
             
             //Virial
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+            static inline __device__ real virial(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+                return real(0);
+            }
+            
+            //Stress
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
                                                     const real& epsilon,const real& sigma){
                 return tensor3(0);
             }
@@ -556,7 +640,13 @@ namespace CommonPotentials{
             }
             
             //Virial
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+            static inline __device__ real virial(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma){
+                return real(0);
+            }
+            
+            //Stress
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
                                                     const real& epsilon,const real& sigma){
                 return tensor3(0);
             }
@@ -587,7 +677,13 @@ namespace CommonPotentials{
             }
             
             //Virial
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+            static inline __device__ real virial(const real3& rij, const real& r2,
+                                                 const real& epsilon,const real& sigma,const real& D){
+                return real(0);
+            }
+            
+            //Stress
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
                                                     const real& epsilon,const real& sigma,const real& D){
                 return tensor3(0);
             }
@@ -624,7 +720,13 @@ namespace CommonPotentials{
         }
         
         //Virial
-        static inline __device__ tensor3 virial(const real3& rij, const real& r2, 
+        static inline __device__ real virial(const real3& rij, const real& r2, 
+                                             const real& epsilon,const real& sigma,const real& zeroEnergy){
+            return real(0);
+        }
+        
+        //Stress
+        static inline __device__ tensor3 stress(const real3& rij, const real& r2, 
                                                 const real& epsilon,const real& sigma,const real& zeroEnergy){
             return tensor3(0);
         }
@@ -684,7 +786,15 @@ namespace CommonPotentials{
             
             //Virial
             template<typename Units_>
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+            static inline __device__ real virial(const real3& rij, const real& r2,
+                                                 const real& chgProduct, 
+                                                 const real& dielectricConstant,const real& debyeLenght){
+                return real(0);
+            }
+            
+            //Stress
+            template<typename Units_>
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
                                                     const real& chgProduct, 
                                                     const real& dielectricConstant,const real& debyeLenght){
                 return tensor3(0);
@@ -730,7 +840,16 @@ namespace CommonPotentials{
             
             //Virial
             template<typename Units_>
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+            static inline __device__ real virial(const real3& rij, const real& r2,
+                                                 const real& chgProduct, 
+                                                 const real& radius1, const real& radius2,
+                                                 const real& dielectricConstant,const real& debyeLenght){
+                return real(0);
+            }
+            
+            //Stress
+            template<typename Units_>
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
                                                     const real& chgProduct, 
                                                     const real& radius1, const real& radius2,
                                                     const real& dielectricConstant,const real& debyeLenght){
@@ -793,7 +912,17 @@ namespace CommonPotentials{
             
             //Virial
             template<typename Units_>
-            static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+            static inline __device__ real virial(const real3& rij, const real& r2,
+                                                 const real& chgProduct,const real& debyeLenght,
+                                                 const real& A, const real& B,
+                                                 const real& k, const real lmd){
+
+                return real(0);
+            }
+            
+            //Stress
+            template<typename Units_>
+            static inline __device__ tensor3 stress(const real3& rij, const real& r2,
                                                     const real& chgProduct,const real& debyeLenght,
                                                     const real& A, const real& B,
                                                     const real& k, const real lmd){
@@ -851,7 +980,16 @@ namespace CommonPotentials{
         }
         
         //Virial
-        static inline __device__ tensor3 virial(const real3& rij, const real& r2,
+        static inline __device__ real virial(const real3& rij, const real& r2,
+                                             const real& epsilon,const real& sigma,
+                                             const real& n,const real& r0,
+                                             const real& zeroEnergy){
+
+            return real(0);
+        }
+        
+        //Stress
+        static inline __device__ tensor3 stress(const real3& rij, const real& r2,
                                                 const real& epsilon,const real& sigma,
                                                 const real& n,const real& r0,
                                                 const real& zeroEnergy){

@@ -160,7 +160,7 @@ class SimulationUmbrellaAlongVector: public Simulation<ForceField_,
             
             this->sys->template log<uammd::System::MESSAGE>("[SimulationUmbrellaAlongVector] UmbrellaWindowsSize: %f",umbrellaWindowsSize);
 
-            simulationGroups = groupUtils::getSimGroups(this->sys,this->pd);
+            simulationGroups = groupUtils::getSimGroups(this->pd);
 
             int requiredSystemCopies = umbrellaWindowsNumber*umbrellaCopies;
 
@@ -169,13 +169,13 @@ class SimulationUmbrellaAlongVector: public Simulation<ForceField_,
                                                                   simulationGroups.size(),requiredSystemCopies);
             } else {
 
-                if(!groupUtils::checkSimGroupsEqual(this->sys,this->pd,simulationGroups)){
+                if(!groupUtils::checkSimGroupsEqual(this->pd,simulationGroups)){
                     this->sys->template log<uammd::System::CRITICAL>("[SimulationUmbrellaAlongVector] Equal simulation groups are required");
                 }
 
                 Nsets = simulationGroups.size();
                 
-                this->simulationModelGroups1 = groupUtils::getSimModelGroups(this->sys,this->pd,selectedModel);
+                this->simulationModelGroups1 = groupUtils::getSimModelGroups(this->pd,selectedModel);
             }
             
             equiPos.resize(Nsets);
@@ -188,9 +188,7 @@ class SimulationUmbrellaAlongVector: public Simulation<ForceField_,
                 int setIndex = j+i*umbrellaWindowsNumber;
                 equiPos[setIndex]=make_real3(j*umbrellaWindowsSize*nVector+umbrellaInit);
                 
-                M1[setIndex]=Measures::totalMass(this->sys,
-                                                 this->pd,
-                                                 simulationModelGroups1[setIndex],
+                M1[setIndex]=Measures::totalMass(simulationModelGroups1[setIndex],
                                                  this->simulationStream);
             }}
 
@@ -198,9 +196,7 @@ class SimulationUmbrellaAlongVector: public Simulation<ForceField_,
 
             umbrellaParam.K = umbrellaK;
             
-            this->umbrellaSetInteractor = std::make_shared<UmbrellaSetInteractor>(this->sys,
-                                                                                  this->pd,
-                                                                                  this->pg,
+            this->umbrellaSetInteractor = std::make_shared<UmbrellaSetInteractor>(this->pg,
                                                                                   this->simulationModelGroups1,
                                                                                   equiPos,
                                                                                   umbrellaParam);
@@ -285,9 +281,7 @@ class SimulationUmbrellaAlongVector: public Simulation<ForceField_,
                 for(int j=0;j<umbrellaWindowsNumber;j++){
                 int setIndex = j+i*umbrellaWindowsNumber;
                 real m1 = M1[setIndex];
-                real3 com1 = Measures::centerOfMassPos(this->sys,
-                                                       this->pd,
-                                                       simulationModelGroups1[setIndex],
+                real3 com1 = Measures::centerOfMassPos(simulationModelGroups1[setIndex],
                                                        m1,
                                                        this->simulationStream);
                 real3 dr = box.apply_pbc(com1-umbrellaInit);

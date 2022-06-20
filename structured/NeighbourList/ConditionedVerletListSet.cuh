@@ -69,14 +69,12 @@ namespace structured{
 
           using NeighbourListData = typename ConditionedListSetBase<condition>::NeighbourListData;
 
-          ConditionedVerletListSet(shared_ptr<System>       sys,
-                                   shared_ptr<ParticleData>  pd,
-                                   shared_ptr<ParticleGroup> pg,
+          ConditionedVerletListSet(shared_ptr<ParticleGroup> pg,
                                    shared_ptr<condition>   cond,
-                                   Parameters par):sys(sys), 
-                                                   pd(pd), 
-                                                   pg(pg),
-                                                   nl(ConditionedListSetBase<condition>(sys,pd,pg,cond)),
+                                   Parameters par):pg(pg),
+                                                   pd(pg->getParticleData()), 
+                                                   sys(pg->getParticleData()->getSystem()), 
+                                                   nl(ConditionedListSetBase<condition>(pg,cond)),
                                                    cutOff(par.cutOff),
                                                    cutOffVerlet(par.cutOffVerlet){
 

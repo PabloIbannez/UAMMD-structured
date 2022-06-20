@@ -142,14 +142,9 @@ namespace structured{
 
                 }
 
-                if(comp.energy == true){
-
-                }
-                
-                if(comp.virial == true){
-
-                }
-
+                if(comp.energy == true){}
+                if(comp.virial == true){}
+                if(comp.stress == true){}
 
             }
             

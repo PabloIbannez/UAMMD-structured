@@ -94,17 +94,13 @@ namespace structured{
 
         public:
             
-            SteepestDescent(shared_ptr<ParticleData>  pd,
-                            shared_ptr<ParticleGroup> pg,
-                            shared_ptr<System>       sys,
+            SteepestDescent(shared_ptr<ParticleGroup> pg,
                             InputFile& in,
-                            cudaStream_t stream):SteepestDescent(pd,pg,sys,inputFileToParam(in),stream){}
+                            cudaStream_t stream):SteepestDescent(pg,inputFileToParam(in),stream){}
 
-            SteepestDescent(shared_ptr<ParticleData>  pd,
-                            shared_ptr<ParticleGroup> pg,
-                            shared_ptr<System>       sys,
+            SteepestDescent(shared_ptr<ParticleGroup> pg,
                             Parameters par,
-                            cudaStream_t stream):Integrator(pd, pg, sys, "SteepestDescent"),
+                            cudaStream_t stream):Integrator(pg,"SteepestDescent"),
                                                  h(par.h),
                                                  nStepsSteepestDescent(par.nStepsSteepestDescent),
                                                  nStepsSteepestDescentProgressInterval(par.nStepsSteepestDescentProgressInterval),
@@ -134,9 +130,9 @@ namespace structured{
 
                 if(nStepsSteepestDescent!=0){
                     this->resetForce();
-                    this->sumForce();
+                    this->updateForce();
 
-                    maxForce = Measures::maxForce(sys,pd,pg,stream);
+                    maxForce = Measures::maxForce(pg,stream);
                     cudaStreamSynchronize(stream);
 
                     sys->log<System::MESSAGE>("[%s] Steepest descent (init), maxForce: %f,"
@@ -187,13 +183,13 @@ namespace structured{
                 sys->log<System::DEBUG1>("[%s] Performing Steepest descent step %d", name.c_str(), steps);
 
                 this->resetEnergy();
-                this->sumEnergy();
+                this->updateEnergy();
                 
-                this->sumForce();
+                this->updateForce();
                 cudaStreamSynchronize(stream);
 
-                real Eprev    = Measures::totalPotentialEnergy(sys,pd,pg,stream);
-                     maxForce = Measures::maxForce(sys,pd,pg,stream);
+                real Eprev    = Measures::totalPotentialEnergy(pg,stream);
+                     maxForce = Measures::maxForce(pg,stream);
                 cudaStreamSynchronize(stream);
 
                 this->copyToRef();
@@ -222,10 +218,10 @@ namespace structured{
                 }
                 
                 this->resetEnergy();
-                this->sumEnergy();
+                this->updateEnergy();
                 cudaStreamSynchronize(stream);
                 
-                real Epost = Measures::totalPotentialEnergy(sys,pd,pg,stream);
+                real Epost = Measures::totalPotentialEnergy(pg,stream);
                 cudaStreamSynchronize(stream);
                 //sys->log<System::MESSAGE>("[SteepestDescent] Epost/N:%f Eprev/N:%f", 
                 //                           Epost/N, Eprev/N);
@@ -239,21 +235,14 @@ namespace structured{
             
             }
             
-            void sumForce(){
+            void updateForce(){
                 for(auto forceComp: interactors) forceComp->sum({.force =true,
                                                                  .energy=false,
                                                                  .virial=false,},stream);
                 //CudaSafeCall(cudaStreamSynchronize(stream));
             }
-            
-            void sumVirial(){
-                for(auto virialComp: interactors) virialComp->sum({.force =false,
-                                                                   .energy=false,
-                                                                   .virial=true,},stream);
-                //CudaSafeCall(cudaStreamSynchronize(stream));
-            }
 
-            void sumEnergy(){
+            void updateEnergy(){
                 for(auto energyComp: interactors) energyComp->sum({.force =false,
                                                                    .energy=true,
                                                                    .virial=false,},stream);

@@ -119,21 +119,21 @@ class Bond1{
         struct VirialTransverser: public BondType{
 
             real4*   pos;
-            tensor3* virial;
+            real* virial;
         
             const int* id2index;
             
-            using resultType=tensor3;
+            using resultType=real;
 
             VirialTransverser(real4* pos,
-                              tensor3* virial,
+                              real* virial,
                               const int* id2index,
                               Parameters param):BondType(param),
                                                 pos(pos),
                                                 virial(virial),
                                                 id2index(id2index){}
                 
-            inline __device__ resultType zero(){return tensor3(0.0);}
+            inline __device__ resultType zero(){return real(0.0);}
                 
             inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
             
@@ -155,8 +155,8 @@ class Bond1{
             
             real4* pos   = this->pd->getPos(access::location::gpu, 
                                             access::mode::read).raw();     
-            tensor3* virial = this->pd->getVirial(access::location::gpu, 
-                                              access::mode::readwrite).raw();
+            real* virial = this->pd->getVirial(access::location::gpu, 
+                                               access::mode::readwrite).raw();
             
             const int* id2index = pd->getIdOrderedIndices(access::location::gpu);
 
@@ -216,6 +216,56 @@ class Bond1{
                                      param);
         }
         
+        struct StressTransverser: public BondType{
+
+            real4*   pos;
+            tensor3* stress;
+        
+            const int* id2index;
+            
+            using resultType=tensor3;
+
+            StressTransverser(real4* pos,
+                              tensor3* stress,
+                              const int* id2index,
+                              Parameters param):BondType(param),
+                                                pos(pos),
+                                                stress(stress),
+                                                id2index(id2index){}
+                
+            inline __device__ resultType zero(){return tensor3(0.0);}
+                
+            inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
+            
+            inline __device__ resultType compute(const int index_i,Bond bond){
+
+                const int i = id2index[bond.i];
+
+                real3 posi = make_real3(pos[i]);
+
+                return BondType::stress(i,index_i,posi,bond.bondInfo);
+                    
+            }
+                
+            inline __device__ void set(const int& index_i,resultType& quantity){stress[index_i]+=quantity;}
+
+        };
+            
+        StressTransverser getStressTransverser(){
+            
+            real4* pos   = this->pd->getPos(access::location::gpu, 
+                                            access::mode::read).raw();     
+            tensor3* stress = this->pd->getStress(access::location::gpu, 
+                                              access::mode::readwrite).raw();
+            
+            const int* id2index = pd->getIdOrderedIndices(access::location::gpu);
+
+            return StressTransverser(pos,
+                                     stress,
+                                     id2index,
+                                     param);
+        }
+        
         void updateBox(Box box){
             if constexpr (has_box<Parameters>::value) {
                 param.box = box;
@@ -225,16 +275,25 @@ class Bond1{
 };
 
 template<class potential>
-struct addVirial: public potential{
+struct addVirialStress: public potential{
 
     using potential::potential;
 
-    inline __device__ tensor3 virial(int i,
+    inline __device__ real virial(int i,
                                      int bond_index,
                                      const real3 &posi,
                                      const typename potential::BondInfo &bi){
 
         return computeVirial(potential::box.apply_pbc(bi.pos-posi),
+                             potential::force(i,i,posi,bi)); //Not a typo
+    }
+    
+    inline __device__ tensor3 stress(int i,
+                                     int bond_index,
+                                     const real3 &posi,
+                                     const typename potential::BondInfo &bi){
+
+        return computeStress(potential::box.apply_pbc(bi.pos-posi),
                              potential::force(i,i,posi,bi)); //Not a typo
     }
 

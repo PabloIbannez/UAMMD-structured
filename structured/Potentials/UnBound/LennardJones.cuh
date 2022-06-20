@@ -30,13 +30,11 @@ namespace UnBound{
             real cutOffDst;
         };
 
-        LennardJones_(std::shared_ptr<System>       sys,
-                      std::shared_ptr<ParticleData>  pd,
-                      std::shared_ptr<ParticleGroup> pg,
+        LennardJones_(std::shared_ptr<ParticleGroup> pg,
                       std::shared_ptr<Topology>     top,
-                      Parameters par):sys(sys),
-                                      pd(pd),
-                                      pg(pg),
+                      Parameters par):pg(pg),
+                                      pd(pg->getParticleData()),
+                                      sys(pg->getParticleData()->getSystem()),
                                       top(top),
                                       label(par.label),
                                       cutOffDst(par.cutOffDst){
@@ -113,7 +111,7 @@ namespace UnBound{
         
         struct virialTransverser{
 
-            tensor3* virial;
+            real* virial;
             
             typename ParameterPairsHandler::PairIterator paramPairIterator;
 
@@ -121,22 +119,22 @@ namespace UnBound{
             
             real cutOffDst2;
             
-            virialTransverser(tensor3* virial,
+            virialTransverser(real* virial,
                               typename ParameterPairsHandler::PairIterator paramPairIterator,
                               Box  box,
                               real cutOffDst2):virial(virial),
                                                        paramPairIterator(paramPairIterator),
                                                        box(box),
                                                        cutOffDst2(cutOffDst2){}
-            using resultType=tensor3;
+            using resultType=real;
 
-            inline __device__ resultType zero(){return tensor3(0);}
+            inline __device__ resultType zero(){return real(0);}
             
             inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
             
             inline __device__ resultType compute(const int index_i,const int index_j,const real4 posi,const real4 posj){
                 
-                tensor3 v(0.0);
+                real v(0.0);
 
                 return v;
             }
@@ -147,7 +145,7 @@ namespace UnBound{
 
         virialTransverser getVirialTransverser(){
             
-            tensor3* virial = this->pd->getVirial(access::location::gpu, access::mode::readwrite).raw();     
+            real* virial = this->pd->getVirial(access::location::gpu, access::mode::readwrite).raw();     
             
             return virialTransverser(virial,
                                      ljParam->getParameters()->getPairIterator(),
@@ -211,6 +209,48 @@ namespace UnBound{
                                      box,
                                      cutOffDst*cutOffDst);
         }
+        
+        //struct stressTransverser{
+
+        //    tensor3* stress;
+        //    
+        //    typename ParameterPairsHandler::PairIterator paramPairIterator;
+
+        //    Box box;
+        //    
+        //    real cutOffDst2;
+        //    
+        //    stressTransverser(tensor3* stress,
+        //                      typename ParameterPairsHandler::PairIterator paramPairIterator,
+        //                      Box  box,
+        //                      real cutOffDst2):stress(stress),
+        //                                               paramPairIterator(paramPairIterator),
+        //                                               box(box),
+        //                                               cutOffDst2(cutOffDst2){}
+        //    using resultType=tensor3;
+
+        //    inline __device__ resultType zero(){return tensor3(0);}
+        //    
+        //    inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
+        //    
+        //    inline __device__ resultType compute(const int index_i,const int index_j,const real4 posi,const real4 posj){
+        //        
+        //        return tensor3(0.0);
+        //    }
+        //    
+        //    inline __device__ void set(const int& index_i,const resultType& quantity){stress[index_i]+=quantity;}
+
+        //};
+
+        //stressTransverser getStressTransverser(){
+        //    
+        //    tensor3* stress = this->pd->getStress(access::location::gpu, access::mode::readwrite).raw();     
+        //    
+        //    return stressTransverser(stress,
+        //                             ljParam->getParameters()->getPairIterator(),
+        //                             box,
+        //                             cutOffDst*cutOffDst);
+        //}
         
         void updateBox(Box newBox) override {
             box=newBox;

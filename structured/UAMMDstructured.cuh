@@ -37,7 +37,68 @@
 //GROMACS convention
 //rij = rj - ri
 //Fij force over particle i due to j
-//Virial -real(0.5)*outer(rij,Fij)
+//Virial -real(0.5)*dot(rij,Fij)
+//Stress -real(0.5)*outer(rij,Fij)
+
+namespace uammd{
+namespace structured{
+namespace quaternions{
+
+    VECATTR real3 getEx(const real4& quat) { 
+                                            real q0 = quat.x;
+                                            real q1 = quat.y;
+                                            real q2 = quat.z;
+                                            real q3 = quat.w;
+
+                                            return real(2.0)*make_real3(q0*q0+q1*q1-real(0.5),
+                                                                        q1*q2+q0*q3,
+                                                                        q1*q3-q0*q2);}
+
+    VECATTR real3 getEy(const real4& quat) { 
+                                            real q0 = quat.x;
+                                            real q1 = quat.y;
+                                            real q2 = quat.z;
+                                            real q3 = quat.w;
+
+                                            return real(2.0)*make_real3(q1*q2-q0*q3,
+                                                                        q0*q0+q2*q2-real(0.5),
+                                                                        q2*q3+q0*q1);}
+
+    VECATTR real3 getEz(const real4& quat) { 
+                                            real q0 = quat.x;
+                                            real q1 = quat.y;
+                                            real q2 = quat.z;
+                                            real q3 = quat.w;
+
+                                            return real(2.0)*make_real3(q1*q3+q0*q2,
+                                                                        q2*q3-q0*q1,
+                                                                        q0*q0+q3*q3-real(0.5));}
+
+    VECATTR real4 rotate(const real4& quat,const real3& omega) {
+                                                  
+        real q0 = quat.x;
+        real q1 = quat.y;
+        real q2 = quat.z;
+        real q3 = quat.w;
+
+        real4 rot;
+
+        real w1=omega.x;
+        real w2=omega.y;
+        real w3=omega.z;
+
+        real factor = -dot(omega,omega)/real(8.0);
+
+        rot.x = q0  +  real(0.5)*(-q1*w1-q2*w2-q3*w3)  +  factor*q0;
+        rot.y = q1  +  real(0.5)*(+q0*w1+q3*w2-q2*w3)  +  factor*q1;
+        rot.z = q2  +  real(0.5)*(-q3*w1+q0*w2+q1*w3)  +  factor*q2;
+        rot.w = q3  +  real(0.5)*(+q2*w1-q1*w2+q0*w3)  +  factor*q3;
+
+        return rot;
+
+    }
+
+}}}
 
 namespace uammd{
 namespace structured{
@@ -93,11 +154,26 @@ namespace UnitsSystem{
     };
 }
 
-__device__ __host__ tensor3 computeVirial(const real3& rij,const real3& Fij){
+__device__ __host__ real computeVirial(const real3& rij,const real3& Fij){
+    return real(0.5)*dot(-rij,Fij);
+}
+
+__device__ __host__ tensor3 computeStress(const real3& rij,const real3& Fij){
     return real(0.5)*outer(-rij,Fij);
 }
 
+SFINAE_DEFINE_HAS_MEMBER(force);
+SFINAE_DEFINE_HAS_MEMBER(energy);
+SFINAE_DEFINE_HAS_MEMBER(virial);
+SFINAE_DEFINE_HAS_MEMBER(stress);
+
+SFINAE_DEFINE_HAS_MEMBER(getForceTransverser);
+SFINAE_DEFINE_HAS_MEMBER(getEnergyTransverser);
+SFINAE_DEFINE_HAS_MEMBER(getVirialTransverser);
+SFINAE_DEFINE_HAS_MEMBER(getStressTransverser);
+
 SFINAE_DEFINE_HAS_MEMBER(box);
+
 SFINAE_DEFINE_HAS_MEMBER(isConstrained);
   
 }}
@@ -137,10 +213,9 @@ SFINAE_DEFINE_HAS_MEMBER(isConstrained);
 #include"Simulation/SimulationAFM.cuh"
 #include"Simulation/SimulationPlates.cuh"
 #include"Simulation/SimulationSphere.cuh"
-//#include"Simulation/SimulationPulling.cuh"
 #include"Simulation/SimulationUmbrellaCenterOfMassDistance.cuh"
 #include"Simulation/SimulationUmbrellaAlongVector.cuh"
 
-//#include"Simulation/SimulationQCM.cuh"
+#include"Wrapper/Wrapper.cuh"
 
 #endif

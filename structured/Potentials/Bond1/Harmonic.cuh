@@ -253,11 +253,11 @@ namespace Bond1{
         }
     };
 
-    using Harmonic                 = Bond1<addVirial<HarmonicAnisotropic_>>;
-    using HarmonicConst_r0         = Bond1<addVirial<HarmonicAnisotropicConst_r0_>>;
-    using HarmonicConst_K_r0       = Bond1<addVirial<HarmonicAnisotropicConst_K_r0_>>;
-    using HarmonicCommon_K_r0      = Bond1<addVirial<HarmonicAnisotropicCommon_K_r0_>>;
-    using HarmonicConstCommon_K_r0 = Bond1<addVirial<HarmonicAnisotropicConstCommon_K_r0_>>;
+    using Harmonic                 = Bond1<addVirialStress<HarmonicAnisotropic_>>;
+    using HarmonicConst_r0         = Bond1<addVirialStress<HarmonicAnisotropicConst_r0_>>;
+    using HarmonicConst_K_r0       = Bond1<addVirialStress<HarmonicAnisotropicConst_K_r0_>>;
+    using HarmonicCommon_K_r0      = Bond1<addVirialStress<HarmonicAnisotropicCommon_K_r0_>>;
+    using HarmonicConstCommon_K_r0 = Bond1<addVirialStress<HarmonicAnisotropicConstCommon_K_r0_>>;
 
 }}}}
 

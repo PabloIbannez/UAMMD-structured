@@ -107,7 +107,19 @@ namespace Bond4{
                 return make_real3(0);
 			}
             
-            inline __device__ tensor3 virial(int i, int j, int k, int l,
+            inline __device__ real virial(int i, int j, int k, int l,
+                                          int bond_index,
+                                          const real3 &posi,
+                                          const real3 &posj,
+                                          const real3 &posk,
+                                          const real3 &posl,
+                                          const BondInfo &bi)
+
+			{
+				return real(0);
+            }
+            
+            inline __device__ tensor3 stress(int i, int j, int k, int l,
                                              int bond_index,
                                              const real3 &posi,
                                              const real3 &posj,
@@ -184,7 +196,21 @@ namespace Bond4{
                 return Dihedral_::force(i,j,k,l,bond_index,posi,posj,posk,posl,biB);
 			}
             
-            inline __device__ tensor3 virial(int i, int j, int k, int l,
+            inline __device__ real virial(int i, int j, int k, int l,
+                                          int bond_index,
+                                          const real3 &posi,
+                                          const real3 &posj,
+                                          const real3 &posk,
+                                          const real3 &posl,
+                                          const BondInfo &bi)
+
+			{
+                const Dihedral_::BondInfo biB = {n,K,phi0};
+
+                return Dihedral_::virial(i,j,k,l,bond_index,posi,posj,posk,posl,biB);
+            }
+            
+            inline __device__ tensor3 stress(int i, int j, int k, int l,
                                              int bond_index,
                                              const real3 &posi,
                                              const real3 &posj,
@@ -195,7 +221,7 @@ namespace Bond4{
 			{
                 const Dihedral_::BondInfo biB = {n,K,phi0};
 
-                return Dihedral_::virial(i,j,k,l,bond_index,posi,posj,posk,posl,biB);
+                return Dihedral_::stress(i,j,k,l,bond_index,posi,posj,posk,posl,biB);
             }
 
 

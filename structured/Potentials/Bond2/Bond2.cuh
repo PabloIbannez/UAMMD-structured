@@ -146,21 +146,21 @@ class Bond2 : public Bond2Base_<BondType>{
         struct VirialTransverser: public BondType{
 
             real4*   pos;
-            tensor3* virial;
+            real* virial;
         
             const int* id2index;
             
-            using resultType=tensor3;
+            using resultType=real;
 
             VirialTransverser(real4* pos,
-                              tensor3* virial,
+                              real* virial,
                               const int* id2index,
                               typename Bond2Base::Parameters param):BondType(param),
                                                                     pos(pos),
                                                                     virial(virial),
                                                                     id2index(id2index){}
                 
-            inline __device__ resultType zero(){return tensor3(0.0);}
+            inline __device__ resultType zero(){return real(0.0);}
                 
             inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
             
@@ -184,8 +184,8 @@ class Bond2 : public Bond2Base_<BondType>{
             
             real4* pos   = this->pd->getPos(access::location::gpu, 
                                             access::mode::read).raw();     
-            tensor3* virial = this->pd->getVirial(access::location::gpu, 
-                                              access::mode::readwrite).raw();
+            real* virial = this->pd->getVirial(access::location::gpu, 
+                                               access::mode::readwrite).raw();
             
             const int* id2index = this->pd->getIdOrderedIndices(access::location::gpu);
 
@@ -243,6 +243,58 @@ class Bond2 : public Bond2Base_<BondType>{
 
             return EnergyTransverser(pos,
                                      energy,
+                                     id2index,
+                                     Bond2Base::param);
+        }
+        
+        struct StressTransverser: public BondType{
+
+            real4*   pos;
+            tensor3* stress;
+        
+            const int* id2index;
+            
+            using resultType=tensor3;
+
+            StressTransverser(real4* pos,
+                              tensor3* stress,
+                              const int* id2index,
+                              typename Bond2Base::Parameters param):BondType(param),
+                                                                    pos(pos),
+                                                                    stress(stress),
+                                                                    id2index(id2index){}
+                
+            inline __device__ resultType zero(){return tensor3(0.0);}
+                
+            inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
+            
+            inline __device__ resultType compute(const int index_i,typename Bond2Base::Bond bond){
+
+                const int i = id2index[bond.i];
+                const int j = id2index[bond.j];
+
+                real3 posi = make_real3(pos[i]);
+                real3 posj = make_real3(pos[j]);
+
+                return BondType::stress(i,j,index_i,posi,posj,bond.bondInfo);
+                    
+            }
+                
+            inline __device__ void set(const int& index_i,resultType& quantity){stress[index_i]+=quantity;}
+
+        };
+            
+        StressTransverser getStressTransverser(){
+            
+            real4* pos   = this->pd->getPos(access::location::gpu, 
+                                            access::mode::read).raw();     
+            tensor3* stress = this->pd->getStress(access::location::gpu, 
+                                              access::mode::readwrite).raw();
+            
+            const int* id2index = this->pd->getIdOrderedIndices(access::location::gpu);
+
+            return StressTransverser(pos,
+                                     stress,
                                      id2index,
                                      Bond2Base::param);
         }
@@ -339,17 +391,17 @@ class OrientedBond2 : public Bond2Base_<BondType>{
         struct VirialTransverser: public BondType{
 
             real4*   pos;
-            tensor3* virial;
+            real* virial;
             
             real4* dir;
         
             const int* id2index;
             
-            using resultType=tensor3;
+            using resultType=real;
 
             VirialTransverser(real4* pos,
                               real4* dir,
-                              tensor3* virial,
+                              real* virial,
                               const int* id2index,
                               typename Bond2Base::Parameters param):BondType(param),
                                                                     pos(pos),
@@ -357,7 +409,7 @@ class OrientedBond2 : public Bond2Base_<BondType>{
                                                                     virial(virial),
                                                                     id2index(id2index){}
                 
-            inline __device__ resultType zero(){return tensor3(0.0);}
+            inline __device__ resultType zero(){return real(0.0);}
                 
             inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
             
@@ -387,8 +439,8 @@ class OrientedBond2 : public Bond2Base_<BondType>{
             real4* dir   = this->pd->getDir(access::location::gpu, 
                                             access::mode::read).raw();     
             
-            tensor3* virial = this->pd->getVirial(access::location::gpu, 
-                                              access::mode::readwrite).raw();
+            real* virial = this->pd->getVirial(access::location::gpu, 
+                                               access::mode::readwrite).raw();
             
             const int* id2index = this->pd->getIdOrderedIndices(access::location::gpu);
 
@@ -460,21 +512,94 @@ class OrientedBond2 : public Bond2Base_<BondType>{
                                      id2index,
                                      Bond2Base::param);
         }
+        
+        struct StressTransverser: public BondType{
+
+            real4*   pos;
+            tensor3* stress;
+            
+            real4* dir;
+        
+            const int* id2index;
+            
+            using resultType=tensor3;
+
+            StressTransverser(real4* pos,
+                              real4* dir,
+                              tensor3* stress,
+                              const int* id2index,
+                              typename Bond2Base::Parameters param):BondType(param),
+                                                                    pos(pos),
+                                                                    dir(dir),
+                                                                    stress(stress),
+                                                                    id2index(id2index){}
+                
+            inline __device__ resultType zero(){return tensor3(0.0);}
+                
+            inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
+            
+            inline __device__ resultType compute(const int index_i,typename Bond2Base::Bond bond){
+
+                const int i = id2index[bond.i];
+                const int j = id2index[bond.j];
+
+                real3 posi = make_real3(pos[i]);
+                real3 posj = make_real3(pos[j]);
+                
+                real4 diri = dir[i];
+                real4 dirj = dir[j];
+
+                return BondType::stress(i,j,index_i,posi,posj,diri,dirj,bond.bondInfo);
+                    
+            }
+                
+            inline __device__ void set(const int& index_i,resultType& quantity){stress[index_i]+=quantity;}
+
+        };
+            
+        StressTransverser getStressTransverser(){
+            
+            real4*      pos   = this->pd->getPos(access::location::gpu, 
+                                            access::mode::read).raw();     
+            real4* dir   = this->pd->getDir(access::location::gpu, 
+                                            access::mode::read).raw();     
+            
+            tensor3* stress = this->pd->getStress(access::location::gpu, 
+                                              access::mode::readwrite).raw();
+            
+            const int* id2index = this->pd->getIdOrderedIndices(access::location::gpu);
+
+            return StressTransverser(pos,
+                                     dir,
+                                     stress,
+                                     id2index,
+                                     Bond2Base::param);
+        }
 };
 
 
 template<class potential>
-struct addVirial: public potential{
+struct addVirialStress: public potential{
 
     using potential::potential;
 
-    inline __device__ tensor3 virial(int i, int j,
+    inline __device__ real virial(int i, int j,
+                                  int bond_index,
+                                  const real3 &posi,
+                                  const real3 &posj,
+                                  const typename potential::BondInfo &bi){
+
+        return computeVirial(potential::box.apply_pbc(posj-posi),
+                             potential::force(i,j,i,posi,posj,bi)); //Not a typo
+    }
+    
+    inline __device__ tensor3 stress(int i, int j,
                                      int bond_index,
                                      const real3 &posi,
                                      const real3 &posj,
                                      const typename potential::BondInfo &bi){
 
-        return computeVirial(potential::box.apply_pbc(posj-posi),
+        return computeStress(potential::box.apply_pbc(posj-posi),
                              potential::force(i,j,i,posi,posj,bi)); //Not a typo
     }
 

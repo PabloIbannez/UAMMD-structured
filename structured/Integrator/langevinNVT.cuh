@@ -69,22 +69,18 @@ namespace structured{
 
         public:
             
-            BBK(shared_ptr<ParticleData>  pd,
-                shared_ptr<ParticleGroup> pg,
-                shared_ptr<System>       sys,
+            BBK(shared_ptr<ParticleGroup> pg,
                 uammd::InputFile& in,
-                cudaStream_t stream):BBK(pd, pg, sys, inputFileToParam(in),stream){}
+                cudaStream_t stream):BBK(pg,inputFileToParam(in),stream){}
             
-            BBK(shared_ptr<ParticleData>  pd,
-                shared_ptr<ParticleGroup> pg,
-                shared_ptr<System>       sys,
+            BBK(shared_ptr<ParticleGroup> pg,
                 Parameters param,
-                cudaStream_t stream):IntegratorBasicNVT(pd, pg, sys,param, "LangevinNVT::BBK",stream),
+                cudaStream_t stream):IntegratorBasicNVT(pg,param, "LangevinNVT::BBK",stream),
                                      frictionConstant(param.frictionConstant){
 
                 sys->log<System::MESSAGE>("[%s] frictionConstant: %f",this->name.c_str(),frictionConstant);
 
-                IntegratorBasic_ns::loadFrictionConstant(pd,pg,frictionConstant);
+                IntegratorBasic_ns::loadFrictionConstant(pg,frictionConstant);
 
             }
 
@@ -97,7 +93,7 @@ namespace structured{
                 IntegratorBasicNVT::applyUnits<UNITS>();
                 
                 frictionConstant = frictionConstant/UNITS::TO_INTERNAL_TIME;
-                IntegratorBasic_ns::loadFrictionConstant(pd,pg,frictionConstant);
+                IntegratorBasic_ns::loadFrictionConstant(pg,frictionConstant);
                 
                 sys->log<System::MESSAGE>("[%s] FrictionConstant (after units): %f", this->name.c_str(), frictionConstant);
                 
@@ -136,11 +132,11 @@ namespace structured{
                 }
 
                 //Compute the center of mass postion and velocity
-                real3 comp = Measures::centerOfMassPos(sys,pd,pg,totalMass,stream);
-                real3 comv = Measures::centerOfMassVel(sys,pd,pg,totalMass,stream);
+                real3 comp = Measures::centerOfMassPos(pg,totalMass,stream);
+                real3 comv = Measures::centerOfMassVel(pg,totalMass,stream);
                 
                 //Compute the center of mass angular velocity
-                real3 angv = Measures::angularVelocity(sys,pd,pg,comp,comv,stream);
+                real3 angv = Measures::angularVelocity(pg,comp,comv,stream);
                 
                 {
                     
@@ -173,8 +169,8 @@ namespace structured{
             }
 
             void resetVelocities(){
-                IntegratorBasic_ns::generateVelocity(this->pd,this->pg,this->sys,
-                                                     this->N,this->kB*this->T,
+                IntegratorBasic_ns::generateVelocity(this->pg,
+                                                     this->kB*this->T,
                                                      this->name,
                                                      this->stream);
             }
@@ -187,7 +183,7 @@ namespace structured{
                 
                 N = pg->getNumberParticles();
                 
-                totalMass = Measures::totalMass(sys,pd,pg,stream);
+                totalMass = Measures::totalMass(pg,stream);
                 
                 //refPos(0) refVel(0)
                 this->copyToRef();
@@ -209,7 +205,7 @@ namespace structured{
                 
                 //Reset force to 0
                 this->resetForce();
-                this->sumForce();
+                this->updateForce();
                 //CudaSafeCall(cudaStreamSynchronize(stream));
                 
                 if(constrained){
@@ -341,7 +337,7 @@ namespace structured{
                 //refPos(0) refVel(0-dt/2)
                 this->copyToRef();
 
-                this->sumForce();
+                this->updateForce();
 
                 CudaCheckError();
                 {
@@ -419,7 +415,7 @@ namespace structured{
                     }
                 }
                 
-                this->sumForce();
+                this->updateForce();
                 this->integrationStep();
 
                 if(stopTransRotSteps > 0){
@@ -532,22 +528,18 @@ namespace structured{
 
         public:
             
-            GJF(shared_ptr<ParticleData>  pd,
-                shared_ptr<ParticleGroup> pg,
-                shared_ptr<System>       sys,
+            GJF(shared_ptr<ParticleGroup> pg,
                 uammd::InputFile& in,
-                cudaStream_t stream):GJF(pd, pg, sys, inputFileToParam(in),stream){}
+                cudaStream_t stream):GJF(pg,inputFileToParam(in),stream){}
             
-            GJF(shared_ptr<ParticleData>  pd,
-                shared_ptr<ParticleGroup> pg,
-                shared_ptr<System>       sys,
+            GJF(shared_ptr<ParticleGroup> pg,
                 Parameters param,
-                cudaStream_t stream):IntegratorBasicNVT(pd, pg, sys,param, "LangevinNVT::GJF",stream),
+                cudaStream_t stream):IntegratorBasicNVT(pg, param, "LangevinNVT::GJF",stream),
                                      frictionConstant(param.frictionConstant){
 
                 sys->log<System::MESSAGE>("[%s] frictionConstant: %f",this->name.c_str(),frictionConstant);
 
-                IntegratorBasic_ns::loadFrictionConstant(pd,pg,frictionConstant);
+                IntegratorBasic_ns::loadFrictionConstant(pg,frictionConstant);
 
             }
             
@@ -556,15 +548,15 @@ namespace structured{
                 IntegratorBasicNVT::applyUnits<UNITS>();
                 
                 frictionConstant = frictionConstant/UNITS::TO_INTERNAL_TIME;
-                IntegratorBasic_ns::loadFrictionConstant(pd,pg,frictionConstant); 
+                IntegratorBasic_ns::loadFrictionConstant(pg,frictionConstant); 
                 
                 sys->log<System::MESSAGE>("[%s] FrictionConstant (after units): %f", this->name.c_str(), frictionConstant);
                 
             }
             
             void resetVelocities(){
-                IntegratorBasic_ns::generateVelocity(this->pd,this->pg,this->sys,
-                                                     this->N,this->kB*this->T,
+                IntegratorBasic_ns::generateVelocity(this->pg,
+                                                     this->kB*this->T,
                                                      this->name,
                                                      this->stream);
             }
@@ -581,7 +573,7 @@ namespace structured{
                 this->resetVelocities();
                 
                 this->resetForce();
-                this->sumForce();
+                this->updateForce();
                 
             }
             
@@ -658,7 +650,7 @@ namespace structured{
                                                                 force_ptr[index] = make_real4(0);});
                 }
 
-                this->sumForce();
+                this->updateForce();
                 
                 {
                     auto mass  = pd->getMass(access::location::gpu, access::mode::read);

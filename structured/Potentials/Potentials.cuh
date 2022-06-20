@@ -9,19 +9,13 @@
 #include "Bond3/Bond3.cuh"
 #include "Bond4/Bond4.cuh"
 
-//#include "UnBound/Steric.cuh"
-//#include "UnBound/HarmonicConstraint.cuh"
 #include "UnBound/LennardJones.cuh"
-//#include "UnBound/WCA.cuh"
-//#include "UnBound/LJ_WCA.cuh"
 #include "UnBound/DebyeHuckel.cuh"
-//#include "UnBound/Statistical.cuh"
+#include "UnBound/DLVO.cuh"
 #include "UnBound/KimHummer.cuh"
-//#include "UnBound/Ravikumar.cuh"
 #include "UnBound/Clashed.cuh"
 
 #include "Surface/GenericSurface.cuh"
-//#include "Surface/KaranicolasBrooksSurfacePotential.cuh"
 
 #include "Bounds/SphericalShell.cuh"
 

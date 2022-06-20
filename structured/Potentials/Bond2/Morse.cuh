@@ -242,11 +242,11 @@ namespace Bond2{
     };
     
     
-    using Morse             = Bond2<addVirial<Morse_>>;
-    using MorseConst_D      = Bond2<addVirial<MorseConst_D_>>;
-    using MorseConst_r0_E_D = Bond2<addVirial<MorseConst_r0_E_D_>>;
+    using Morse             = Bond2<addVirialStress<Morse_>>;
+    using MorseConst_D      = Bond2<addVirialStress<MorseConst_D_>>;
+    using MorseConst_r0_E_D = Bond2<addVirialStress<MorseConst_r0_E_D_>>;
     
-    using MorseWCA          = Bond2<addVirial<MorseWCA_>>;
+    using MorseWCA          = Bond2<addVirialStress<MorseWCA_>>;
 
 }}}}
 

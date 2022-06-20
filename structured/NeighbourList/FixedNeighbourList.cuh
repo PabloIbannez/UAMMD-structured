@@ -73,12 +73,11 @@ namespace structured{
                 const int * numberNeighbours;
             };
 
-            FixedNeighbourList(std::shared_ptr<System>       sys,
-                               std::shared_ptr<ParticleData>  pd,
-                               std::shared_ptr<ParticleGroup> pg,
+            FixedNeighbourList(std::shared_ptr<ParticleGroup> pg,
                                std::shared_ptr<Topology>     top,
-                               Parameters param):sys(sys),
-                                                 pd(pd),pg(pg),
+                               Parameters param):pg(pg),
+                                                 pd(pg->getParticleData()), 
+                                                 sys(pg->getParticleData()->getSystem()), 
                                                  top(top),
                                                  topologyLabel(param.topologyLabel){
               

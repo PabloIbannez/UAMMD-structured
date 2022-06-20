@@ -30,11 +30,11 @@ namespace UnBound{
         
         };
 
-        Clashed_(std::shared_ptr<System>       sys,
-                 std::shared_ptr<ParticleData>  pd,
-                 std::shared_ptr<ParticleGroup> pg,
+        Clashed_(std::shared_ptr<ParticleGroup> pg,
                  std::shared_ptr<Topology>     top,
-                 Parameters par):pd(pd),
+                 Parameters par):pg(pg),
+                                 pd(pg->getParticleData()),
+                                 sys(pg->getParticleData()->getSystem()),
                                  lambda(par.lambda),
                                  gamma(par.gamma),
                                  cutOffDst(par.cutOffDst){}
@@ -112,59 +112,6 @@ namespace UnBound{
                                     gamma,
                                     box,
                                     cutOffDst*cutOffDst);
-        }
-        
-        struct virialTransverser{
-
-            tensor3* virial;
-
-            real* radius;
-
-            real lambda;
-            real gamma;
-            
-            Box  box;
-
-            real cutOffDst2;
-            
-            virialTransverser(tensor3* virial,
-                              real* radius,
-                              real lambda,
-                              real gamma,
-                              Box  box,
-                              real cutOffDst2):virial(virial),
-                                            radius(radius),
-                                            lambda(lambda),
-                                            gamma(gamma),
-                                            box(box),
-                                            cutOffDst2(cutOffDst2){}
-
-            using resultType=tensor3;
-
-            inline __device__ resultType zero(){return tensor3(0);}
-            
-            inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
-            
-            inline __device__ resultType compute(const int index_i,const int index_j,const real4 posi,const real4 posj){
-                
-                return tensor3(real(0.0));
-            }
-            
-            inline __device__ void set(const int& index_i,const resultType& quantity){virial[index_i]+=quantity;}
-
-        };
-
-        virialTransverser getVirialTransverser(){
-            
-            tensor3* virial = this->pd->getVirial(access::location::gpu, access::mode::readwrite).raw();     
-            real*    radius = this->pd->getRadius(access::location::gpu, access::mode::readwrite).raw();     
-            
-            return virialTransverser(virial,
-                                     radius,
-                                     lambda,
-                                     gamma,
-                                     box,
-                                     cutOffDst*cutOffDst);
         }
         
         struct energyTransverser{

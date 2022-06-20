@@ -454,7 +454,7 @@ class SimulationAFM: public Simulation<ForceField_,
             this->integrator->resetForce();
             //Compute tip force
             this->integrator->sumForce();
-            real3 tipForce = Measures::totalForce(this->sys,this->pd,pgTip,
+            real3 tipForce = Measures::totalForce(pgTip,
                                                   Simulation::simulationStream); 
             
             //Set forces to 0
@@ -468,7 +468,7 @@ class SimulationAFM: public Simulation<ForceField_,
             this->integrator->resetForce();
             //Compute sample force
             this->integrator->sumForce();
-            real3 sampleForce = Measures::totalForce(this->sys,this->pd,pgSample, 
+            real3 sampleForce = Measures::totalForce(pgSample, 
                                                      Simulation::simulationStream); 
             
             //Set forces to 0

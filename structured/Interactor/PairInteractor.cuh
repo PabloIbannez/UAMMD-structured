@@ -89,40 +89,69 @@ namespace Interactor{
                 int Nthreads=THREADS_PER_BLOCK;
                 int Nblocks=numberParticles/Nthreads + ((numberParticles%Nthreads)?1:0);
                 
-                if(comp.force == true){
-                
-                    PairInteractor_ns::transverseNeighboursThreadPerParticle
-                    <typename Potential::forceTransverser,typename NeighbourList::NeighbourListData>
-                    <<<Nblocks,Nthreads,0, st>>>(numberParticles,
-                                                 pos.raw(),
-                                                 group2GlobalIndex,
-                                                 nlData,
-                                                 pot->getForceTransverser());
-                    CudaCheckError();
-                }
 
                 if(comp.energy == true){
 
-                    PairInteractor_ns::transverseNeighboursThreadPerParticle
-                    <typename Potential::energyTransverser,typename NeighbourList::NeighbourListData>
-                    <<<Nblocks,Nthreads,0, st>>>(numberParticles,
-                                                 pos.raw(),
-                                                 group2GlobalIndex,
-                                                 nlData,
-                                                 pot->getEnergyTransverser());
-                    CudaCheckError();
+                    if constexpr (has_getEnergyTransverser<Potential>::value){
+                        PairInteractor_ns::transverseNeighboursThreadPerParticle
+                        <typename Potential::energyTransverser,typename NeighbourList::NeighbourListData>
+                        <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                     pos.raw(),
+                                                     group2GlobalIndex,
+                                                     nlData,
+                                                     pot->getEnergyTransverser());
+                        CudaCheckError();
+                    } else {
+                        sys->log<System::MESSAGE>("[%s] Requested energyTransverser for potential, but it is not defined.",name.c_str());
+                    }
+                }
+                
+                if(comp.force == true){
+
+                    if constexpr (has_getForceTransverser<Potential>::value){
+                        PairInteractor_ns::transverseNeighboursThreadPerParticle
+                        <typename Potential::forceTransverser,typename NeighbourList::NeighbourListData>
+                        <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                     pos.raw(),
+                                                     group2GlobalIndex,
+                                                     nlData,
+                                                     pot->getForceTransverser());
+                        CudaCheckError();
+                    } else {
+                        sys->log<System::MESSAGE>("[%s] Requested forceTransverser for potential, but it is not defined.",name.c_str());
+                    }
                 }
                 
                 if(comp.virial == true){
 
-                    PairInteractor_ns::transverseNeighboursThreadPerParticle
-                    <typename Potential::virialTransverser,typename NeighbourList::NeighbourListData>
-                    <<<Nblocks,Nthreads,0, st>>>(numberParticles,
-                                                 pos.raw(),
-                                                 group2GlobalIndex,
-                                                 nlData,
-                                                 pot->getVirialTransverser());
-                    CudaCheckError();
+                    if constexpr (has_getVirialTransverser<Potential>::value){
+                        PairInteractor_ns::transverseNeighboursThreadPerParticle
+                        <typename Potential::virialTransverser,typename NeighbourList::NeighbourListData>
+                        <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                     pos.raw(),
+                                                     group2GlobalIndex,
+                                                     nlData,
+                                                     pot->getVirialTransverser());
+                        CudaCheckError();
+                    } else {
+                        sys->log<System::MESSAGE>("[%s] Requested virialTransverser for potential, but it is not defined.",name.c_str());
+                    }
+                }
+                
+                if(comp.stress == true){
+
+                    if constexpr (has_getStressTransverser<Potential>::value){
+                        PairInteractor_ns::transverseNeighboursThreadPerParticle
+                        <typename Potential::stressTransverser,typename NeighbourList::NeighbourListData>
+                        <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                     pos.raw(),
+                                                     group2GlobalIndex,
+                                                     nlData,
+                                                     pot->getStressTransverser());
+                        CudaCheckError();
+                    } else {
+                        sys->log<System::MESSAGE>("[%s] Requested stressTransverser for potential, but it is not defined.",name.c_str());
+                    }
                 }
             }
             

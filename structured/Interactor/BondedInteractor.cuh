@@ -221,7 +221,7 @@ namespace Interactor{
 
                     //----Init bondProcessor
 
-                    this->bondProcessor = std::make_shared<BondProcessor>(sys,pg);
+                    this->bondProcessor = std::make_shared<BondProcessor>(pg);
 
                     //----Register bonds in bonds processor
                     Bond bond;
@@ -373,6 +373,7 @@ namespace Interactor{
             using ForceTransverser  = typename BondType::ForceTransverser;
             using EnergyTransverser = typename BondType::EnergyTransverser;
             using VirialTransverser = typename BondType::VirialTransverser;
+            using StressTransverser = typename BondType::StressTransverser;
             
             std::shared_ptr<InputType> input;
             std::string bondName;
@@ -451,13 +452,13 @@ namespace Interactor{
                     CudaCheckError();
                 }
                 
-                if(comp.virial == true){
+                if(comp.stress == true){
 
-                    VirialTransverser vt = bondType->getVirialTransverser();
+                    StressTransverser vt = bondType->getStressTransverser();
                
                     BondedInteractor_ns::transverseBondListThreadPerParticle<
                                          typename BondType::Bond,
-                                         VirialTransverser>
+                                         StressTransverser>
                     <<<Nblocks,Nthreads,0,st>>>(N,
                                                 particlesWithBonds_ptr,
                                                 bondStart_ptr,

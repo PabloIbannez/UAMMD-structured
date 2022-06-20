@@ -70,8 +70,7 @@ namespace structured{
         
         public:
             
-            exclusions(std::shared_ptr<System>      sys,
-                       std::shared_ptr<ParticleData> pd):sys(sys),
+            exclusions(std::shared_ptr<ParticleData> pd):sys(pd->getSystem()),
                                                          pd(pd){}
 
             template<class Topology>
