@@ -69,8 +69,8 @@ std::shared_ptr<ForceField> setUpForceField(std::shared_ptr<ParticleGroup> pg,
             
     auto top = ff->getTopology();
 
-    top->loadStructureData(pd);
-    top->loadTypes(pd);
+    top->loadStructureData(pg->getParticleData());
+    top->loadTypes(pg->getParticleData());
 
     return ff;
 }

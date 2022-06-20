@@ -29,15 +29,14 @@
                                   ((ChainId, chainId, int))  \
                                   ((ModelId, modelId, int))  \
                                   ((SimulationId, simulationId, int))  \
+                                  ((Stress, stress, tensor3))  \
                                   ((FrictionConstant, frictionConstant, real)) \
                                   ((TranslationalSelfDiffusion, TranslationalSelfDiffusion, real)) \
                                   ((RotationalSelfDiffusion, rotationalSelfDiffusion, real)) \
                                   ((SASA, SASA, real)) \
                                   ((InnerRadius, innerRadius, real)) \
                                   ((Epsilon, epsilon, real)) \
-                                  ((Surface, surface, real)) \
-                                  ((Torque, torque, real4))\
-                                  ((Dir, dir, real4)) 
+                                  ((Surface, surface, real)) 
 
 //Append to this list any extra parameter that you need included in the ParameterUpdatable interface
 //Use the following syntax:
