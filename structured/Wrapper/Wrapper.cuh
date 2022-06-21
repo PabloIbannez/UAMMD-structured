@@ -71,6 +71,14 @@ std::shared_ptr<ForceField> setUpForceField(std::shared_ptr<ParticleGroup> pg,
 
     top->loadStructureData(pg->getParticleData());
     top->loadTypes(pg->getParticleData());
+    
+    real3 boxSize;
+    in.getOption("boxSize",InputFile::Required)>>boxSize.x
+                                               >>boxSize.y
+                                               >>boxSize.z;
+
+    Box box(boxSize);
+    ff->updateBox(box);
 
     return ff;
 }

@@ -210,48 +210,6 @@ namespace UnBound{
                                      cutOffDst*cutOffDst);
         }
         
-        //struct stressTransverser{
-
-        //    tensor3* stress;
-        //    
-        //    typename ParameterPairsHandler::PairIterator paramPairIterator;
-
-        //    Box box;
-        //    
-        //    real cutOffDst2;
-        //    
-        //    stressTransverser(tensor3* stress,
-        //                      typename ParameterPairsHandler::PairIterator paramPairIterator,
-        //                      Box  box,
-        //                      real cutOffDst2):stress(stress),
-        //                                               paramPairIterator(paramPairIterator),
-        //                                               box(box),
-        //                                               cutOffDst2(cutOffDst2){}
-        //    using resultType=tensor3;
-
-        //    inline __device__ resultType zero(){return tensor3(0);}
-        //    
-        //    inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
-        //    
-        //    inline __device__ resultType compute(const int index_i,const int index_j,const real4 posi,const real4 posj){
-        //        
-        //        return tensor3(0.0);
-        //    }
-        //    
-        //    inline __device__ void set(const int& index_i,const resultType& quantity){stress[index_i]+=quantity;}
-
-        //};
-
-        //stressTransverser getStressTransverser(){
-        //    
-        //    tensor3* stress = this->pd->getStress(access::location::gpu, access::mode::readwrite).raw();     
-        //    
-        //    return stressTransverser(stress,
-        //                             ljParam->getParameters()->getPairIterator(),
-        //                             box,
-        //                             cutOffDst*cutOffDst);
-        //}
-        
         void updateBox(Box newBox) override {
             box=newBox;
         }
