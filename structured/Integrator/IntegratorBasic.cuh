@@ -77,6 +77,14 @@ namespace structured{
             //CudaSafeCall(cudaStreamSynchronize(stream));
 
         }
+        
+        void generateVelocity(shared_ptr<ParticleGroup> pg,
+                              real kBT,
+                              std::string name){
+            cudaDeviceSynchronize();
+            generateVelocity(pg,kBT,name,0);
+            cudaDeviceSynchronize();
+        }
 
     }
 

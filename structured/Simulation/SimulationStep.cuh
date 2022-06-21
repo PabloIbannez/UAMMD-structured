@@ -53,6 +53,12 @@ class SimulationStep: public ParameterUpdatable{
             } 
         };
 
+        void tryInit(){
+            cudaDeviceSynchronize();
+            tryInit(0);
+            cudaDeviceSynchronize();
+        }
+
         virtual void tryApplyStep(int step, cudaStream_t st,bool force=false){
             if(initialized){
                 if(this->interval==0 and !force){return;}
@@ -61,6 +67,12 @@ class SimulationStep: public ParameterUpdatable{
                     this->applyStep(step,st);
                 }
             }
+        }
+        
+        void tryApplyStep(int step,bool force=false){
+            cudaDeviceSynchronize();
+            tryApplyStep(step,0,force);
+            cudaDeviceSynchronize();
         }
 
 };
@@ -362,7 +374,31 @@ class EnergyMeasure: public SimulationStep{
             real kE = Measures::totalKineticEnergy(this->pg,st);
             real pE = Measures::totalPotentialEnergy(this->pg,st);
 
-            this->outPutFile << step << " " << kE << " " << pE << " " << kE+pE << std::endl;
+            this->outPutFile << step << " " << std::setprecision(25) << kE << " " 
+                                            << std::setprecision(25) << pE << " " 
+                                            << std::setprecision(25) << kE+pE << std::endl;
+        }
+};
+
+class InertiaMeasure: public SimulationStep{
+
+        std::ofstream outPutFile;
+
+    public:
+        
+        InertiaMeasure(std::shared_ptr<ParticleGroup> pg,
+                       int interval,
+                       std::string outPutFileName):SimulationStep(pg,"InertiaMeasure",interval){
+            outPutFile = std::ofstream(outPutFileName);
+        }
+
+        void init(cudaStream_t st) override{}
+
+        void applyStep(int step, cudaStream_t st) override{
+            
+            tensor3 I = Measures::inertiaTensor(this->pg,make_real3(0.0),st);
+
+            this->outPutFile << step << " " << I << std::endl;
         }
 };
 
