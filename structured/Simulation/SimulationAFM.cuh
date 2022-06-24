@@ -233,22 +233,21 @@ class SimulationAFM: public Simulation<ForceField_,
             this->loadParticleData();
 
             //Generate group all
-            this->pg = std::make_shared<ParticleGroup>(this->pd,this->sys,"All");
+            this->pg = std::make_shared<ParticleGroup>(this->pd,"All");
             
             //Generate group sample
             selectors::notId sampleSel(tipId);
             this->pgSample  = std::make_shared<ParticleGroup>(sampleSel,
-                                                              this->pd, this->sys, "Sample");
+                                                              this->pd,"Sample");
 
             //Generate group tip
             selectors::id tipSel(tipId);
             this->pgTip  = std::make_shared<ParticleGroup>(tipSel,
-                                                           this->pd, this->sys, "Tip");
+                                                           this->pd,"Tip");
 
             //Load topology and add structure
-            this-> ff = std::make_shared<typename Simulation::ForceField>(this->sys,
-                                                                          this->pd,
-                                                                          this->pgSample,in);
+            this-> ff = std::make_shared<typename Simulation::ForceField>(this->pgSample,in);
+
             this->top = this->ff->getTopology();
 
             {
@@ -288,17 +287,15 @@ class SimulationAFM: public Simulation<ForceField_,
 
             this->top->loadTypes(this->pd);
 
-            this->tip = std::make_shared<TipModel>(this->sys, 
-                                                   this->pd, 
-                                                   this->pgSample, 
+            this->tip = std::make_shared<TipModel>(this->pgSample, 
                                                    this->pgTip, 
                                                    in);
             {
                 real3 sampleCOM;
                 
                 {
-                      sampleCOM = Measures::centerOfMassPos(this->sys,this->pd,
-                                                            this->pgSample,
+                      sampleCOM = Measures::centerOfMassPos(this->pgSample,
+                                                            Measures::totalMass(this->pgSample,this->simulationStream),
                                                             this->simulationStream);
                 }
                 
@@ -346,8 +343,8 @@ class SimulationAFM: public Simulation<ForceField_,
 
             this->tip->template applyUnits<typename Simulation::Topology::Units>();
             
-            this->minimization = std::make_shared<typename Simulation::Minimization>(this->pd,this->pg,this->sys,in,this->simulationStream);
-            this->integrator   = std::make_shared<typename Simulation::Integrator>  (this->pd,this->pg,this->sys,in,this->simulationStream);
+            this->minimization = std::make_shared<typename Simulation::Minimization>(this->pg,in,this->simulationStream);
+            this->integrator   = std::make_shared<typename Simulation::Integrator>  (this->pg,in,this->simulationStream);
             
             {
                 auto vel = this->pd->getVel(access::location::cpu, access::mode::readwrite);
@@ -384,8 +381,8 @@ class SimulationAFM: public Simulation<ForceField_,
             this->integrator->addInteractor(this->ff);
             this->integrator->addInteractor(this->tip);
             
-            this->addSimulationStep(std::make_shared<InfoStep>(this->sys,this->pd,this->pg,this->nStepsInfoInterval,this->nSteps));
-            this->addSimulationStep(std::make_shared<SortStep>(this->sys,this->pd,this->pg,this->nStepsSortInterval));
+            this->addSimulationStep(std::make_shared<InfoStep>(this->pg,this->nStepsInfoInterval,this->nSteps));
+            this->addSimulationStep(std::make_shared<SortStep>(this->pg,this->nStepsSortInterval));
             
         }
         
@@ -449,32 +446,38 @@ class SimulationAFM: public Simulation<ForceField_,
 
         }
         
-        real3 getTipForce(){
+        std::tuple<real3,real3> getTipAndSampleForce(){
+
+            uninitialized_cached_vector<real4> forceBuffer(this->pg->getNumberParticles());
+
+            //Copy force to buffer
+            {
+                auto force = this->pd->getForce(access::location::gpu, access::mode::read);     
+                thrust::copy(thrust::cuda::par.on(Simulation::simulationStream),
+                             force.begin(), 
+                             force.end(), 
+                             forceBuffer.begin());
+            }
+
             //Set forces to 0
             this->integrator->resetForce();
             //Compute tip force
-            this->integrator->sumForce();
+            this->integrator->updateForce();
             real3 tipForce = Measures::totalForce(pgTip,
                                                   Simulation::simulationStream); 
-            
-            //Set forces to 0
-            this->integrator->resetForce();
-
-            return tipForce;
-        }
-        
-        real3 getSampleForce(){
-            //Set forces to 0
-            this->integrator->resetForce();
-            //Compute sample force
-            this->integrator->sumForce();
             real3 sampleForce = Measures::totalForce(pgSample, 
                                                      Simulation::simulationStream); 
             
-            //Set forces to 0
-            this->integrator->resetForce();
+            //Copy back buffer to force
+            {
+                auto force = this->pd->getForce(access::location::gpu, access::mode::read);     
+                thrust::copy(thrust::cuda::par.on(Simulation::simulationStream),
+                             forceBuffer.begin(), 
+                             forceBuffer.end(), 
+                             force.begin());
+            }
 
-            return sampleForce;
+            return {tipForce,sampleForce};
         }
         
         void measureIndentation(std::ofstream& out){
@@ -510,8 +513,10 @@ class SimulationAFM: public Simulation<ForceField_,
             real zChip = chipPos.z - this->ff->getSurfacePosition();
             real zTip  = tipPos.z  - this->ff->getSurfacePosition();
             
-            real3 tipForce    = this->getTipForce()*Simulation::Topology::Units::FROM_INTERNAL_FORCE;
-            real3 sampleForce = this->getSampleForce()*Simulation::Topology::Units::FROM_INTERNAL_FORCE;
+            auto tipAndSampleForce = this->getTipAndSampleForce();
+
+            real3 tipForce    = std::get<0>(tipAndSampleForce)*Simulation::Topology::Units::FROM_INTERNAL_FORCE;
+            real3 sampleForce = std::get<1>(tipAndSampleForce)*Simulation::Topology::Units::FROM_INTERNAL_FORCE;
 
             real tipDeflection      = tip->getTipDeflection();
             real tipDeflectionForce = tip->getTipDeflectionForce()*Simulation::Topology::Units::FROM_INTERNAL_FORCE;

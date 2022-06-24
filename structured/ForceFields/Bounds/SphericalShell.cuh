@@ -33,10 +33,8 @@ namespace Bounds{
 
         public:
         
-            SphericalShell(std::shared_ptr<System>        sys,
-                           std::shared_ptr<ParticleData>  pd,
-                           std::shared_ptr<ParticleGroup> pg,
-                           InputFile&                     in):Base(sys,pd,pg,in){
+            SphericalShell(std::shared_ptr<ParticleGroup> pg,
+                           InputFile&                     in):Base(pg,in){
 
                 in.getOption("epsilonShell",InputFile::Required)>>epsilonShell;
                 in.getOption("sigmaShell",InputFile::Required)>>sigmaShell;
@@ -82,9 +80,9 @@ namespace Bounds{
                 sphericalShellParameters.shellRadius = shellRadius;
                 
                 {
-                    auto pos = pd->getPos(access::location::cpu, access::mode::read); 
+                    auto pos = this->pd->getPos(access::location::cpu, access::mode::read); 
                     
-                    auto groupIndex  = pg->getIndexIterator(access::location::cpu);
+                    auto groupIndex  = this->pg->getIndexIterator(access::location::cpu);
 
                     real3 dr = make_real3(pos[groupIndex[0]])-shellCenter;
                     real  innerRadius = sqrt(dot(dr,dr));
@@ -108,8 +106,7 @@ namespace Bounds{
                 
                 sphericalPotential = std::make_shared<SphericalShellType>(sphericalShellParameters);
 
-                spherical = std::make_shared<InteractorSphericalShellType>(this->pd,this->pg,
-                                                                           this->sys,
+                spherical = std::make_shared<InteractorSphericalShellType>(this->pg,
                                                                            sphericalPotential);
             }
                 

@@ -27,6 +27,13 @@ namespace Measures{
 
         return tpp;
     }
+
+    real totalVirial(std::shared_ptr<ParticleGroup> pg){
+        cudaDeviceSynchronize();
+        real v = totalVirial(pg,0);
+        cudaDeviceSynchronize();
+        return v;
+    }
     
     tensor3  totalStress(std::shared_ptr<ParticleGroup> pg,
                          cudaStream_t st){
@@ -50,6 +57,13 @@ namespace Measures{
 
         return tpp;
     }
+    
+    tensor3 totalStress(std::shared_ptr<ParticleGroup> pg){
+        cudaDeviceSynchronize();
+        tensor3 v = totalStress(pg,0);
+        cudaDeviceSynchronize();
+        return v;
+    }
 
     tensor3  totalKineticPressure(std::shared_ptr<ParticleGroup> pg,
                                   cudaStream_t st){
@@ -66,13 +80,20 @@ namespace Measures{
 
         auto pgIter = pg->getIndexIterator(access::location::gpu);
         
-        tensor3 tkp = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()),
+        tensor3 tkp = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                                      thrust::make_transform_iterator(pgIter, kp),
                                      thrust::make_transform_iterator(pgIter + N, kp),(tensor3){0,0,0,
                                                                                                0,0,0,
                                                                                                0,0,0});
 
         return tkp;
+    }
+
+    tensor3 totalKineticPressure(std::shared_ptr<ParticleGroup> pg){
+        cudaDeviceSynchronize();
+        tensor3 v = totalKineticPressure(pg,0);
+        cudaDeviceSynchronize();
+        return v;
     }
 
     real  totalKineticEnergy(std::shared_ptr<ParticleGroup> pg,
@@ -90,11 +111,18 @@ namespace Measures{
 
         auto pgIter = pg->getIndexIterator(access::location::gpu);
         
-        real tke = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()),
+        real tke = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                                   thrust::make_transform_iterator(pgIter, ke),
                                   thrust::make_transform_iterator(pgIter + N, ke),(real){0});
 
         return tke;
+    }
+
+    real totalKineticEnergy(std::shared_ptr<ParticleGroup> pg){
+        cudaDeviceSynchronize();
+        real v = totalKineticEnergy(pg,0);
+        cudaDeviceSynchronize();
+        return v;
     }
     
     real maxForce(std::shared_ptr<ParticleGroup> pg,
@@ -111,11 +139,18 @@ namespace Measures{
         
         auto pgIter = pg->getIndexIterator(access::location::gpu);
         
-        real maxForce = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()),
+        real maxForce = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                                        thrust::make_transform_iterator(pgIter, mF),
                                        thrust::make_transform_iterator(pgIter+N, mF),(real){-1.0},thrust::maximum<real>());
 
         return maxForce;
+    }
+    
+    real maxForce(std::shared_ptr<ParticleGroup> pg){
+        cudaDeviceSynchronize();
+        real v = maxForce(pg,0);
+        cudaDeviceSynchronize();
+        return v;
     }
     
     real totalPotentialEnergy(std::shared_ptr<ParticleGroup> pg,
@@ -132,11 +167,18 @@ namespace Measures{
         
         auto pgIter = pg->getIndexIterator(access::location::gpu);
         
-        real tEnergy = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()),
+        real tEnergy = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                                       thrust::make_transform_iterator(pgIter  , pE),
                                       thrust::make_transform_iterator(pgIter+N, pE),(real){0});
 
         return tEnergy;
+    }
+    
+    real totalPotentialEnergy(std::shared_ptr<ParticleGroup> pg){
+        cudaDeviceSynchronize();
+        real v = totalPotentialEnergy(pg,0);
+        cudaDeviceSynchronize();
+        return v;
     }
     
     real3 totalForce(std::shared_ptr<ParticleGroup> pg,
@@ -153,11 +195,18 @@ namespace Measures{
         
         auto pgIter = pg->getIndexIterator(access::location::gpu);
         
-        real3 tForce = make_real3(thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()),
+        real3 tForce = make_real3(thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                        thrust::make_transform_iterator(pgIter, tF),
                        thrust::make_transform_iterator(pgIter+N, tF),(real4){0,0,0,0}));
 
         return tForce;
+    }
+    
+    real3 totalForce(std::shared_ptr<ParticleGroup> pg){
+        cudaDeviceSynchronize();
+        real3 v = totalForce(pg,0);
+        cudaDeviceSynchronize();
+        return v;
     }
     
     real3 centroidPos(std::shared_ptr<ParticleGroup> pg,
@@ -174,11 +223,18 @@ namespace Measures{
         
         auto pgIter = pg->getIndexIterator(access::location::gpu);
 
-        real3 centroid = make_real3(thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()),
+        real3 centroid = make_real3(thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                          thrust::make_transform_iterator(pgIter, tP),
                          thrust::make_transform_iterator(pgIter + N, tP),(real4){0,0,0,0})/N);
 
         return centroid;
+    }
+    
+    real3 centroidPos(std::shared_ptr<ParticleGroup> pg){
+        cudaDeviceSynchronize();
+        real3 v = centroidPos(pg,0);
+        cudaDeviceSynchronize();
+        return v;
     }
     
     real totalCharge(std::shared_ptr<ParticleGroup> pg,
@@ -195,11 +251,18 @@ namespace Measures{
         
         auto pgIter = pg->getIndexIterator(access::location::gpu);
         
-        real tCharge = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()),
+        real tCharge = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                      thrust::make_transform_iterator(pgIter, tQ),
                      thrust::make_transform_iterator(pgIter+N, tQ),(real){0});
 
         return tCharge;
+    }
+    
+    real totalCharge(std::shared_ptr<ParticleGroup> pg){
+        cudaDeviceSynchronize();
+        real v = totalCharge(pg,0);
+        cudaDeviceSynchronize();
+        return v;
     }
 
     real totalMass(std::shared_ptr<ParticleGroup> pg,
@@ -216,11 +279,18 @@ namespace Measures{
         
         auto pgIter = pg->getIndexIterator(access::location::gpu);
         
-        real tMass = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()),
+        real tMass = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                      thrust::make_transform_iterator(pgIter, tM),
                      thrust::make_transform_iterator(pgIter+N, tM),(real){0});
 
         return tMass;
+    }
+    
+    real totalMass(std::shared_ptr<ParticleGroup> pg){
+        cudaDeviceSynchronize();
+        real v = totalMass(pg,0);
+        cudaDeviceSynchronize();
+        return v;
     }
     
     real3 centerOfMassPos(std::shared_ptr<ParticleGroup> pg,
@@ -239,24 +309,20 @@ namespace Measures{
         
         auto pgIter = pg->getIndexIterator(access::location::gpu);
 
-        real3 comp = make_real3(thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()),
-                    thrust::make_transform_iterator(pgIter, mWs),
-                    thrust::make_transform_iterator(pgIter + N, mWs),(real4){0,0,0,0})/totalMass);
+        real3 comp = make_real3(thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
+                                thrust::make_transform_iterator(pgIter, mWs),
+                                thrust::make_transform_iterator(pgIter + N, mWs),(real4){0,0,0,0})/totalMass);
 
         return comp;
     }
     
     real3 centerOfMassPos(std::shared_ptr<ParticleGroup> pg,
-                          cudaStream_t st){
-
-        auto pd  = pg->getParticleData();
-        auto sys = pd->getSystem(); 
-
-        real tM = totalMass(pg,st);
-
-        return centerOfMassPos(pg,tM,st);
+                          real totalMass){
+        cudaDeviceSynchronize();
+        real3 v = centerOfMassPos(pg,totalMass,0);
+        cudaDeviceSynchronize();
+        return v;
     }
-
     
     real3 centerOfMassVel(std::shared_ptr<ParticleGroup> pg,
                           real   totalMass,
@@ -274,11 +340,19 @@ namespace Measures{
         
         auto pgIter = pg->getIndexIterator(access::location::gpu);
 
-        real3 comv = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()),
+        real3 comv = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                                     thrust::make_transform_iterator(pgIter, mWs),
                                     thrust::make_transform_iterator(pgIter + N, mWs),(real3){0,0,0})/totalMass;
 
         return comv;
+    }
+    
+    real3 centerOfMassVel(std::shared_ptr<ParticleGroup> pg,
+                          real totalMass){
+        cudaDeviceSynchronize();
+        real3 v = centerOfMassVel(pg,totalMass,0);
+        cudaDeviceSynchronize();
+        return v;
     }
     
     real3 angularMomentum(std::shared_ptr<ParticleGroup> pg,
@@ -302,11 +376,20 @@ namespace Measures{
         
         auto pgIter = pg->getIndexIterator(access::location::gpu);
 
-        real3 angM = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()),
+        real3 angM = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                      thrust::make_transform_iterator(pgIter, aM),
                      thrust::make_transform_iterator(pgIter + N, aM),(real3){0,0,0});
 
         return angM;
+    }
+    
+    real3 angularMomentum(std::shared_ptr<ParticleGroup> pg,
+                          real3 refp,
+                          real3 refv){
+        cudaDeviceSynchronize();
+        real3 v = angularMomentum(pg,refp,refv,0);
+        cudaDeviceSynchronize();
+        return v;
     }
 
     tensor3 inertiaTensor(std::shared_ptr<ParticleGroup> pg,
@@ -325,11 +408,20 @@ namespace Measures{
         
         auto pgIter = pg->getIndexIterator(access::location::gpu);
 
-        tensor3 inertia = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()),
+        tensor3 inertia = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                           thrust::make_transform_iterator(pgIter, I),
                           thrust::make_transform_iterator(pgIter + N, I),tensor3(0));
 
         return inertia;
+    }
+    
+    tensor3 inertiaTensor(std::shared_ptr<ParticleGroup> pg,
+                          real3 refp,
+                          real3 refv){
+        cudaDeviceSynchronize();
+        tensor3 v = inertiaTensor(pg,refp,0);
+        cudaDeviceSynchronize();
+        return v;
     }
     
     real3 angularVelocity(std::shared_ptr<ParticleGroup> pg,
@@ -379,6 +471,15 @@ namespace Measures{
         angularVelocity.z = invInertia.zx*angm.x+invInertia.zy*angm.y+invInertia.zz*angm.z;
 
         return angularVelocity;
+    }
+    
+    real3 angularVelocity(std::shared_ptr<ParticleGroup> pg,
+                          real3 refp,
+                          real3 refv){
+        cudaDeviceSynchronize();
+        real3 v = angularVelocity(pg,refp,refv,0);
+        cudaDeviceSynchronize();
+        return v;
     }
 
 }}}

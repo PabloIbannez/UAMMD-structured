@@ -29,14 +29,12 @@ namespace LennardJonesSurface{
 
         public:
         
-            LennardJonesSurface(std::shared_ptr<System>        sys,
-                                std::shared_ptr<ParticleData>  pd,
-                                std::shared_ptr<ParticleGroup> pg,
-                                InputFile&                     in):Base(sys,pd,pg,in),
-                                                                    epsilon(std::stof(in.getOption("epsilonSurf",InputFile::Required).str())),
-                                                                    sigma(std::stof(in.getOption("sigmaSurf",InputFile::Required).str())),
-                                                                    surfacePosition(std::stof(in.getOption("surfacePosition",InputFile::Required).str())){
-                
+            LennardJonesSurface(std::shared_ptr<ParticleGroup> pg,
+                                InputFile&                     in):Base(pg,in),
+                                                                   epsilon(std::stof(in.getOption("epsilonSurf",InputFile::Required).str())),
+                                                                   sigma(std::stof(in.getOption("sigmaSurf",InputFile::Required).str())),
+                                                                   surfacePosition(std::stof(in.getOption("surfacePosition",InputFile::Required).str())){
+               
                 {
                     typename SurfaceType::Parameters surfaceParameters;
 
@@ -46,8 +44,7 @@ namespace LennardJonesSurface{
 
                     surfacePotential = std::make_shared<SurfaceType>(surfaceParameters);
 
-                    surface = std::make_shared<InteractorSurfaceType>(this->pd,this->pg,
-                                                                      this->sys,
+                    surface = std::make_shared<InteractorSurfaceType>(this->pg,
                                                                       surfacePotential);
 
                 }

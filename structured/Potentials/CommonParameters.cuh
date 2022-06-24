@@ -270,23 +270,23 @@ namespace CommonParameters{
                 std::shared_ptr<ParameterPairsHandler> getParameters(){
                     if(!parametersRequested){
                     
-                        auto typesParam    = this->top->getTypes();
-                        auto typeList = typesParam->getTypeIdList();
-                        
-                        for(int type_i=0;type_i<typeList.size();type_i++){
-                            for(int type_j=type_i;type_j<typeList.size();type_j++){
-                                
-                            int type_i_id = typeList[type_i];
-                            int type_j_id = typeList[type_j];
-                                    
-                            std::string type_i_name = typesParam->getTypeParameters(type_i_id).name;
-                            std::string type_j_name = typesParam->getTypeParameters(type_j_id).name;
-                        
-                            this->sys->template log<System::MESSAGE>("[StatisticalPotential] "
-                                                                     "(%s %s) Pair param: %f",
-                                                                      type_i_name.c_str(),type_j_name.c_str(),
-                                                                      interParam->getPairParameters(type_i_id,type_j_id).epsilon);
-                        }}
+                        //auto typesParam    = this->top->getTypes();
+                        //auto typeList = typesParam->getTypeIdList();
+                        //
+                        //for(int type_i=0;type_i<typeList.size();type_i++){
+                        //    for(int type_j=type_i;type_j<typeList.size();type_j++){
+                        //        
+                        //    int type_i_id = typeList[type_i];
+                        //    int type_j_id = typeList[type_j];
+                        //            
+                        //    std::string type_i_name = typesParam->getTypeParameters(type_i_id).name;
+                        //    std::string type_j_name = typesParam->getTypeParameters(type_j_id).name;
+                        //
+                        //    this->sys->template log<System::MESSAGE>("[StatisticalPotential] "
+                        //                                             "(%s %s) Pair param: %f",
+                        //                                              type_i_name.c_str(),type_j_name.c_str(),
+                        //                                              interParam->getPairParameters(type_i_id,type_j_id).epsilon);
+                        //}}
                         
                         parametersRequested=true;
                     }

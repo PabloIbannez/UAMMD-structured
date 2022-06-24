@@ -395,8 +395,10 @@ class InertiaMeasure: public SimulationStep{
         void init(cudaStream_t st) override{}
 
         void applyStep(int step, cudaStream_t st) override{
-            
-            tensor3 I = Measures::inertiaTensor(this->pg,make_real3(0.0),st);
+
+            real totalMass = Measures::totalMass(this->pg,st);
+            real3 com = Measures::centerOfMassPos(this->pg,totalMass,st);
+            tensor3 I = Measures::inertiaTensor(this->pg,com,st);
 
             this->outPutFile << step << " " << I << std::endl;
         }

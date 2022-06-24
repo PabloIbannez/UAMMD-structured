@@ -11,6 +11,7 @@
 #include"ThirdParty/json.hpp"
 
 #include"uammd.cuh"
+#include"utils/container.h"
 
 #include"misc/ParameterUpdatable.h"
 

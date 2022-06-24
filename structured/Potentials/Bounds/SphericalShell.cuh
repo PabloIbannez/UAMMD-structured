@@ -84,7 +84,16 @@ namespace Bounds{
                 return real(2.0)*e;
             
             }
-            __device__ __forceinline__ real3 virial(const real4 &pos){return make_real3(0);}
+            __device__ __forceinline__ real virial(const real4 &pos){return real(0);}
+            
+            __device__ __forceinline__ ForceEnergyVirial sum(Interactor::Computables comp,const real4& pos){
+
+                real3 f = comp.force?force(pos):real3();
+                real  e = comp.energy?energy(pos):real(0.0);
+                real  v = comp.virial?virial(pos):real(0.0);
+
+                return {f,e,v};
+            }
     	    
     	    std::tuple<const real4 *> getArrays(ParticleData *pd){
     	    	
