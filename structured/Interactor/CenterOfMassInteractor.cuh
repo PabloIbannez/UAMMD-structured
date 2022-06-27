@@ -93,8 +93,6 @@ namespace Interactor{
                                                                                                 F);  
 
                 }
-
-                //CudaSafeCall(cudaStreamSynchronize(st));
             }
             
             void  setState(real3 newForce){F=newForce;}

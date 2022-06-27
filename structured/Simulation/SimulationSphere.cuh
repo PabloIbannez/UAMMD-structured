@@ -182,7 +182,6 @@ class SimulationSphere: public Simulation<ForceField_,
 
             this->integrator->forwardTime();
             this->tryApplySteps();
-
         
         }
         

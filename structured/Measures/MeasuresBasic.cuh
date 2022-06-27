@@ -21,9 +21,11 @@ namespace Measures{
 
         auto pgIter = pg->getIndexIterator(access::location::gpu);
         
-        real tpp = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
+        real tpp = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st).on(st),
                                   thrust::make_transform_iterator(pgIter, pp),
                                   thrust::make_transform_iterator(pgIter + N, pp),real(0.0));
+
+        cudaStreamSynchronize(st);
 
         return tpp;
     }
@@ -54,6 +56,8 @@ namespace Measures{
                                      thrust::make_transform_iterator(pgIter + N, pp),(tensor3){0,0,0,
                                                                                                0,0,0,
                                                                                                0,0,0});
+        
+        cudaStreamSynchronize(st);
 
         return tpp;
     }
@@ -86,6 +90,8 @@ namespace Measures{
                                                                                                0,0,0,
                                                                                                0,0,0});
 
+        cudaStreamSynchronize(st);
+        
         return tkp;
     }
 
@@ -114,6 +120,8 @@ namespace Measures{
         real tke = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                                   thrust::make_transform_iterator(pgIter, ke),
                                   thrust::make_transform_iterator(pgIter + N, ke),(real){0});
+        
+        cudaStreamSynchronize(st);
 
         return tke;
     }
@@ -142,6 +150,8 @@ namespace Measures{
         real maxForce = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                                        thrust::make_transform_iterator(pgIter, mF),
                                        thrust::make_transform_iterator(pgIter+N, mF),(real){-1.0},thrust::maximum<real>());
+        
+        cudaStreamSynchronize(st);
 
         return maxForce;
     }
@@ -170,6 +180,8 @@ namespace Measures{
         real tEnergy = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                                       thrust::make_transform_iterator(pgIter  , pE),
                                       thrust::make_transform_iterator(pgIter+N, pE),(real){0});
+        
+        cudaStreamSynchronize(st);
 
         return tEnergy;
     }
@@ -198,6 +210,8 @@ namespace Measures{
         real3 tForce = make_real3(thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                        thrust::make_transform_iterator(pgIter, tF),
                        thrust::make_transform_iterator(pgIter+N, tF),(real4){0,0,0,0}));
+        
+        cudaStreamSynchronize(st);
 
         return tForce;
     }
@@ -226,6 +240,8 @@ namespace Measures{
         real3 centroid = make_real3(thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                          thrust::make_transform_iterator(pgIter, tP),
                          thrust::make_transform_iterator(pgIter + N, tP),(real4){0,0,0,0})/N);
+        
+        cudaStreamSynchronize(st);
 
         return centroid;
     }
@@ -254,6 +270,8 @@ namespace Measures{
         real tCharge = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                      thrust::make_transform_iterator(pgIter, tQ),
                      thrust::make_transform_iterator(pgIter+N, tQ),(real){0});
+        
+        cudaStreamSynchronize(st);
 
         return tCharge;
     }
@@ -282,6 +300,8 @@ namespace Measures{
         real tMass = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                      thrust::make_transform_iterator(pgIter, tM),
                      thrust::make_transform_iterator(pgIter+N, tM),(real){0});
+        
+        cudaStreamSynchronize(st);
 
         return tMass;
     }
@@ -312,6 +332,8 @@ namespace Measures{
         real3 comp = make_real3(thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                                 thrust::make_transform_iterator(pgIter, mWs),
                                 thrust::make_transform_iterator(pgIter + N, mWs),(real4){0,0,0,0})/totalMass);
+        
+        cudaStreamSynchronize(st);
 
         return comp;
     }
@@ -343,6 +365,8 @@ namespace Measures{
         real3 comv = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                                     thrust::make_transform_iterator(pgIter, mWs),
                                     thrust::make_transform_iterator(pgIter + N, mWs),(real3){0,0,0})/totalMass;
+        
+        cudaStreamSynchronize(st);
 
         return comv;
     }
@@ -379,6 +403,8 @@ namespace Measures{
         real3 angM = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                      thrust::make_transform_iterator(pgIter, aM),
                      thrust::make_transform_iterator(pgIter + N, aM),(real3){0,0,0});
+        
+        cudaStreamSynchronize(st);
 
         return angM;
     }
@@ -411,6 +437,8 @@ namespace Measures{
         tensor3 inertia = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                           thrust::make_transform_iterator(pgIter, I),
                           thrust::make_transform_iterator(pgIter + N, I),tensor3(0));
+        
+        cudaStreamSynchronize(st);
 
         return inertia;
     }
@@ -469,6 +497,8 @@ namespace Measures{
         angularVelocity.x = invInertia.xx*angm.x+invInertia.xy*angm.y+invInertia.xz*angm.z;
         angularVelocity.y = invInertia.yx*angm.x+invInertia.yy*angm.y+invInertia.yz*angm.z;
         angularVelocity.z = invInertia.zx*angm.x+invInertia.zy*angm.y+invInertia.zz*angm.z;
+        
+        cudaStreamSynchronize(st);
 
         return angularVelocity;
     }

@@ -167,6 +167,8 @@ namespace structured{
                                        thrust::raw_pointer_cast(BottomPlateForceTemp.data()), 
                                        BottomPlateTotalForce, 
                                        N,st);
+                
+                cudaStreamSynchronize(st);
 
                 return {TopPlateTotalForce[0].z,BottomPlateTotalForce[0].z};
             }
