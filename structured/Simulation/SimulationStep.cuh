@@ -338,6 +338,140 @@ class WriteStep: public SimulationStep{
             pbc=new_pbc;
         }
 };
+
+template<class ForceField>
+class ComputableMeasure: public SimulationStep{
+
+        std::ofstream outPutFile;
+
+        std::shared_ptr<ForceField> ff;
+
+        uammd::Interactor::Computables compToMeasure;
+
+    public:
+        
+        ComputableMeasure(std::shared_ptr<ParticleGroup> pg,
+                          int interval,
+                          std::string outPutFileName,
+                          std::shared_ptr<ForceField> ff,
+                          uammd::Interactor::Computables compToMeasure):SimulationStep(pg,"ComputableMeasure",interval),
+                                                                        ff(ff),compToMeasure(compToMeasure){
+                outPutFile = std::ofstream(outPutFileName);
+        }
+
+        void init(cudaStream_t st) override{}
+
+        void applyStep(int step, cudaStream_t st) override{
+
+            if(compToMeasure.energy == true){
+                uninitialized_cached_vector<real> energyBuffer(this->pg->getNumberParticles());
+
+                //Copy energy to buffer
+                {
+                    auto energy = this->pd->getEnergy(access::location::gpu, access::mode::read);     
+                    thrust::copy(thrust::cuda::par.on(st),
+                                 energy.begin(), 
+                                 energy.end(), 
+                                 energyBuffer.begin());
+                }
+
+                this->integrator->resetEnergy();
+                this->integrator->updateEnergy();
+                real totalEnergy = Measures::totalPotentialEnergy(pg, 
+                                                                  st); 
+                
+                //Copy back buffer to energy
+                {
+                    auto energy = this->pd->getEnergy(access::location::gpu, access::mode::read);     
+                    thrust::copy(thrust::cuda::par.on(st),
+                                 energyBuffer.begin(), 
+                                 energyBuffer.end(), 
+                                 energy.begin());
+                }
+            }
+            
+            if(compToMeasure.force == true){
+                uninitialized_cached_vector<real4> forceBuffer(this->pg->getNumberParticles());
+
+                //Copy force to buffer
+                {
+                    auto force = this->pd->getForce(access::location::gpu, access::mode::read);     
+                    thrust::copy(thrust::cuda::par.on(st),
+                                 force.begin(), 
+                                 force.end(), 
+                                 forceBuffer.begin());
+                }
+
+                this->integrator->resetForce();
+                this->integrator->updateForce();
+                real3 totalForce = Measures::totalForce(pg, 
+                                                        st); 
+                
+                //Copy back buffer to force
+                {
+                    auto force = this->pd->getForce(access::location::gpu, access::mode::read);     
+                    thrust::copy(thrust::cuda::par.on(st),
+                                 forceBuffer.begin(), 
+                                 forceBuffer.end(), 
+                                 force.begin());
+                }
+            }
+            
+            if(compToMeasure.virial == true){
+                uninitialized_cached_vector<real> virialBuffer(this->pg->getNumberParticles());
+
+                //Copy virial to buffer
+                {
+                    auto virial = this->pd->getVirial(access::location::gpu, access::mode::read);     
+                    thrust::copy(thrust::cuda::par.on(st),
+                                 virial.begin(), 
+                                 virial.end(), 
+                                 virialBuffer.begin());
+                }
+
+                this->integrator->resetVirial();
+                this->integrator->updateVirial();
+                real totalVirial = Measures::totalVirial(pg, 
+                                                         st); 
+                
+                //Copy back buffer to virial
+                {
+                    auto virial = this->pd->getVirial(access::location::gpu, access::mode::read);     
+                    thrust::copy(thrust::cuda::par.on(st),
+                                 virialBuffer.begin(), 
+                                 virialBuffer.end(), 
+                                 virial.begin());
+                }
+            }
+            
+            if(compToMeasure.stress == true){
+                uninitialized_cached_vector<tensor3> stressBuffer(this->pg->getNumberParticles());
+
+                //Copy stress to buffer
+                {
+                    auto stress = this->pd->getStress(access::location::gpu, access::mode::read);     
+                    thrust::copy(thrust::cuda::par.on(st),
+                                 stress.begin(), 
+                                 stress.end(), 
+                                 stressBuffer.begin());
+                }
+
+                this->integrator->resetStress();
+                this->integrator->updateStress();
+                tensor3 totalStress = Measures::totalStress(pg, 
+                                                            st); 
+                
+                //Copy back buffer to stress
+                {
+                    auto stress = this->pd->getStress(access::location::gpu, access::mode::read);     
+                    thrust::copy(thrust::cuda::par.on(st),
+                                 stressBuffer.begin(), 
+                                 stressBuffer.end(), 
+                                 stress.begin());
+                }
+            }
+        }
+};
     
 template<class ForceField>
 class EnergyMeasure: public SimulationStep{

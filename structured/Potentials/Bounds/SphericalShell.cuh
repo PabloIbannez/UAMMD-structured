@@ -84,7 +84,24 @@ namespace Bounds{
                 return real(2.0)*e;
             
             }
-            __device__ __forceinline__ real virial(const real4 &pos){return real(0);}
+            __device__ __forceinline__ real virial(const real4 &pos){
+                
+                const real3 dr = shellCenter-make_real3(pos);
+                
+                const real r  = sqrt(dot(dr,dr));
+                      real r2 = r-shellRadius;
+                           r2 = r2*r2;
+                
+                const real sinvr2  = sigmaShell*sigmaShell/r2;
+                const real sinvr6  = sinvr2*sinvr2*sinvr2;
+                const real sinvr12 = sinvr6*sinvr6;
+                
+                real fmod = -epsilonShell*real(6.0)*(real(2.0)*Ashell*sinvr12+Bshell*sinvr6)/abs(r-shellRadius);
+
+                real3 f = -fmod*(dr/r);
+
+                return -dot(f,dr/r);
+            }
             
             __device__ __forceinline__ ForceEnergyVirial sum(Interactor::Computables comp,const real4& pos){
 

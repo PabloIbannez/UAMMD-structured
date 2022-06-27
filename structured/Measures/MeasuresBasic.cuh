@@ -21,7 +21,7 @@ namespace Measures{
 
         auto pgIter = pg->getIndexIterator(access::location::gpu);
         
-        real tpp = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st).on(st),
+        real tpp = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                                   thrust::make_transform_iterator(pgIter, pp),
                                   thrust::make_transform_iterator(pgIter + N, pp),real(0.0));
 
