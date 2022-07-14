@@ -100,6 +100,7 @@ namespace CommonParameters{
                 }
                 
                 std::shared_ptr<ParameterPairsHandler> getParameters(){
+                    
                     if(!parametersRequested){
                     
                         auto typesParam    = this->top->getTypes();
@@ -110,15 +111,18 @@ namespace CommonParameters{
                                 
                             int type_i_id = typeList[type_i];
                             int type_j_id = typeList[type_j];
+
+                            if(interParam->isPairAdded(std::make_pair(type_i_id,type_j_id))){
                                     
-                            std::string type_i_name = typesParam->getTypeParameters(type_i_id).name;
-                            std::string type_j_name = typesParam->getTypeParameters(type_j_id).name;
+                                std::string type_i_name = typesParam->getTypeParameters(type_i_id).name;
+                                std::string type_j_name = typesParam->getTypeParameters(type_j_id).name;
                         
-                            this->sys->template log<System::DEBUG1>("[LennardJonesParameters] "
-                                                                     "(%s %s) Pair param, eps:%f and sigma:%f",
-                                                                      type_i_name.c_str(),type_j_name.c_str(),
-                                                                      interParam->getPairParameters(type_i_id,type_j_id).epsilon,
-                                                                      interParam->getPairParameters(type_i_id,type_j_id).sigma);
+                                this->sys->template log<System::DEBUG1>("[LennardJonesParameters] "
+                                                                         "(%s %s) Pair param, eps:%f and sigma:%f",
+                                                                          type_i_name.c_str(),type_j_name.c_str(),
+                                                                          interParam->getPairParameters(type_i_id,type_j_id).epsilon,
+                                                                          interParam->getPairParameters(type_i_id,type_j_id).sigma);
+                            }
                         }}
                         
                         parametersRequested=true;
@@ -268,25 +272,30 @@ namespace CommonParameters{
                 }
 
                 std::shared_ptr<ParameterPairsHandler> getParameters(){
+
                     if(!parametersRequested){
                     
-                        //auto typesParam    = this->top->getTypes();
-                        //auto typeList = typesParam->getTypeIdList();
-                        //
-                        //for(int type_i=0;type_i<typeList.size();type_i++){
-                        //    for(int type_j=type_i;type_j<typeList.size();type_j++){
-                        //        
-                        //    int type_i_id = typeList[type_i];
-                        //    int type_j_id = typeList[type_j];
-                        //            
-                        //    std::string type_i_name = typesParam->getTypeParameters(type_i_id).name;
-                        //    std::string type_j_name = typesParam->getTypeParameters(type_j_id).name;
-                        //
-                        //    this->sys->template log<System::MESSAGE>("[StatisticalPotential] "
-                        //                                             "(%s %s) Pair param: %f",
-                        //                                              type_i_name.c_str(),type_j_name.c_str(),
-                        //                                              interParam->getPairParameters(type_i_id,type_j_id).epsilon);
-                        //}}
+                        auto typesParam    = this->top->getTypes();
+                        auto typeList = typesParam->getTypeIdList();
+                        
+                        for(int type_i=0;type_i<typeList.size();type_i++){
+                            for(int type_j=type_i;type_j<typeList.size();type_j++){
+                                
+                            int type_i_id = typeList[type_i];
+                            int type_j_id = typeList[type_j];
+                                    
+                            if(interParam->isPairAdded(std::make_pair(type_i_id,type_j_id))){
+                            
+                                std::string type_i_name = typesParam->getTypeParameters(type_i_id).name;
+                                std::string type_j_name = typesParam->getTypeParameters(type_j_id).name;
+                                    
+                                this->sys->template log<System::MESSAGE>("[StatisticalPotential] "
+                                                                         "(%s %s) Pair param: %f",
+                                                                          type_i_name.c_str(),type_j_name.c_str(),
+                                                                          interParam->getPairParameters(type_i_id,type_j_id).epsilon);
+                            }
+                        
+                        }}
                         
                         parametersRequested=true;
                     }

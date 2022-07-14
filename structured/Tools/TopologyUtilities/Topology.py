@@ -168,6 +168,7 @@ class Topology:
         
         self.propertiesCommon = ["TYPES",
                                  "MJ",
+                                 "WCA",
                                  "PDNA",
                                  "LJ_WCA",
                                  "UNBOUND",

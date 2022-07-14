@@ -18,12 +18,12 @@ namespace structured{
                                            real epsilonTip,
                                            real sigmaTip,
                                            real A,real B,
-                                           real epsilonTipSurf,
-                                           real sigmaTipSurf,
-                                           real ATipSurf,real BTipSurf,
+                                           //real epsilonTipSurf,
+                                           //real sigmaTipSurf,
+                                           //real ATipSurf,real BTipSurf,
                                            real Rtip,
                                            real3 chipPos,
-                                           real  surfPos,
+                                           //real  surfPos,
                                            real Kxy,
                                            real K){
             
@@ -60,23 +60,23 @@ namespace structured{
             //Compute surface and umbrella force in thread 0
             if(i==0){
 
-                real fmodSurf = real(0.0);
-                    
-                const real dz  = abs(surfPos-tPos.z);
+                //real fmodSurf = real(0.0);
+                //    
+                //const real dz  = abs(surfPos-tPos.z);
 
-                if((ATipSurf == real(0.0)) and (BTipSurf == real(0.0))){
-                
-                } else {
-                    
-                    real dz2 = dz-Rtip;
-                         dz2 = dz2*dz2;
-                    
-                    const real sinvdz2  = sigmaTipSurf*sigmaTipSurf/dz2;
-                    const real sinvdz6  = sinvdz2*sinvdz2*sinvdz2;
-                    const real sinvdz12 = sinvdz6*sinvdz6;
-                    
-                    fmodSurf = -epsilonTipSurf*real(6.0)*(real(2.0)*ATipSurf*sinvdz12+BTipSurf*sinvdz6)/abs(dz-Rtip); 
-                }
+                //if((ATipSurf == real(0.0)) and (BTipSurf == real(0.0))){
+                //
+                //} else {
+                //    
+                //    real dz2 = dz-Rtip;
+                //         dz2 = dz2*dz2;
+                //    
+                //    const real sinvdz2  = sigmaTipSurf*sigmaTipSurf/dz2;
+                //    const real sinvdz6  = sinvdz2*sinvdz2*sinvdz2;
+                //    const real sinvdz12 = sinvdz6*sinvdz6;
+                //    
+                //    fmodSurf = -epsilonTipSurf*real(6.0)*(real(2.0)*ATipSurf*sinvdz12+BTipSurf*sinvdz6)/abs(dz-Rtip); 
+                //}
                 
                 if(numberParticles == 0){
                     tipForce[0] = make_real4(0);
@@ -85,7 +85,8 @@ namespace structured{
                 
                 tipForce[0] += make_real4(Kxy*(chipPos.x-tPos.x),
                                           Kxy*(chipPos.y-tPos.y),
-                                          K*(chipPos.z-tPos.z)+fmodSurf*(surfPos-tPos.z)/dz,
+                                          //K*(chipPos.z-tPos.z)+fmodSurf*(surfPos-tPos.z)/dz,
+                                          K*(chipPos.z-tPos.z),
                                           0);
             }
             
@@ -106,7 +107,7 @@ namespace structured{
             size_t cubReductionTempStorageSize;
             
             double3 chipPos;
-            double  surfPos;
+            //double  surfPos;
             
         public:
 
@@ -117,10 +118,10 @@ namespace structured{
                 real A;
                 real B;
                 
-                real epsilonTipSurf;
-                real sigmaTipSurf;
-                real ATipSurf;
-                real BTipSurf;
+                //real epsilonTipSurf;
+                //real sigmaTipSurf;
+                //real ATipSurf;
+                //real BTipSurf;
                 
                 real Rtip;
 
@@ -135,10 +136,10 @@ namespace structured{
             real A;
             real B;
             
-            real epsilonTipSurf;
-            real sigmaTipSurf;
-            real ATipSurf;
-            real BTipSurf;
+            //real epsilonTipSurf;
+            //real sigmaTipSurf;
+            //real ATipSurf;
+            //real BTipSurf;
             
             real Rtip;
             
@@ -161,14 +162,14 @@ namespace structured{
                 in.getOption("Btip",InputFile::Required)
                               >>param.B;
                 
-                in.getOption("epsilonTipSurf",InputFile::Required)
-                              >>param.epsilonTipSurf;
-                in.getOption("sigmaTipSurf",InputFile::Required)
-                              >>param.sigmaTipSurf;
-                in.getOption("ATipSurf",InputFile::Required)
-                              >>param.ATipSurf;
-                in.getOption("BTipSurf",InputFile::Required)
-                              >>param.BTipSurf;
+                //in.getOption("epsilonTipSurf",InputFile::Required)
+                //              >>param.epsilonTipSurf;
+                //in.getOption("sigmaTipSurf",InputFile::Required)
+                //              >>param.sigmaTipSurf;
+                //in.getOption("ATipSurf",InputFile::Required)
+                //              >>param.ATipSurf;
+                //in.getOption("BTipSurf",InputFile::Required)
+                //              >>param.BTipSurf;
                 
                 in.getOption("Rtip",InputFile::Required)
                               >>param.Rtip;
@@ -195,10 +196,10 @@ namespace structured{
                                          sigmaTip(par.sigmaTip),
                                          A(par.A),
                                          B(par.B),
-                                         epsilonTipSurf(par.epsilonTipSurf),
-                                         sigmaTipSurf(par.sigmaTipSurf),
-                                         ATipSurf(par.ATipSurf),
-                                         BTipSurf(par.BTipSurf),
+                                         //epsilonTipSurf(par.epsilonTipSurf),
+                                         //sigmaTipSurf(par.sigmaTipSurf),
+                                         //ATipSurf(par.ATipSurf),
+                                         //BTipSurf(par.BTipSurf),
                                          Rtip(par.Rtip),
                                          Kxy(par.Kxy),
                                          K(par.K)
@@ -213,14 +214,14 @@ namespace structured{
                 this->sys->log<System::MESSAGE>("[SphericalTip] "
                                                  "Parameter Btip %f",B);
                 
-                this->sys->log<System::MESSAGE>("[SphericalTip] "
-                                                 "Parameter epsilonTipSurf %f",epsilonTipSurf);
-                this->sys->log<System::MESSAGE>("[SphericalTip] "
-                                                 "Parameter sigmaTipSurf %f",sigmaTipSurf);
-                this->sys->log<System::MESSAGE>("[SphericalTip] "
-                                                 "Parameter ATipSurf %f",ATipSurf);
-                this->sys->log<System::MESSAGE>("[SphericalTip] "
-                                                 "Parameter BTipSurf %f",BTipSurf);
+                //this->sys->log<System::MESSAGE>("[SphericalTip] "
+                //                                 "Parameter epsilonTipSurf %f",epsilonTipSurf);
+                //this->sys->log<System::MESSAGE>("[SphericalTip] "
+                //                                 "Parameter sigmaTipSurf %f",sigmaTipSurf);
+                //this->sys->log<System::MESSAGE>("[SphericalTip] "
+                //                                 "Parameter ATipSurf %f",ATipSurf);
+                //this->sys->log<System::MESSAGE>("[SphericalTip] "
+                //                                 "Parameter BTipSurf %f",BTipSurf);
                 
                 this->sys->log<System::MESSAGE>("[SphericalTip] "
                                                  "Parameter Rtip %f",Rtip);
@@ -298,12 +299,12 @@ namespace structured{
                                                                                       epsilonTip,
                                                                                       sigmaTip,
                                                                                       A,B,
-                                                                                      epsilonTipSurf,
-                                                                                      sigmaTipSurf,
-                                                                                      ATipSurf,BTipSurf,
+                                                                                      //epsilonTipSurf,
+                                                                                      //sigmaTipSurf,
+                                                                                      //ATipSurf,BTipSurf,
                                                                                       Rtip,
                                                                                       {real(chipPos.x),real(chipPos.y),real(chipPos.z)},
-                                                                                      real(surfPos),
+                                                                                      //real(surfPos),
                                                                                       Kxy,
                                                                                       K);  
                     //CudaSafeCall(cudaStreamSynchronize(st));
@@ -341,8 +342,8 @@ namespace structured{
             }
             double  getChipHeight(){return chipPos.z;}
             
-            void   setSurfacePosition(double newSurfPos){surfPos=newSurfPos;}
-            double getSurfacePosition(){return surfPos;}
+            //void   setSurfacePosition(double newSurfPos){surfPos=newSurfPos;}
+            //double getSurfacePosition(){return surfPos;}
 
             real3 getTipPosition(){
                     

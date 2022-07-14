@@ -7,6 +7,128 @@ namespace uammd{
 namespace structured{
 namespace Measures{
     
+    real meanDistance(std::shared_ptr<ParticleGroup> pg,
+                      real3 point,
+                      cudaStream_t st){
+
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
+        
+        int N = pg->getNumberParticles();
+
+        real4* pos = pd->getPos(access::location::gpu, access::mode::read).raw();
+        
+        MeasuresTransforms::totalDistance r(pos,point);
+
+        auto pgIter = pg->getIndexIterator(access::location::gpu);
+        
+        real mr = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
+                                 thrust::make_transform_iterator(pgIter, r),
+                                 thrust::make_transform_iterator(pgIter + N, r),real(0.0));
+
+        cudaStreamSynchronize(st);
+
+        return mr/N;
+    }
+
+    real meanDistance(std::shared_ptr<ParticleGroup> pg,
+                      real3 point){
+        cudaDeviceSynchronize();
+        real v = meanDistance(pg,point,0);
+        cudaDeviceSynchronize();
+        return v;
+    }
+    
+    real2 extremalDistances(std::shared_ptr<ParticleGroup> pg,
+                            real3 point,
+                            cudaStream_t st){
+
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
+        
+        int N = pg->getNumberParticles();
+
+        real4* pos = pd->getPos(access::location::gpu, access::mode::read).raw();
+        
+        MeasuresTransforms::totalDistance r(pos,point);
+
+        auto pgIter = pg->getIndexIterator(access::location::gpu);
+        
+        real min = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
+                                  thrust::make_transform_iterator(pgIter, r),
+                                  thrust::make_transform_iterator(pgIter + N, r),(real){ INFINITY},thrust::minimum<real>());
+
+        real max = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
+                                  thrust::make_transform_iterator(pgIter, r),
+                                  thrust::make_transform_iterator(pgIter + N, r),(real){-INFINITY},thrust::maximum<real>());
+        
+        cudaStreamSynchronize(st);
+
+        return {min,max};
+    }
+
+    real2 extremalDistances(std::shared_ptr<ParticleGroup> pg,
+                            real3 point){
+        cudaDeviceSynchronize();
+        real2 v = extremalDistances(pg,point,0);
+        cudaDeviceSynchronize();
+        return v;
+    }
+    
+    std::tuple<real2,real2,real2> extremalPositions(std::shared_ptr<ParticleGroup> pg,
+                                                    cudaStream_t st){
+
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
+        
+        int N = pg->getNumberParticles();
+
+        real4* pos = pd->getPos(access::location::gpu, access::mode::read).raw();
+        
+        auto pgIter = pg->getIndexIterator(access::location::gpu);
+        
+        MeasuresTransforms::posX px(pos);
+        MeasuresTransforms::posY py(pos);
+        MeasuresTransforms::posZ pz(pos);
+        
+        real minX = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
+                                   thrust::make_transform_iterator(pgIter, px),
+                                   thrust::make_transform_iterator(pgIter + N, px),(real){ INFINITY},thrust::minimum<real>());
+
+        real maxX = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
+                                   thrust::make_transform_iterator(pgIter, px),
+                                   thrust::make_transform_iterator(pgIter + N, px),(real){-INFINITY},thrust::maximum<real>());
+        
+        real minY = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
+                                   thrust::make_transform_iterator(pgIter, py),
+                                   thrust::make_transform_iterator(pgIter + N, py),(real){ INFINITY},thrust::minimum<real>());
+
+        real maxY = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
+                                   thrust::make_transform_iterator(pgIter, py),
+                                   thrust::make_transform_iterator(pgIter + N, py),(real){-INFINITY},thrust::maximum<real>());
+        
+        real minZ = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
+                                   thrust::make_transform_iterator(pgIter, pz),
+                                   thrust::make_transform_iterator(pgIter + N, pz),(real){ INFINITY},thrust::minimum<real>());
+
+        real maxZ = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
+                                   thrust::make_transform_iterator(pgIter, pz),
+                                   thrust::make_transform_iterator(pgIter + N, pz),(real){-INFINITY},thrust::maximum<real>());
+        
+        cudaStreamSynchronize(st);
+
+        return std::make_tuple<real2,real2,real2>({minX,maxX},
+                                                  {minY,maxY},
+                                                  {minZ,maxZ});
+    }
+
+    std::tuple<real2,real2,real2> extremalPositions(std::shared_ptr<ParticleGroup> pg){
+        cudaDeviceSynchronize();
+        auto v = extremalPositions(pg,0);
+        cudaDeviceSynchronize();
+        return v;
+    }
+    
     real totalVirial(std::shared_ptr<ParticleGroup> pg,
                       cudaStream_t st){
 
@@ -149,7 +271,7 @@ namespace Measures{
         
         real maxForce = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                                        thrust::make_transform_iterator(pgIter, mF),
-                                       thrust::make_transform_iterator(pgIter+N, mF),(real){-1.0},thrust::maximum<real>());
+                                       thrust::make_transform_iterator(pgIter+N, mF),(real){-INFINITY},thrust::maximum<real>());
         
         cudaStreamSynchronize(st);
 
@@ -331,11 +453,11 @@ namespace Measures{
 
         real3 comp = make_real3(thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                                 thrust::make_transform_iterator(pgIter, mWs),
-                                thrust::make_transform_iterator(pgIter + N, mWs),(real4){0,0,0,0})/totalMass);
+                                thrust::make_transform_iterator(pgIter + N, mWs),(real4){0,0,0,0}));
         
         cudaStreamSynchronize(st);
 
-        return comp;
+        return comp/totalMass;
     }
     
     real3 centerOfMassPos(std::shared_ptr<ParticleGroup> pg,
@@ -364,11 +486,11 @@ namespace Measures{
 
         real3 comv = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
                                     thrust::make_transform_iterator(pgIter, mWs),
-                                    thrust::make_transform_iterator(pgIter + N, mWs),(real3){0,0,0})/totalMass;
+                                    thrust::make_transform_iterator(pgIter + N, mWs),(real3){0,0,0});
         
         cudaStreamSynchronize(st);
 
-        return comv;
+        return comv/totalMass;
     }
     
     real3 centerOfMassVel(std::shared_ptr<ParticleGroup> pg,

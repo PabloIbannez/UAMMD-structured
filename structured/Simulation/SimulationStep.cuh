@@ -339,12 +339,12 @@ class WriteStep: public SimulationStep{
         }
 };
 
-template<class ForceField>
+template<class Interact>
 class ComputableMeasure: public SimulationStep{
 
         std::ofstream outPutFile;
 
-        std::shared_ptr<ForceField> ff;
+        std::shared_ptr<Interact> interact;
 
         uammd::Interactor::Computables compToMeasure;
 
@@ -353,15 +353,26 @@ class ComputableMeasure: public SimulationStep{
         ComputableMeasure(std::shared_ptr<ParticleGroup> pg,
                           int interval,
                           std::string outPutFileName,
-                          std::shared_ptr<ForceField> ff,
+                          std::shared_ptr<Interact> interact,
                           uammd::Interactor::Computables compToMeasure):SimulationStep(pg,"ComputableMeasure",interval),
-                                                                        ff(ff),compToMeasure(compToMeasure){
+                                                                                       interact(interact),
+                                                                                       compToMeasure(compToMeasure){
                 outPutFile = std::ofstream(outPutFileName);
         }
 
-        void init(cudaStream_t st) override{}
+        void init(cudaStream_t st) override{
+
+            this->outPutFile << "# step";
+            if(compToMeasure.energy == true){this->outPutFile << " energy ";}
+            if(compToMeasure.force  == true){this->outPutFile << " force  ";}
+            if(compToMeasure.virial == true){this->outPutFile << " virial ";}
+            if(compToMeasure.stress == true){this->outPutFile << " stress ";}
+            this->outPutFile << std::endl;
+        }
 
         void applyStep(int step, cudaStream_t st) override{
+            
+            this->outPutFile << step << " ";
 
             if(compToMeasure.energy == true){
                 uninitialized_cached_vector<real> energyBuffer(this->pg->getNumberParticles());
@@ -375,8 +386,14 @@ class ComputableMeasure: public SimulationStep{
                                  energyBuffer.begin());
                 }
 
-                this->integrator->resetEnergy();
-                this->integrator->updateEnergy();
+                {
+                    auto energy = pd->getEnergy(access::location::gpu, access::mode::write);     
+                    thrust::fill(thrust::cuda::par.on(st), energy.begin(), energy.end(), real(0));
+                }
+
+                uammd::Interactor::Computables compTmp;
+                compTmp.energy = true;
+                this->interact->sum(compTmp,st);
                 real totalEnergy = Measures::totalPotentialEnergy(pg, 
                                                                   st); 
                 
@@ -388,6 +405,8 @@ class ComputableMeasure: public SimulationStep{
                                  energyBuffer.end(), 
                                  energy.begin());
                 }
+            
+                this->outPutFile << totalEnergy << " ";
             }
             
             if(compToMeasure.force == true){
@@ -402,8 +421,14 @@ class ComputableMeasure: public SimulationStep{
                                  forceBuffer.begin());
                 }
 
-                this->integrator->resetForce();
-                this->integrator->updateForce();
+                {
+                    auto force = pd->getForce(access::location::gpu, access::mode::write);     
+                    thrust::fill(thrust::cuda::par.on(st), force.begin(), force.end(), make_real4(0.0));
+                }
+
+                uammd::Interactor::Computables compTmp;
+                compTmp.force = true;
+                this->interact->sum(compTmp,st);
                 real3 totalForce = Measures::totalForce(pg, 
                                                         st); 
                 
@@ -415,6 +440,8 @@ class ComputableMeasure: public SimulationStep{
                                  forceBuffer.end(), 
                                  force.begin());
                 }
+                
+                this->outPutFile << totalForce << " ";
             }
             
             if(compToMeasure.virial == true){
@@ -429,8 +456,14 @@ class ComputableMeasure: public SimulationStep{
                                  virialBuffer.begin());
                 }
 
-                this->integrator->resetVirial();
-                this->integrator->updateVirial();
+                {
+                    auto virial = pd->getVirial(access::location::gpu, access::mode::write);     
+                    thrust::fill(thrust::cuda::par.on(st), virial.begin(), virial.end(), real(0));
+                }
+
+                uammd::Interactor::Computables compTmp;
+                compTmp.virial = true;
+                this->interact->sum(compTmp,st);
                 real totalVirial = Measures::totalVirial(pg, 
                                                          st); 
                 
@@ -442,6 +475,8 @@ class ComputableMeasure: public SimulationStep{
                                  virialBuffer.end(), 
                                  virial.begin());
                 }
+                
+                this->outPutFile << totalVirial << " ";
             }
             
             if(compToMeasure.stress == true){
@@ -456,8 +491,14 @@ class ComputableMeasure: public SimulationStep{
                                  stressBuffer.begin());
                 }
 
-                this->integrator->resetStress();
-                this->integrator->updateStress();
+                {
+                    auto stress = pd->getStress(access::location::gpu, access::mode::write);     
+                    thrust::fill(thrust::cuda::par.on(st), stress.begin(), stress.end(), tensor3(0));
+                }
+
+                uammd::Interactor::Computables compTmp;
+                compTmp.stress = true;
+                this->interact->sum(compTmp,st);
                 tensor3 totalStress = Measures::totalStress(pg, 
                                                             st); 
                 
@@ -469,7 +510,12 @@ class ComputableMeasure: public SimulationStep{
                                  stressBuffer.end(), 
                                  stress.begin());
                 }
+                
+                this->outPutFile << totalStress << " ";
             }
+                
+            this->outPutFile << std::endl;
+
         }
 };
     
@@ -518,6 +564,8 @@ class InertiaMeasure: public SimulationStep{
 
         std::ofstream outPutFile;
 
+        real totalMass;
+
     public:
         
         InertiaMeasure(std::shared_ptr<ParticleGroup> pg,
@@ -526,11 +574,13 @@ class InertiaMeasure: public SimulationStep{
             outPutFile = std::ofstream(outPutFileName);
         }
 
-        void init(cudaStream_t st) override{}
+        void init(cudaStream_t st) override{
+            totalMass = Measures::totalMass(this->pg,st);
+            this->outPutFile << "# step Ixx Ixy Ixz Iyx Iyy Iyz Izx Izy Izz" << std::endl;
+        }
 
         void applyStep(int step, cudaStream_t st) override{
 
-            real totalMass = Measures::totalMass(this->pg,st);
             real3 com = Measures::centerOfMassPos(this->pg,totalMass,st);
             tensor3 I = Measures::inertiaTensor(this->pg,com,st);
 
@@ -684,6 +734,36 @@ class StressMeasure: public SimulationStep{
             }
         }
 };
+
+class meanRadiusMeasure: public SimulationStep {
+
+        std::ofstream outPutFile;
+
+        real totalMass;
+
+    public:
+        
+        meanRadiusMeasure(std::shared_ptr<ParticleGroup> pg,
+                          int interval,
+                          std::string outPutFileName):SimulationStep(pg,"meanRadiusMeasure",interval){
+            outPutFile = std::ofstream(outPutFileName);
+        }
+
+        void init(cudaStream_t st) override{
+            this->outPutFile << "# step radius" << std::endl;
+            
+            totalMass = Measures::totalMass(this->pg,st);
+        }
+
+        void applyStep(int step, cudaStream_t st) override{
+
+            real3 com = Measures::centerOfMassPos(this->pg,totalMass,st);
+            real  R   = Measures::meanDistance(this->pg,com,st);
+
+            this->outPutFile << step << " " << R << std::endl;
+        }
+};
+
 
 template<class NativeContactDefinition>
 class NativeContactsMeasure: public SimulationStep{

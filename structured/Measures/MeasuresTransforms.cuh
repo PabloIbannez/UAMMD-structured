@@ -6,6 +6,60 @@ namespace structured{
 namespace Measures{
 namespace MeasuresTransforms{
     
+    struct posX : public thrust::unary_function<int,real>
+    {
+        real4* pos;
+
+        posX(real4* pos):pos(pos){}
+
+        __host__ __device__
+        real operator()(int index) const
+        {
+            return pos[index].x;
+        }
+    };
+    
+    struct posY : public thrust::unary_function<int,real>
+    {
+        real4* pos;
+
+        posY(real4* pos):pos(pos){}
+
+        __host__ __device__
+        real operator()(int index) const
+        {
+            return pos[index].y;
+        }
+    };
+    
+    struct posZ : public thrust::unary_function<int,real>
+    {
+        real4* pos;
+
+        posZ(real4* pos):pos(pos){}
+
+        __host__ __device__
+        real operator()(int index) const
+        {
+            return pos[index].z;
+        }
+    };
+    
+    struct totalDistance : public thrust::unary_function<int,real>
+    {
+        real4* pos;
+        real3  point;
+
+        totalDistance(real4* pos,real3 point):pos(pos),point(point){}
+
+        __host__ __device__
+        real operator()(int index) const
+        {
+            real3 dr = make_real3(pos[index])-point;
+            return sqrt(dot(dr,dr));
+        }
+    };
+    
     struct totalVirial : public thrust::unary_function<int,real>
     {
         real* virial;

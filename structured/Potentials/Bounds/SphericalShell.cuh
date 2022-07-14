@@ -6,14 +6,32 @@ namespace structured{
 namespace Potentials{
 namespace Bounds{
     
-    class SphericalShell: public ParameterUpdatable{
+    namespace SphericalShellPotential_ns{
+    namespace SphericalShellPotentialModel{
+
+        struct Steric{
+            static constexpr real A = 1.0;
+            static constexpr real B = 0.0;
+            static constexpr real energyOffSet = 0.0;
+            static constexpr real cutOff = INFINITY;
+        };
+        
+        struct LennardJones{
+            static constexpr real A =  1.0;
+            static constexpr real B = -2.0;
+            static constexpr real energyOffSet = 0.0;
+            static constexpr real cutOff = INFINITY;
+        };
+
+    }}
+    
+    template<class SphericalShellModel> 
+    class SphericalShellPotential: public ParameterUpdatable{
     	
         private:
             
             real epsilonShell;
             real sigmaShell;
-            real Ashell;
-            real Bshell;
 
             real3 shellCenter;
             real  shellRadius;
@@ -24,19 +42,15 @@ namespace Bounds{
             
                 real epsilonShell;
                 real sigmaShell;
-                real Ashell;
-                real Bshell;
     	        
                 real3 shellCenter;
                 real  shellRadius;
             };
     	    
-    	    SphericalShell(Parameters par):epsilonShell(par.epsilonShell),
-                                           sigmaShell(par.sigmaShell),
-                                           Ashell(par.Ashell),
-                                           Bshell(par.Bshell),
-                                           shellCenter(par.shellCenter),
-                                           shellRadius(par.shellRadius){}     
+    	    SphericalShellPotential(Parameters par):epsilonShell(par.epsilonShell),
+                                                    sigmaShell(par.sigmaShell),
+                                                    shellCenter(par.shellCenter),
+                                                    shellRadius(par.shellRadius){}     
     	    
     	    __device__ __forceinline__ real3 force(const real4 &pos){
                 
@@ -50,7 +64,7 @@ namespace Bounds{
                 const real sinvr6  = sinvr2*sinvr2*sinvr2;
                 const real sinvr12 = sinvr6*sinvr6;
                 
-                real fmod = -epsilonShell*real(6.0)*(real(2.0)*Ashell*sinvr12+Bshell*sinvr6)/abs(r-shellRadius);
+                real fmod = -epsilonShell*real(6.0)*(real(2.0)*SphericalShellModel::A*sinvr12+SphericalShellModel::B*sinvr6)/abs(r-shellRadius);
 
                 real3 f = -fmod*(dr/r);
                 
@@ -78,8 +92,8 @@ namespace Bounds{
                 real  r2 = abs(sqrt(dot(rij,rij))-shellRadius);
                       r2 = r2*r2;
                 
-                real e = Ashell*CommonPotentials::Steric::Steric::energy<12>(rij,r2,epsilonShell,sigmaShell) + 
-                         Bshell*CommonPotentials::Steric::Steric::energy<6>(rij,r2,epsilonShell,sigmaShell);
+                real e = SphericalShellModel::A*CommonPotentials::Steric::Steric::energy<12>(rij,r2,epsilonShell,sigmaShell) + 
+                         SphericalShellModel::B*CommonPotentials::Steric::Steric::energy<6>(rij,r2,epsilonShell,sigmaShell);
 
                 return real(2.0)*e;
             
@@ -96,7 +110,7 @@ namespace Bounds{
                 const real sinvr6  = sinvr2*sinvr2*sinvr2;
                 const real sinvr12 = sinvr6*sinvr6;
                 
-                real fmod = -epsilonShell*real(6.0)*(real(2.0)*Ashell*sinvr12+Bshell*sinvr6)/abs(r-shellRadius);
+                real fmod = -epsilonShell*real(6.0)*(real(2.0)*SphericalShellModel::A*sinvr12+SphericalShellModel::B*sinvr6)/abs(r-shellRadius);
 
                 real3 f = -fmod*(dr/r);
 
@@ -119,11 +133,11 @@ namespace Bounds{
                 return std::make_tuple(pos.raw());
     	    }
 
-            void setShellRadius(real newShellRadius){
-                shellRadius = newShellRadius;
-            }
-            
+            void setShellRadius(real newShellRadius){ shellRadius = newShellRadius;}
             real getShellRadius(){return shellRadius;}
+            
+            void  setShellCenter(real3 newShellCenter){ shellCenter = newShellCenter;}
+            real3 getShellCenter(){return shellCenter;}
     };
     
 }}}}

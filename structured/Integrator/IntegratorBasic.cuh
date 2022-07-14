@@ -225,6 +225,18 @@ namespace structured{
                 resetVirial(stream);
             }
             
+            void resetStress(cudaStream_t st){
+                
+                auto stress = pd->getStress(access::location::gpu, access::mode::readwrite);     
+                thrust::fill(thrust::cuda::par.on(st), stress.begin(), stress.end(), real(0));
+                
+                CudaCheckError();
+            }
+            
+            void resetStress(){
+                resetStress(stream);
+            }
+            
             void updateForce() {
                 this->updateForce(stream);
             }

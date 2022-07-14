@@ -96,6 +96,18 @@ stampa("C 106.06 3.2 0.0")
 stampa("G 146.09 2.45 0.0")
 stampa("T 120.07 3.55 0.0")
 
+typesRadius = { "S":3.2,
+                "P":2.25, 
+                "A":2.7,
+                "C":3.2, 
+                "G":2.45,
+                "T":3.55}
+
+stampa("[WCA]")
+for t1,r1 in typesRadius.items():
+    for t2,r2 in typesRadius.items():
+        stampa("{} {} {} {}".format(t1,t2,1.0,r1+r2))
+
 stampa("[STRUCTURE]")
 nucID = 0
 for i in range(1,natoms+1):

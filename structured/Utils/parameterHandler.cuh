@@ -160,6 +160,10 @@ namespace structured{
             std::set<std::pair<int,int>> getAddedPairs(){
                 return addedPairs;
             }
+            
+            bool isPairAdded(std::pair<int,int> pair){
+                return bool(addedPairs.count(pair));
+            }
 
             int getNumTypes(){
                 return ntypes;

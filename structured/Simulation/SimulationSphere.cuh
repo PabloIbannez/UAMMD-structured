@@ -17,34 +17,21 @@ class SimulationSphere: public Simulation<ForceField_,
                                       Minimization_,
                                       Integrator_>;
         
-        using SphereType           = Potentials::Bounds::SphericalShell;
-        using InteractorSphereType = ExternalForces<SphereType>;
+        using InteractorSphereType = typename Interactor::Bounds::StericSphericalShell;
 
     protected:
         
-        std::shared_ptr<SphereType>  spherePotential;
         std::shared_ptr<InteractorSphereType> sphere;
         
         //Input
         
         real dt;
         real compressionVelocity;
-            
-        real epsilonSphere = real(1.0);
-        real sigmaSphere   = real(1.0);
-        real Asphere = real(1.0);
-        real Bsphere = real(0.0);
-        
+           
         real minimalSphereRadius = real(0.0);
-            
-        real3 sphereCenter = {0,0,0};
-        real  initialSphereRadius;
-                              
-        std::string outputPressureMeasureFilePath;
-        std::ofstream outputPressureMeasureFile;
-        
-        int nStepsPressureMeasure;
 
+        real initialSphereRadius;
+            
     public:
 
         SimulationSphere(std::shared_ptr<System> sys,
@@ -54,11 +41,8 @@ class SimulationSphere: public Simulation<ForceField_,
             in.getOption("dt",InputFile::Required)
                           >>dt;
             
-            in.getOption("initialSphereRadius",InputFile::Required)
-                          >>initialSphereRadius;
             in.getOption("minimalSphereRadius",InputFile::Required)
                           >>minimalSphereRadius;
-            
             in.getOption("compressionVelocity",InputFile::Required)
                           >>compressionVelocity;
 
@@ -67,51 +51,12 @@ class SimulationSphere: public Simulation<ForceField_,
                                                       ,dt);
 
             this->sys->template log<System::MESSAGE>("[SimulationSphere] "
-                                                      "Parameter initialSphereRadius %f"
-                                                      ,initialSphereRadius);
-            this->sys->template log<System::MESSAGE>("[SimulationSphere] "
                                                       "Parameter minimalSphereRadius %f"
                                                       ,minimalSphereRadius);
             
             this->sys->template log<System::MESSAGE>("[SimulationSphere] "
                                                       "Parameter compressionVelocity %f"
                                                       ,compressionVelocity);
-            
-            in.getOption("epsilonSphere",InputFile::Optional)
-                          >>epsilonSphere;
-            in.getOption("sigmaSphere",InputFile::Optional)
-                          >>sigmaSphere;
-            in.getOption("Asphere",InputFile::Optional)
-                          >>Asphere;
-            in.getOption("Bsphere",InputFile::Optional)
-                          >>Bsphere;
-            
-            this->sys->template log<System::MESSAGE>("[SimulationSphere] "
-                                                      "Parameter epsilonSphere %f"
-                                                      ,epsilonSphere);
-            this->sys->template log<System::MESSAGE>("[SimulationSphere] "
-                                                      "Parameter sigmaSphere %f"
-                                                      ,sigmaSphere);
-            this->sys->template log<System::MESSAGE>("[SimulationSphere] "
-                                                      "Parameter Asphere %f"
-                                                      ,Asphere);
-            this->sys->template log<System::MESSAGE>("[SimulationSphere] "
-                                                      "Parameter Bsphere %f"
-                                                      ,Bsphere);
-            
-            if(in.getOption("nStepsPressureMeasure",InputFile::Optional)){
-                in.getOption("nStepsPressureMeasure",InputFile::Required)
-                              >>nStepsPressureMeasure;
-                in.getOption("outputPressureMeasureFilePath",InputFile::Required)
-                              >>outputPressureMeasureFilePath;
-                
-                this->sys->template log<System::MESSAGE>("[SimulationSphere] "
-                                                          "Parameter nStepsPressureMeasure %f",
-                                                          nStepsPressureMeasure);
-                this->sys->template log<System::MESSAGE>("[SimulationSphere] "
-                                                          "Parameter outputPressureMeasureFilePath %s",
-                                                          outputPressureMeasureFilePath.c_str());
-            }
             
             if(init){
                 this->init(in);
@@ -120,6 +65,12 @@ class SimulationSphere: public Simulation<ForceField_,
         
         void init(uammd::InputFile& in){
             Simulation::init(in);
+            
+            sphere = std::make_shared<InteractorSphereType>(this->pg,in);
+
+            initialSphereRadius = sphere->getPotential()->getShellRadius(); 
+
+            real3 sphereCenter        = sphere->getPotential()->getShellCenter(); 
 
             {
                 auto pos = this->pd->getPos(access::location::cpu, access::mode::read); 
@@ -145,22 +96,6 @@ class SimulationSphere: public Simulation<ForceField_,
                 }
             }
 
-            SphereType::Parameters sphereParameters;
-
-            sphereParameters.epsilonShell = epsilonSphere;
-            sphereParameters.sigmaShell   = sigmaSphere;
-            sphereParameters.Ashell       = Asphere;
-            sphereParameters.Bshell       = Bsphere;
-            
-            sphereParameters.shellCenter = sphereCenter;
-            sphereParameters.shellRadius = initialSphereRadius;
-                                        
-                
-            spherePotential = std::make_shared<SphereType>(sphereParameters);
-
-            sphere = std::make_shared<InteractorSphereType>(this->pg,
-                                                            spherePotential);
-            
             int requiredStepsEstimation = std::ceil((initialSphereRadius-minimalSphereRadius)/(dt*compressionVelocity));
             this->sys->template log<System::MESSAGE>("[SimulationSphere] "
                                                       "Estimated steps to get the minimal sphere radius: %i",
@@ -168,8 +103,6 @@ class SimulationSphere: public Simulation<ForceField_,
             
             this->minimization->addInteractor(this->sphere);
             this->integrator->addInteractor(this->sphere);
-            
-            outputPressureMeasureFile = std::ofstream(outputPressureMeasureFilePath);
         }
         
         void start(){
@@ -193,21 +126,16 @@ class SimulationSphere: public Simulation<ForceField_,
 
             this->t++;
             
-            if((this->spherePotential->getShellRadius() > minimalSphereRadius) and initialSphereRadius > minimalSphereRadius){
-                this->spherePotential->setShellRadius(initialSphereRadius-dt*this->t*compressionVelocity);
+            if((this->sphere->getPotential()->getShellRadius() > minimalSphereRadius) and initialSphereRadius > minimalSphereRadius){
+                this->sphere->getPotential()->setShellRadius(initialSphereRadius-dt*this->t*compressionVelocity);
             }
-            if((this->spherePotential->getShellRadius() < minimalSphereRadius) and initialSphereRadius < minimalSphereRadius){
-                this->spherePotential->setShellRadius(initialSphereRadius+dt*this->t*compressionVelocity);
+            if((this->sphere->getPotential()->getShellRadius() < minimalSphereRadius) and initialSphereRadius < minimalSphereRadius){
+                this->sphere->getPotential()->setShellRadius(initialSphereRadius+dt*this->t*compressionVelocity);
             }
 
             this->integrator->forwardTime();
             this->tryApplySteps();
             
-            if(this->t%this->nStepsPressureMeasure==0){
-                this->sys->template log<System::DEBUG1>("[SimulationSphere] Measuring pressure at step %i", this->t);
-                this->measurePressure(this->outputPressureMeasureFile);
-            }
-        
         }
         
         void run(){
@@ -224,10 +152,6 @@ class SimulationSphere: public Simulation<ForceField_,
             auto totalTime = tim.toc();
 
             this->sys->template log<System::MESSAGE>("Mean FPS: %.2f", real(this->t)/totalTime);
-
-        }
-
-        void measurePressure(std::ofstream& out){
 
         }
 };

@@ -17,11 +17,13 @@ class SimulationAFM: public Simulation<ForceField_,
                                       Minimization_,
                                       Integrator_>;
         
-        using TipModel = typename structured::Interactor::SphericalTip;
+        using SurfaceModel = typename structured::Interactor::Surface::LennardJonesSurface;
+        using TipModel     = typename structured::Interactor::SphericalTip;
 
     protected:
         
-        std::shared_ptr<TipModel> tip;
+        std::shared_ptr<SurfaceModel> surface;
+        std::shared_ptr<TipModel>     tip;
         
         std::shared_ptr<ParticleGroup> pgSample;
         std::shared_ptr<ParticleGroup> pgTip;
@@ -47,7 +49,7 @@ class SimulationAFM: public Simulation<ForceField_,
         real minimalChipHeight;
         bool minimalChipHeightReached;
         
-        bool checkSurfacePosition;
+        bool isSurfaceActive;
 
         int nStepsIndentMeasure;
         
@@ -71,7 +73,7 @@ class SimulationAFM: public Simulation<ForceField_,
             bool setTargetIndentationForce;
             real targetIndentationForce;
             
-            bool checkSurfacePosition=true;
+            bool isSurfaceActive=true;
 
             int nStepsIndentMeasure;
 
@@ -117,10 +119,10 @@ class SimulationAFM: public Simulation<ForceField_,
                 param.setTargetIndentationForce = false;
             }
             
-            if(in.getOption("notCheckSurfacePosition",InputFile::Optional)){
-                param.checkSurfacePosition = false;
+            if(in.getOption("isSurfaceActive",InputFile::Optional)){
+                param.isSurfaceActive = false;
             } else {
-                param.checkSurfacePosition = true;
+                param.isSurfaceActive = true;
             }
 
             return param;
@@ -143,7 +145,7 @@ class SimulationAFM: public Simulation<ForceField_,
                                         setMinimalChipHeight(param.setMinimalChipHeight),
                                         minimalChipHeight(param.minimalChipHeight),
                                         minimalChipHeightReached(false),
-                                        checkSurfacePosition(param.checkSurfacePosition){
+                                        isSurfaceActive(param.isSurfaceActive){
                 
             
             this->sys->template log<System::MESSAGE>("[SimulationAFM] "
@@ -182,9 +184,9 @@ class SimulationAFM: public Simulation<ForceField_,
                                                          "Target force set to:%f",targetIndentationForce);
             }
             
-            if(!checkSurfacePosition){
+            if(!isSurfaceActive){
                 this->sys->template log<System::WARNING>("[SimulationAFM] "
-                                                         "Not performing surface position checking...");
+                                                         "Surface will not be added...");
             }
             
             if(init){
@@ -251,6 +253,7 @@ class SimulationAFM: public Simulation<ForceField_,
             this->top = this->ff->getTopology();
 
             {
+                cudaDeviceSynchronize();
                 auto types = this->top->getTypes();
 
                 std::vector<int> typeIdList = types->getTypeIdList();
@@ -265,9 +268,11 @@ class SimulationAFM: public Simulation<ForceField_,
                 types->add(tipTypeId,tipType);
 
                 this->sys->template log<System::MESSAGE>("[SimulationAFM] Tip type Id %i",tipTypeId);
+                cudaDeviceSynchronize();
             }
 
             this->top->loadStructureData(this->pd);
+            cudaDeviceSynchronize();
 
             //Tip structure data
             
@@ -284,12 +289,15 @@ class SimulationAFM: public Simulation<ForceField_,
                 chnId[sortedIndex[tipId]] = -1;
                 molId[sortedIndex[tipId]] = -1;
             }
+            cudaDeviceSynchronize();
 
             this->top->loadTypes(this->pd);
+            cudaDeviceSynchronize();
 
             this->tip = std::make_shared<TipModel>(this->pgSample, 
                                                    this->pgTip, 
                                                    in);
+            cudaDeviceSynchronize();
             {
                 real3 sampleCOM;
                 
@@ -321,15 +329,21 @@ class SimulationAFM: public Simulation<ForceField_,
 
                 this->tip->setChipPosition(chipPos);
             }
+            cudaDeviceSynchronize();
             
-            
-            if(checkSurfacePosition){
+            /////////////////////////
+
+            if(isSurfaceActive){
+
+                this->surface = std::make_shared<SurfaceModel>(this->pg,in);
+                cudaDeviceSynchronize();
+
                 if(this->pdBuffer.size() > 0){
                     real minPartHeight = std::min_element(this->pdBuffer.begin(),
                                                           this->pdBuffer.end(),
                                                           [](const auto& a,const auto& b){return a.pos.z < b.pos.z; })->pos.z;
                 
-                    real surfacePosition = this->ff->getSurfacePosition();
+                    real surfacePosition = this->surface->getPotential()->getSurfacePosition();
 
                     if(surfacePosition > minPartHeight){
                         this->sys->template log<System::CRITICAL>("[SimulationAFM] Surface position (%f) is larger than the minimal particle height (%f)",
@@ -337,9 +351,11 @@ class SimulationAFM: public Simulation<ForceField_,
                                                                     minPartHeight);
                     }
                 }
+
             }
             
-            this->tip->setSurfacePosition(this->ff->getSurfacePosition());
+            //this->tip->setSurfacePosition(this->ff->getSurfacePosition());
+            /////////////////////////
 
             this->tip->template applyUnits<typename Simulation::Topology::Units>();
             
@@ -370,6 +386,7 @@ class SimulationAFM: public Simulation<ForceField_,
 
                 vel[sortedIndex[tipId]] = make_real3(0,0,0);
                 fricConst[sortedIndex[tipId]] = frictionConstantTip;
+                cudaDeviceSynchronize();
 
             }
 
@@ -379,10 +396,14 @@ class SimulationAFM: public Simulation<ForceField_,
             
             this->minimization->addInteractor(this->ff);
             this->integrator->addInteractor(this->ff);
-            this->integrator->addInteractor(this->tip);
+
+            if(isSurfaceActive){
+                this->integrator->addInteractor(this->surface);
+            }
             
             this->addSimulationStep(std::make_shared<InfoStep>(this->pg,this->nStepsInfoInterval,this->nSteps));
             this->addSimulationStep(std::make_shared<SortStep>(this->pg,this->nStepsSortInterval));
+            cudaDeviceSynchronize();
             
         }
         
@@ -445,6 +466,9 @@ class SimulationAFM: public Simulation<ForceField_,
             this->sys->template log<System::MESSAGE>("Mean FPS: %.2f", real(this->t)/totalTime);
 
         }
+
+        std::shared_ptr<TipModel>     getTip(){return tip;}
+        std::shared_ptr<SurfaceModel> getSurface(){return surface;};
         
         std::tuple<real3,real3> getTipAndSampleForce(){
 
@@ -510,8 +534,13 @@ class SimulationAFM: public Simulation<ForceField_,
 
             real3 tipPos  = tip->getTipPosition();
             
-            real zChip = chipPos.z - this->ff->getSurfacePosition();
-            real zTip  = tipPos.z  - this->ff->getSurfacePosition();
+            real zChip = chipPos.z;
+            real zTip  = tipPos.z;
+            
+            if(isSurfaceActive){
+                zChip -= this->surface->getPotential()->getSurfacePosition();
+                zTip  -= this->surface->getPotential()->getSurfacePosition();
+            }
             
             auto tipAndSampleForce = this->getTipAndSampleForce();
 

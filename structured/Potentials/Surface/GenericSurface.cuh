@@ -6,8 +6,8 @@ namespace structured{
 namespace Potentials{
 namespace Surface{
 
-    namespace GenericSurface_ns{
-    namespace GenericSurfaceModel{
+    namespace GenericSurfacePotential_ns{
+    namespace GenericSurfacePotentialModel{
 
         struct Steric{
             static constexpr real A = 1.0;
@@ -23,11 +23,10 @@ namespace Surface{
             static constexpr real cutOff = INFINITY;
         };
 
-
     }}
     
-    template<class Topology,class SurfaceType> 
-    class GenericSurface: public ParameterUpdatable{
+    template<class SurfaceType> 
+    class GenericSurfacePotential: public ParameterUpdatable{
     	
         private:
             
@@ -46,9 +45,9 @@ namespace Surface{
                 real surfacePosition;
             };
     	    
-    	    GenericSurface(Parameters par):epsilon(par.epsilon),
-                                           sigma(par.sigma),
-                                           surfacePosition(par.surfacePosition){}     
+    	    GenericSurfacePotential(Parameters par):epsilon(par.epsilon),
+                                                    sigma(par.sigma),
+                                                    surfacePosition(par.surfacePosition){}     
     	    
     	    __device__ __forceinline__ real3 force(const real4 &pos){
                 
@@ -75,8 +74,6 @@ namespace Surface{
     	    
             __device__ __forceinline__ real  energy(const real4 &pos){
 
-                //const int type = int(pos.w);
-    	    	
                 const real dz = abs(surfacePosition-pos.z);
 
                 if(dz<=SurfaceType::cutOff){
@@ -110,12 +107,11 @@ namespace Surface{
     	    	
                 return std::make_tuple(pos.raw());
     	    }
+
+            real getSurfacePosition(){return surfacePosition;}
+            void setSurfacePosition(real newSurfacePosition){surfacePosition=newSurfacePosition;}
+
     };
-    
-    template<class Topology>
-    using StericSurface       = GenericSurface<Topology,GenericSurface_ns::GenericSurfaceModel::Steric>; 
-    template<class Topology>
-    using LennardJonesSurface = GenericSurface<Topology,GenericSurface_ns::GenericSurfaceModel::LennardJones>; 
     
 }}}}
 

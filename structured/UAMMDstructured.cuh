@@ -190,6 +190,9 @@ SFINAE_DEFINE_HAS_MEMBER(isConstrained);
 
 #include"Interactor/BondedInteractor.cuh"
 #include"Interactor/PairInteractor.cuh"
+   
+#include"Interactor/GenericSurfaceInteractor.cuh"
+#include"Interactor/SphericalShellInteractor.cuh"
 
 #include"Interactor/AFMInteractor.cuh"
 #include"Interactor/PlatesInteractor.cuh"
