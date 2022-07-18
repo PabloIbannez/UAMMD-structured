@@ -518,6 +518,31 @@ class ComputableMeasure: public SimulationStep{
 
         }
 };
+
+class ComputeVirial: public SimulationStep{
+
+        std::ofstream outPutFile;
+
+    public:
+        
+        ComputeVirial(std::shared_ptr<ParticleGroup> pg,
+                      int interval,
+                      std::string outPutFileName):SimulationStep(pg,"ComputeVirial",interval){
+            
+            outPutFile = std::ofstream(outPutFileName);
+        }
+
+        void init(cudaStream_t st) override{}
+
+        void applyStep(int step, cudaStream_t st) override{
+            
+            real cv = Measures::computeVirial(this->pg,st);
+
+            this->outPutFile << step << " " << std::setprecision(25) << cv << std::endl;
+        }
+};
+
+
     
 template<class ForceField>
 class EnergyMeasure: public SimulationStep{
@@ -735,7 +760,7 @@ class StressMeasure: public SimulationStep{
         }
 };
 
-class meanRadiusMeasure: public SimulationStep {
+class MeasureMeanRadius: public SimulationStep {
 
         std::ofstream outPutFile;
 
@@ -743,9 +768,9 @@ class meanRadiusMeasure: public SimulationStep {
 
     public:
         
-        meanRadiusMeasure(std::shared_ptr<ParticleGroup> pg,
+        MeasureMeanRadius(std::shared_ptr<ParticleGroup> pg,
                           int interval,
-                          std::string outPutFileName):SimulationStep(pg,"meanRadiusMeasure",interval){
+                          std::string outPutFileName):SimulationStep(pg,"MeasureMeanRadius",interval){
             outPutFile = std::ofstream(outPutFileName);
         }
 

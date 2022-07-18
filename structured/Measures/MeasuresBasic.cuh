@@ -159,6 +159,37 @@ namespace Measures{
         return v;
     }
     
+    real computeVirial(std::shared_ptr<ParticleGroup> pg,
+                       cudaStream_t st){
+
+        auto pd  = pg->getParticleData();
+        auto sys = pd->getSystem(); 
+        
+        int N = pg->getNumberParticles();
+
+        real4* pos   = pd->getPos(access::location::gpu, access::mode::read).raw();
+        real4* force = pd->getForce(access::location::gpu, access::mode::read).raw();
+        
+        MeasuresTransforms::computeVirial cv(force,pos);
+
+        auto pgIter = pg->getIndexIterator(access::location::gpu);
+        
+        real tcv = thrust::reduce(thrust::cuda::par(sys->getTemporaryDeviceAllocator<char>()).on(st),
+                                  thrust::make_transform_iterator(pgIter, cv),
+                                  thrust::make_transform_iterator(pgIter + N, cv),real(0.0));
+
+        cudaStreamSynchronize(st);
+
+        return -real(0.5)*tcv/N;
+    }
+
+    real computeVirial(std::shared_ptr<ParticleGroup> pg){
+        cudaDeviceSynchronize();
+        real v = computeVirial(pg,0);
+        cudaDeviceSynchronize();
+        return v;
+    }
+    
     tensor3  totalStress(std::shared_ptr<ParticleGroup> pg,
                          cudaStream_t st){
 

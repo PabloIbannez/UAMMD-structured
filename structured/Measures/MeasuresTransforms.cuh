@@ -60,6 +60,20 @@ namespace MeasuresTransforms{
         }
     };
     
+    struct computeVirial : public thrust::unary_function<int,real>
+    {
+        real4* pos;
+        real4* force;
+
+        computeVirial(real4* pos,real4* force):pos(pos),force(force){}
+
+        __host__ __device__
+        real operator()(int index) const
+        {
+            return dot(make_real3(pos[index]),make_real3(force[index]));
+        }
+    };
+    
     struct totalVirial : public thrust::unary_function<int,real>
     {
         real* virial;
