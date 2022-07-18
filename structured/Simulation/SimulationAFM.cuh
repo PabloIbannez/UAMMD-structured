@@ -396,6 +396,7 @@ class SimulationAFM: public Simulation<ForceField_,
             
             this->minimization->addInteractor(this->ff);
             this->integrator->addInteractor(this->ff);
+            this->integrator->addInteractor(this->tip);
 
             if(isSurfaceActive){
                 this->integrator->addInteractor(this->surface);
