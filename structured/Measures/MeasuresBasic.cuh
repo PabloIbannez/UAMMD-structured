@@ -170,7 +170,7 @@ namespace Measures{
         real4* pos   = pd->getPos(access::location::gpu, access::mode::read).raw();
         real4* force = pd->getForce(access::location::gpu, access::mode::read).raw();
         
-        MeasuresTransforms::computeVirial cv(force,pos);
+        MeasuresTransforms::computeVirial cv(pos,force);
 
         auto pgIter = pg->getIndexIterator(access::location::gpu);
         

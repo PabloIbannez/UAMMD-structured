@@ -519,15 +519,19 @@ class ComputableMeasure: public SimulationStep{
         }
 };
 
+template<class Interact>
 class ComputeVirial: public SimulationStep{
 
         std::ofstream outPutFile;
+        
+        std::shared_ptr<Interact> interact;
 
     public:
         
         ComputeVirial(std::shared_ptr<ParticleGroup> pg,
                       int interval,
-                      std::string outPutFileName):SimulationStep(pg,"ComputeVirial",interval){
+                      std::string outPutFileName,
+                      std::shared_ptr<Interact> interact):SimulationStep(pg,"ComputeVirial",interval),interact(interact){
             
             outPutFile = std::ofstream(outPutFileName);
         }
@@ -536,9 +540,39 @@ class ComputeVirial: public SimulationStep{
 
         void applyStep(int step, cudaStream_t st) override{
             
-            real cv = Measures::computeVirial(this->pg,st);
+            uninitialized_cached_vector<real4> forceBuffer(this->pg->getNumberParticles());
 
+            //Copy force to buffer
+            {
+                auto force = this->pd->getForce(access::location::gpu, access::mode::read);     
+                thrust::copy(thrust::cuda::par.on(st),
+                             force.begin(), 
+                             force.end(), 
+                             forceBuffer.begin());
+            }
+
+            {
+                auto force = pd->getForce(access::location::gpu, access::mode::write);     
+                thrust::fill(thrust::cuda::par.on(st), force.begin(), force.end(), make_real4(0.0));
+            }
+
+            uammd::Interactor::Computables compTmp;
+            compTmp.force = true;
+            this->interact->sum(compTmp,st);
+            
+            real cv = Measures::computeVirial(this->pg,st);
+            
+            //Copy back buffer to force
+            {
+                auto force = this->pd->getForce(access::location::gpu, access::mode::read);     
+                thrust::copy(thrust::cuda::par.on(st),
+                             forceBuffer.begin(), 
+                             forceBuffer.end(), 
+                             force.begin());
+            }
+            
             this->outPutFile << step << " " << std::setprecision(25) << cv << std::endl;
+            
         }
 };
 
