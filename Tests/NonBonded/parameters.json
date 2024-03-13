@@ -1,0 +1,47 @@
+{
+	"units":"KcalMol_A",
+	"N":100,
+	"b":5.0,
+	"temperature":312,
+  "lambda":0.23,
+
+	"mass":1.54321,
+	"radius":0.678,
+  "charge":-0.568,
+
+	"viscosity":0.5432,
+	"frictionConstant":0.8765,
+
+	"timeStep":0.001,
+
+	"nSteps":50000000,
+	"nStepsOutput":10000,
+	"nStepsMeasure":100,
+
+	"bond2bound":{"type":"MaxDistanceRestraint","K":10,"distance":10.0},
+
+	"nonBondedList":{
+        "DebyeHuckel":              {"parameters":{"dielectricConstant":80.0,"debyeLength":2.3,"cutOffFactor":1.2}},
+        "DLVOType1":                {"parameters":{"dielectricConstant":73.0,"debyeLength":2.2,"cutOffNPFactor":1.9,"cutOffDHFactor":1.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.1,2.0]]},
+        "DLVOType2":                {"parameters":{"dielectricConstant":75.0,"debyeLength":2.1,"cutOffNPFactor":1.8,"cutOffDHFactor":1.7},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.0,2.0]]},
+        "DLVOType3":                {"parameters":{"dielectricConstant":76.0,"debyeLength":2.6,"cutOffNPFactor":1.4,"cutOffDHFactor":1.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.3,2.0]]},
+        "Clashed":                  {"parameters":{"lambda":1.2,"gamma":2.5}},
+        "KimHummer":                {"parameters":{"sasaModel":"A","dielectricConstant":80.0,"debyeLength":5.0,"cutOffNPFactor":2.0,"cutOffDHFactor":1.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.2,2.0]]},
+        "LennardJonesType1":        {"parameters":{"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.0,1.7]]},
+        "LennardJonesType2":        {"parameters":{"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.5,1.5]]},
+        "LennardJonesType3":        {"parameters":{"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.2,1.8]]},
+        "SplitLennardJones":        {"parameters":{"cutOffFactor":2.5,"epsilon_r":1.52,"epsilon_a":1.321},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",0.921,1.7]]},
+        "WCAType1":                 {"parameters":{"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.5,1.3]]},
+        "WCAType2":                 {"parameters":{"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.1,1.4]]},
+        "WCAType3":                 {"parameters":{"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.3,1.6]]},
+        "GeneralLennardJonesType1": {"parameters":{"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",-1.2,1.4]]},
+        "GeneralLennardJonesType2": {"parameters":{"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.4,1.5]]},
+        "GeneralLennardJonesType3": {"parameters":{"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",-1.4,1.6]]},
+        "Steric6":                  {"parameters":{"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.2,1.7]]},
+        "Steric12":                 {"parameters":{"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.1,1.8]]},
+        "Steric6SoftCore":          {"parameters":{"alpha":0.23,"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.1,1.9]]},
+        "Steric12SoftCore":         {"parameters":{"alpha":0.33,"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.2,1.3]]},
+        "LennardJonesSoftCoreType1":{"parameters":{"alpha":0.44,"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.7,1.1]]},
+        "LennardJonesSoftCoreType2":{"parameters":{"alpha":0.53,"cutOffFactor":2.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.5,1.2]]}
+	}
+}

@@ -1,0 +1,16 @@
+{
+	"particleRadius":0.5,
+	"resolution":1,
+	"radius":5,
+	"Kb":10.0,
+	"Kd":5.0,
+	"Kf":20.0,
+	"Kc":10.0,
+	"boxSize":100,
+	"temperature":1.0,
+	"timeStep":0.001,
+	"frictionConstant":1.0,
+	"nSteps":100000000,
+	"nStepsOutput":100000,
+	"nStepsMeasure":1000
+}

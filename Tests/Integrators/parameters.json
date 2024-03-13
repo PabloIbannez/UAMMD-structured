@@ -1,0 +1,19 @@
+{
+	"N":100000,
+	"density":0.5,
+	"temperature":1.2345,
+
+	"mass":1.54321,
+	"radius":0.678,
+
+	"viscosity":0.5432,
+	"frictionConstant":0.8765,
+
+	"timeStep":0.001,
+
+	"nSteps":10000,
+	"nStepsOutput":100,
+	"nStepsMeasure":100
+
+
+}

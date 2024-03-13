@@ -1,0 +1,15 @@
+{
+	"N":100,
+	"c":4.0,
+	"sigma":1.0,
+	"E":10.0,
+	"rc":0.5,
+	"Kb":1.1,
+	"dt":0.000,
+	"nSteps":2,
+	"nStepsOutput":1,
+	"nStepsPot":1,
+	"avoidPBC":true
+}
+
+

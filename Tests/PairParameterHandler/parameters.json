@@ -1,0 +1,38 @@
+{
+	"units":"KcalMol_A",
+
+	"N":100,
+	"N_eps_sgm":10,
+
+	"epsilon_min":1.0,
+	"epsilon_max":5.0,
+	"sigma_min":1.0,
+	"sigma_max":3.0,
+
+	"b":5.0,
+	"temperature":312,
+
+	"massA":1.54321,
+	"radiusA":0.678,
+  "chargeA":-0.568,
+
+	"massB":1.345,
+	"radiusB":0.953,
+  "chargeB":0.698,
+
+	"massC":1.025,
+	"radiusC":0.789,
+  "chargeC":0.123,
+
+	"frictionConstant":0.8765,
+
+	"timeStep":0.001,
+
+	"nSteps":50000000,
+	"nStepsOutput":10000,
+	"nStepsMeasure":100,
+
+	"bond2bound":{"type":"MaxDistanceRestraint","K":10,"distance":10.0},
+
+	"nonBonded":"LennardJonesType2"
+}

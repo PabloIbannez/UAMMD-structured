@@ -1,0 +1,20 @@
+{
+    "radius":1,
+    "viscosity":10,
+    "tolerance": 1e-10,
+    "vwall" :[10,0],
+    "omega": 1,
+    "overtone":7,
+    "z0": 2.5,
+    "H": 5,
+    "Lxy": 10,
+    "memory":5,
+    "notAcceleratedInterval":2,
+    "damping":0.01,
+    "toleranceConvergence":1e-20,
+    "particleMass": 1.1,
+    "fluidMass": 1,
+    "k":1000,
+    "iterationsList": [1,5,10,15,20,25,30,40,50],
+    "nTethers":0
+}

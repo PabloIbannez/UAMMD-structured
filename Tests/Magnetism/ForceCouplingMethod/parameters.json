@@ -1,0 +1,11 @@
+{
+    "tolerance":0.00001,
+    "lbox": 20,
+    "radius":0.928337,    
+    "viscosity":0.1,
+    "nSteps": 100,
+    "nStepsOutput":1,
+    "nStepsMeasure":1,
+    "force":1,
+    "timeStep":0.001
+}

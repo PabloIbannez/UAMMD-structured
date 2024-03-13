@@ -1,0 +1,21 @@
+{
+    "N":100000,
+    "temperature":1.25,
+    "L": 10,
+    "volume":1.5,    
+    "density":2,
+    "mass":1,
+    "timeStep":0.0001,
+    "radius": 5,
+    "viscosity":1,
+    "magneticAlgorithm":"LLG_Heun",
+    "anisotropy": 2,
+    "gyroRatio":5,
+    "damping":0.1,
+    "msat": 0.75,
+    "nSteps":200000,
+    "firstStepSave":100000,
+    "nStepsOutput":10000,
+    "nStepsMeasure":10000
+
+}

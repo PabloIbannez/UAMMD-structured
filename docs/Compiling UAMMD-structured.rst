@@ -1,0 +1,2 @@
+Compiling UAMMD-structured
+==========================

@@ -1,0 +1,9 @@
+{
+    "pos0":[1.5,2.2,-3.3],
+    "pos1":[1,4,1],
+    "charge":6.22,
+    "dielectricConstant":0.94,
+    "debyeLength":3.42,
+    "L":30
+    
+}

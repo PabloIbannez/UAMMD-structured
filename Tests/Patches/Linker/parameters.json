@@ -1,0 +1,13 @@
+{
+	"N":100,
+	"c":4.0,
+	"E":5.0,
+	"D":1.5,
+	"dt":0.00,
+	"linkerPos":[0.5,0.0,0.0],
+	"nSteps":1,
+	"nStepsOutput":1,
+	"nStepsPot":1
+}
+
+

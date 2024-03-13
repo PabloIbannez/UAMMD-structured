@@ -1,0 +1,16 @@
+{
+	"particleRadius":0.5,
+	"resolution":1,
+	"radius":1.5,
+	"Kb":11.0,
+	"Kf":8.3,
+	"boxSize":100,
+	"temperature":1.0,
+	"timeStep":0.001,
+	"frictionConstant":1.0,
+	"lambda":0.67,
+	"n":4,
+	"alpha":0.81,
+	"epsilon":1.3,
+	"sigma":0.91
+}

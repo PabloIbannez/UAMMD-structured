@@ -1,0 +1,17 @@
+{
+    "N":1,
+    "temperature":0,
+    "L": 10,
+    "volume":2.5,
+    "viscosity":1,
+    "permeability": 2,
+    "timeStep":0.001,
+    "gyroRatio":1.5,
+    "damping":0.1,
+    "msat": 1.5,
+    "nSteps":20000,
+    "firstStepSave":0,
+    "nStepsOutput":50,
+    "nStepsMeasure":50,
+    "rij": [0,0,3]
+}

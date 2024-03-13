@@ -1,0 +1,29 @@
+#ifndef __BONDS_INCLUDERS_CUH__
+#define __BONDS_INCLUDERS_CUH__
+
+#include "Bond1/Bond1.cuh"
+#include "Bond1/ConstantForce.cuh"
+#include "Bond1/FixedHarmonic.cuh"
+#include "Bond1/FixedHarmonicAnisotropic.cuh"
+#include "Bond1/LambdaFixedHarmonicAnisotropic.cuh"
+#include "Bond2/Bond2.cuh"
+#include "Bond2/DebyeHuckel.cuh"
+#include "Bond2/Fene.cuh"
+#include "Bond2/Gaussian.cuh"
+#include "Bond2/Harmonic.cuh"
+#include "Bond2/Helix.cuh"
+#include "Bond2/LambdaHarmonic.cuh"
+#include "Bond2/LennardJones.cuh"
+#include "Bond2/LennardJonesSoftCore.cuh"
+#include "Bond2/MaxDistanceRestraint.cuh"
+#include "Bond2/Morse.cuh"
+#include "Bond2/Steric.cuh"
+#include "Bond3/Bond3.cuh"
+#include "Bond3/BestChenHummerAngular.cuh"
+#include "Bond3/HarmonicAngular.cuh"
+#include "Bond3/KratkyPorod.cuh"
+#include "Bond4/Bond4.cuh"
+#include "Bond4/Dihedral.cuh"
+#include "Bond4/IDP_Fourier.cuh"
+
+#endif //__BONDS_INCLUDERS_CUH__

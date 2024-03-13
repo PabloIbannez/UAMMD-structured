@@ -1,0 +1,15 @@
+{
+    "N":100000,
+    "temperature":2.25,
+    "L": 10,
+    "radius":2,    
+    "nSteps":120000,
+    "timeStep": 0.001,
+    "msat": 1.25,
+    "gyroRatio": 3,
+    "anisotropy": 0.04,
+    "damping": 0.1,
+    "viscosity": 1.5,
+    "nStepsOutput":1000,
+    "nStepsMeasure":1000
+}

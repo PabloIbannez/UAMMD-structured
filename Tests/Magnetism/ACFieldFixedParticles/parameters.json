@@ -1,0 +1,16 @@
+{
+    "N":10000,
+    "temperature":1.25,
+    "L": 10,
+    "radius":0.75,    
+    "nCycles":20,
+    "stepsPerCycle":2000,
+    "damping":0.1,
+    "gyroRatio":5,
+    "anisotropy":2.5,
+    "msat": 1,
+    "nOutputPerCycle":50,
+    "nMeasurePerCycle":200,
+    "frequency":0.1,
+    "b0":12
+}

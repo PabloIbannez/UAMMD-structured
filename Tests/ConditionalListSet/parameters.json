@@ -1,0 +1,13 @@
+{
+	"units":"None",
+
+	"timeStep":0.005,
+	"frictionConstant":2.0,
+
+	"nSteps":50000000,
+	"nStepsInfo":10000,
+	"nStepsOutput":10000,
+
+	"nModel":2,
+	"nSim":2
+}

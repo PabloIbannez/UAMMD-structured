@@ -1,0 +1,31 @@
+{
+  "Integrator": {
+    "NVT" : {}
+  },
+  "SimulationStep": { },
+  "Interactor": {
+    "Bonds": {
+			"Bond1": ["Oriented"],
+			"Bond2": ["Oriented"],
+			"Bond3": ["Angle"],
+			"Bond4": ["Angle"]
+    },
+    "Single": {},
+    "Set": {
+			"Set1": ["CenterOfMass"],
+			"Set2": ["CenterOfMass"]
+		},
+    "Pair": {
+      "NonBonded": {}
+    },
+    "Patches": {
+      "SurfacePatches": {},
+      "NonBondedPatches": {}
+    }
+  },
+  "DataStructures": {
+    "VerletConditionalListSet":{
+      "Condition": ["ExclusionList"]
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+	"particleRadius":0.5,
+	"resolution":1,
+	"radius":1.5,
+	"Kb":10.0,
+	"boxSize":100,
+	"temperature":1.0,
+	"timeStep":0.001,
+	"frictionConstant":1.0,
+	"stressCutOff":20.0
+}
