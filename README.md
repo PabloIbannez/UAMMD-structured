@@ -1,6 +1,6 @@
 ## UAMMD structured
 
-[Documentation](https://uammdstructured.readthedocs.io/en/latest/)
+[Documentation](https://uammd-structured.readthedocs.io/en/latest/)
 
 
 
