@@ -3,6 +3,20 @@ import logging
 import shutil
 import json
 import jsbeautifier
+import requests
+import subprocess
+
+def isGithubRepo(repo_url, logger):
+    # Run the git ls-remote command to check repository access
+    result = subprocess.run(["git", "ls-remote", repo_url], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+    isrepo = False
+    # If the command was successful, print the output and return True
+    if result.returncode == 0:
+        logger.info("Extensions is a Github repository, cloning the repository")
+        isrepo = True
+    else:
+        logger.info("Extensions is not a Github repository, it will be interpreted as a local folder")
+    return isrepo
 
 def copyFilesInFolder(originPath, destinationPath, logger):
     filesOrigin  = os.listdir(originPath)
@@ -62,16 +76,22 @@ def mergeComponentsFiles(COMPONENTS_PATH, EXTENSION_PATH, logger):
 def extensions(args,
                COMPONENTS_PATH,
                UAMMD_STRUCTURED_PATH):
-
+    
     logger = logging.getLogger("USCM")
 
     logger.info("Adding an extension ...")
 
     EXTENSION_FOLDER = args.extensions[0]
+    TMP_FOLDER       = "TMP_EXTENSION_FOLDER"
     #Check if the extension path is a git repository
+    githubrepo = isGithubRepo(EXTENSION_FOLDER, logger)
     #If so create a folder called TMP and clone the repository there
-    #Then do EXTENSION_FOLDER = TMP_EXTENSION_FOLDER
-
+    if githubrepo:
+        #Clone the repository in the TMP_FOLDER
+        subprocess.run(["git", "clone", EXTENSION_FOLDER, TMP_FOLDER])
+        #Rename EXTENSION_FOLDER TO TMP_FOLDER
+        EXTENSION_FOLDER = TMP_FOLDER
+    
     #Check if path exits
     if not os.path.exists(EXTENSION_FOLDER):
         logger.error(f"Extension folder does not exist. {EXTENSION_FOLDER}")
@@ -85,9 +105,16 @@ def extensions(args,
 
     #Copy all the folders subfolders and files to the main folder that is in UAMMD_STRUCTURED_PATH
     mergeComponentsFiles(COMPONENTS_PATH, EXTENSION_FOLDER, logger)
-    copyFilesInFolder(EXTENSION_FOLDER, UAMMD_STRUCTURED_PATH, logger)
+    allFiles = os.listdir(EXTENSION_FOLDER)
+    if "structured" not in allFiles:
+        logger.error("All the extensions must be contained in a folder named structured.")
+        if githubrepo:
+            shutil.rmtree(EXTENSION_FOLDER)
+        raise Exception("All the extensions must be contained in a folder named structured.")
+        
+    copyFilesInFolder(f"{EXTENSION_FOLDER}/structured", UAMMD_STRUCTURED_PATH, logger)
 
-    if EXTENSION_FOLDER == "TMP_EXTENSION_FOLDER":
+    if githubrepo:
         shutil.rmtree(EXTENSION_FOLDER)
     logger.info("Extension added successfully.")
 
