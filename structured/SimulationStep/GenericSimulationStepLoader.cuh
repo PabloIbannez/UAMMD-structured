@@ -80,15 +80,6 @@ namespace SimulationStepLoader{
         if("MagneticMeasure" == simulationStepType and "MeasureMeanMagnetization" == simulationStepSubType){
             return true;
         }
-        if("OscillatingFluidMeasure" == simulationStepType and "VQCMMeasure" == simulationStepSubType){
-            return true;
-        }
-        if("OscillatingFluidMeasure" == simulationStepType and "VQCMMeasureFromMobility" == simulationStepSubType){
-            return true;
-        }
-        if("OscillatingFluidMeasure" == simulationStepType and "VAFMMeasure" == simulationStepSubType){
-            return true;
-        }
         if("ExperimentMeasures" == simulationStepType and "AFMMeasure" == simulationStepSubType){
             return true;
         }
@@ -108,6 +99,24 @@ namespace SimulationStepLoader{
             return true;
         }
         if("MechanicalMeasure" == simulationStepType and "ForceBetweenSetsMeasure" == simulationStepSubType){
+            return true;
+        }
+        if("OscillatingFluidMeasure" == simulationStepType and "VQCMMeasure" == simulationStepSubType){
+            return true;
+        }
+        if("OscillatingFluidMeasure" == simulationStepType and "VQCMMeasureFromMobility" == simulationStepSubType){
+            return true;
+        }
+        if("OscillatingFluidMeasure" == simulationStepType and "VAFMMeasure" == simulationStepSubType){
+            return true;
+        }
+        if("OscillatingFluidMeasure" == simulationStepType and "VQCMMeasure" == simulationStepSubType){
+            return true;
+        }
+        if("OscillatingFluidMeasure" == simulationStepType and "VQCMMeasureFromMobility" == simulationStepSubType){
+            return true;
+        }
+        if("OscillatingFluidMeasure" == simulationStepType and "VAFMMeasure" == simulationStepSubType){
             return true;
         }
         
@@ -248,21 +257,6 @@ namespace SimulationStepLoader{
             simulationStep = std::make_shared<SimulationStep::SimulationMeasures::MeasureMeanMagnetization>(pg,integrator,ff,data,path.back());
             found = true;
         }
-        if("OscillatingFluidMeasure" == simulationStepType and "VQCMMeasure" == simulationStepSubType){
-            System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected OscillatingFluidMeasure::VQCMMeasure simulationStep",path.back().c_str());
-            simulationStep = std::make_shared<SimulationStep::SimulationMeasures::VQCMMeasure>(pg,integrator,ff,data,path.back());
-            found = true;
-        }
-        if("OscillatingFluidMeasure" == simulationStepType and "VQCMMeasureFromMobility" == simulationStepSubType){
-            System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected OscillatingFluidMeasure::VQCMMeasureFromMobility simulationStep",path.back().c_str());
-            simulationStep = std::make_shared<SimulationStep::SimulationMeasures::VQCMMeasureFromMobility>(pg,integrator,ff,data,path.back());
-            found = true;
-        }
-        if("OscillatingFluidMeasure" == simulationStepType and "VAFMMeasure" == simulationStepSubType){
-            System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected OscillatingFluidMeasure::VAFMMeasure simulationStep",path.back().c_str());
-            simulationStep = std::make_shared<SimulationStep::SimulationMeasures::VAFMMeasure>(pg,integrator,ff,data,path.back());
-            found = true;
-        }
         if("ExperimentMeasures" == simulationStepType and "AFMMeasure" == simulationStepSubType){
             System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected ExperimentMeasures::AFMMeasure simulationStep",path.back().c_str());
             simulationStep = std::make_shared<SimulationStep::SimulationMeasures::AFMMeasure>(pg,integrator,ff,data,path.back());
@@ -296,6 +290,36 @@ namespace SimulationStepLoader{
         if("MechanicalMeasure" == simulationStepType and "ForceBetweenSetsMeasure" == simulationStepSubType){
             System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected MechanicalMeasure::ForceBetweenSetsMeasure simulationStep",path.back().c_str());
             simulationStep = std::make_shared<SimulationStep::SimulationMeasures::ForceBetweenSetsMeasure>(pg,integrator,ff,data,path.back());
+            found = true;
+        }
+        if("OscillatingFluidMeasure" == simulationStepType and "VQCMMeasure" == simulationStepSubType){
+            System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected OscillatingFluidMeasure::VQCMMeasure simulationStep",path.back().c_str());
+            simulationStep = std::make_shared<SimulationStep::SimulationMeasures::VQCMMeasure>(pg,integrator,ff,data,path.back());
+            found = true;
+        }
+        if("OscillatingFluidMeasure" == simulationStepType and "VQCMMeasureFromMobility" == simulationStepSubType){
+            System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected OscillatingFluidMeasure::VQCMMeasureFromMobility simulationStep",path.back().c_str());
+            simulationStep = std::make_shared<SimulationStep::SimulationMeasures::VQCMMeasureFromMobility>(pg,integrator,ff,data,path.back());
+            found = true;
+        }
+        if("OscillatingFluidMeasure" == simulationStepType and "VAFMMeasure" == simulationStepSubType){
+            System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected OscillatingFluidMeasure::VAFMMeasure simulationStep",path.back().c_str());
+            simulationStep = std::make_shared<SimulationStep::SimulationMeasures::VAFMMeasure>(pg,integrator,ff,data,path.back());
+            found = true;
+        }
+        if("OscillatingFluidMeasure" == simulationStepType and "VQCMMeasure" == simulationStepSubType){
+            System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected OscillatingFluidMeasure::VQCMMeasure simulationStep",path.back().c_str());
+            simulationStep = std::make_shared<SimulationStep::SimulationMeasures::VQCMMeasure>(pg,integrator,ff,data,path.back());
+            found = true;
+        }
+        if("OscillatingFluidMeasure" == simulationStepType and "VQCMMeasureFromMobility" == simulationStepSubType){
+            System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected OscillatingFluidMeasure::VQCMMeasureFromMobility simulationStep",path.back().c_str());
+            simulationStep = std::make_shared<SimulationStep::SimulationMeasures::VQCMMeasureFromMobility>(pg,integrator,ff,data,path.back());
+            found = true;
+        }
+        if("OscillatingFluidMeasure" == simulationStepType and "VAFMMeasure" == simulationStepSubType){
+            System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected OscillatingFluidMeasure::VAFMMeasure simulationStep",path.back().c_str());
+            simulationStep = std::make_shared<SimulationStep::SimulationMeasures::VAFMMeasure>(pg,integrator,ff,data,path.back());
             found = true;
         }
 
