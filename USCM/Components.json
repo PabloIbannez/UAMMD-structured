@@ -84,13 +84,7 @@
             ["ThermodynamicMeasure", "InteractorsListEnergyMeasure", "InteractorsListEnergyMeasure.cuh"],
             ["MechanicalMeasure", "HessianMeasure", "HessianMeasure.cuh"],
             ["MechanicalMeasure", "PairwiseForceMeasure", "PairwiseForceMeasure.cuh"],
-            ["MechanicalMeasure", "ForceBetweenSetsMeasure", "ForceBetweenSetsMeasure.cuh"],
-            ["OscillatingFluidMeasure", "VQCMMeasure", "VQCMMeasure.cuh"],
-            ["OscillatingFluidMeasure", "VQCMMeasureFromMobility", "VQCMMeasureFromMobility.cuh"],
-            ["OscillatingFluidMeasure", "VAFMMeasure", "VAFMMeasure.cuh"],
-            ["OscillatingFluidMeasure", "VQCMMeasure", "VQCMMeasure.cuh"],
-            ["OscillatingFluidMeasure", "VQCMMeasureFromMobility", "VQCMMeasureFromMobility.cuh"],
-            ["OscillatingFluidMeasure", "VAFMMeasure", "VAFMMeasure.cuh"]
+            ["MechanicalMeasure", "ForceBetweenSetsMeasure", "ForceBetweenSetsMeasure.cuh"]
         ]
     },
     "Interactor": {
