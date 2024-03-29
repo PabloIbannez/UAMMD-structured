@@ -8,7 +8,7 @@ import subprocess
 
 def isGithubRepo(repo_url, logger):
     # Run the git ls-remote command to check repository access
-    result = subprocess.run(["git", "ls-remote", repo_url], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+    result = subprocess.run(["git", "ls-remote", repo_url], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     isrepo = False
     # If the command was successful, print the output and return True
     if result.returncode == 0:
@@ -22,7 +22,7 @@ def copyFilesInFolder(originPath, destinationPath, logger):
     filesOrigin  = os.listdir(originPath)
     filesDestination = os.listdir(destinationPath)
     for file_origin in filesOrigin:
-        if file_origin == "Components.json":
+        if file_origin == "Extension.json":
             continue
         pathToFileOrigin = os.path.join(originPath, file_origin)
         if os.path.isdir(pathToFileOrigin): #If the folder exists copy recursively the directories inside it, else copy the full folder
@@ -65,7 +65,7 @@ def mergeComponentsFiles(COMPONENTS_PATH, EXTENSION_PATH, logger):
     with open(f'{COMPONENTS_PATH}/Components.json', 'r') as f:
         components_uammd = json.load(f)
 
-    with open(f'{EXTENSION_PATH}/Components.json', 'r') as f:
+    with open(f'{EXTENSION_PATH}/Extension.json', 'r') as f:
         components_extension = json.load(f)
 
     components_uammd_new = combineTwoDictionaries(components_uammd, components_extension, logger)
@@ -84,24 +84,25 @@ def extensions(args,
     EXTENSION_FOLDER = args.extensions[0]
     TMP_FOLDER       = "TMP_EXTENSION_FOLDER"
     #Check if the extension path is a git repository
-    githubrepo = isGithubRepo(EXTENSION_FOLDER, logger)
+    githubrepo = False #isGithubRepo(EXTENSION_FOLDER, logger)
     #If so create a folder called TMP and clone the repository there
-    if githubrepo:
-        #Clone the repository in the TMP_FOLDER
-        subprocess.run(["git", "clone", EXTENSION_FOLDER, TMP_FOLDER])
-        #Rename EXTENSION_FOLDER TO TMP_FOLDER
-        EXTENSION_FOLDER = TMP_FOLDER
+    # if githubrepo:
+    #     #Clone the repository in the TMP_FOLDER
+    #     subprocess.run(["git", "clone", EXTENSION_FOLDER, TMP_FOLDER])
+    #     #Rename EXTENSION_FOLDER TO TMP_FOLDER
+    #     EXTENSION_FOLDER = TMP_FOLDER
     
     #Check if path exits
     if not os.path.exists(EXTENSION_FOLDER):
         logger.error(f"Extension folder does not exist. {EXTENSION_FOLDER}")
         raise Exception(f"Extension path does not exists.")
 
-    #If path exits check if there is a file with the name Components.json
-    components_path = os.path.join(EXTENSION_FOLDER, "Components.json")
+    #If path exits check if there is a file with the name Extension.json
+    components_path = os.path.join(EXTENSION_FOLDER, "Extension.json")
+    print(components_path)
     if not os.path.exists(components_path):
-        logger.error("Components.json file not found in the extension path.")
-        raise Exception("Components.json file not found.")
+        logger.error("Extension.json file not found in the extension path.")
+        raise Exception("Extension.json file not found.")
 
     #Copy all the folders subfolders and files to the main folder that is in UAMMD_STRUCTURED_PATH
     mergeComponentsFiles(COMPONENTS_PATH, EXTENSION_FOLDER, logger)
@@ -117,6 +118,3 @@ def extensions(args,
     if githubrepo:
         shutil.rmtree(EXTENSION_FOLDER)
     logger.info("Extension added successfully.")
-
-
-
