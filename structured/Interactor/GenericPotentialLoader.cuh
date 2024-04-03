@@ -37,6 +37,10 @@ namespace GenericLoader{
             return true;
         }
             
+        if("Bond2" == potType and "HarmonicAnisotropic" == potSubType){
+            return true;
+        }
+            
         if("Bond2" == potType and "LambdaHarmonic" == potSubType){
             return true;
         }
@@ -277,11 +281,11 @@ namespace GenericLoader{
             return true;
         }
             
-        if("Set1" == potType and "FixedHarmonicCenterOfMass" == potSubType){
+        if("Set1" == potType and "FixedHarmonicAnisotropicCenterOfMass" == potSubType){
             return true;
         }
             
-        if("Set1" == potType and "FixedHarmonicCommon_K_r0CenterOfMass" == potSubType){
+        if("Set1" == potType and "FixedHarmonicAnisotropicCommon_K_r0CenterOfMass" == potSubType){
             return true;
         }
             
@@ -491,6 +495,15 @@ namespace GenericLoader{
             std::make_shared<Bond2::Harmonic>(gd,pg,data);
 
             interactor = std::make_shared<typename Interactor::BondsInteractor<Bond2::Harmonic>>(gd,pg,data,pot,path.back());
+            found = true;
+        }
+        if("Bond2" == potType and "HarmonicAnisotropic" == potSubType){
+            System::log<System::MESSAGE>("[GenericLoader] (%s) Detected Bond2::HarmonicAnisotropic potential",path.back().c_str());
+
+            std::shared_ptr<Bond2::HarmonicAnisotropic> pot =
+            std::make_shared<Bond2::HarmonicAnisotropic>(gd,pg,data);
+
+            interactor = std::make_shared<typename Interactor::BondsInteractor<Bond2::HarmonicAnisotropic>>(gd,pg,data,pot,path.back());
             found = true;
         }
         if("Bond2" == potType and "LambdaHarmonic" == potSubType){
@@ -1033,22 +1046,22 @@ namespace GenericLoader{
             interactor = std::make_shared<typename Interactor::SetInteractor<Set1::ConstantForceOverCenterOfMass>>(gd,pg,data,pot,path.back());
             found = true;
         }
-        if("Set1" == potType and "FixedHarmonicCenterOfMass" == potSubType){
-            System::log<System::MESSAGE>("[GenericLoader] (%s) Detected Set1::FixedHarmonicCenterOfMass potential",path.back().c_str());
+        if("Set1" == potType and "FixedHarmonicAnisotropicCenterOfMass" == potSubType){
+            System::log<System::MESSAGE>("[GenericLoader] (%s) Detected Set1::FixedHarmonicAnisotropicCenterOfMass potential",path.back().c_str());
 
-            std::shared_ptr<Set1::FixedHarmonicCenterOfMass> pot =
-            std::make_shared<Set1::FixedHarmonicCenterOfMass>(gd,pg,data);
+            std::shared_ptr<Set1::FixedHarmonicAnisotropicCenterOfMass> pot =
+            std::make_shared<Set1::FixedHarmonicAnisotropicCenterOfMass>(gd,pg,data);
 
-            interactor = std::make_shared<typename Interactor::SetInteractor<Set1::FixedHarmonicCenterOfMass>>(gd,pg,data,pot,path.back());
+            interactor = std::make_shared<typename Interactor::SetInteractor<Set1::FixedHarmonicAnisotropicCenterOfMass>>(gd,pg,data,pot,path.back());
             found = true;
         }
-        if("Set1" == potType and "FixedHarmonicCommon_K_r0CenterOfMass" == potSubType){
-            System::log<System::MESSAGE>("[GenericLoader] (%s) Detected Set1::FixedHarmonicCommon_K_r0CenterOfMass potential",path.back().c_str());
+        if("Set1" == potType and "FixedHarmonicAnisotropicCommon_K_r0CenterOfMass" == potSubType){
+            System::log<System::MESSAGE>("[GenericLoader] (%s) Detected Set1::FixedHarmonicAnisotropicCommon_K_r0CenterOfMass potential",path.back().c_str());
 
-            std::shared_ptr<Set1::FixedHarmonicCommon_K_r0CenterOfMass> pot =
-            std::make_shared<Set1::FixedHarmonicCommon_K_r0CenterOfMass>(gd,pg,data);
+            std::shared_ptr<Set1::FixedHarmonicAnisotropicCommon_K_r0CenterOfMass> pot =
+            std::make_shared<Set1::FixedHarmonicAnisotropicCommon_K_r0CenterOfMass>(gd,pg,data);
 
-            interactor = std::make_shared<typename Interactor::SetInteractor<Set1::FixedHarmonicCommon_K_r0CenterOfMass>>(gd,pg,data,pot,path.back());
+            interactor = std::make_shared<typename Interactor::SetInteractor<Set1::FixedHarmonicAnisotropicCommon_K_r0CenterOfMass>>(gd,pg,data,pot,path.back());
             found = true;
         }
         if("Set2" == potType and "ConstantTorqueBetweenCentersOfMass" == potSubType){
