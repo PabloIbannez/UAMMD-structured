@@ -1,0 +1,14 @@
+{
+    "N":1000,
+    "density":0.5,
+    "temperature":1.2345,
+    "r0":1,
+    "k":1,
+    "viscosity":0.5432,
+    "timeStep":0.001,
+    "nSteps":1000000,
+    "nStepsOutput":100,
+    "nStepsMeasure":100,
+    "firstStepSave":0,
+    "L":40
+}

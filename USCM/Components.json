@@ -95,6 +95,7 @@
             ["Bond2", "FeneCommon_r0_K_R0", "Fene.cuh"],
             ["Bond2", "DebyeHuckel", "DebyeHuckel.cuh"],
             ["Bond2", "Harmonic", "Harmonic.cuh"],
+	    ["Bond2", "HarmonicAnisotropic", "HarmonicAnisotropic.cuh"],
             ["Bond2", "LambdaHarmonic", "LambdaHarmonic.cuh"],
             ["Bond2", "HarmonicCommon_K", "Harmonic.cuh"],
             ["Bond2", "HarmonicCommon_K_r0", "Harmonic.cuh"],

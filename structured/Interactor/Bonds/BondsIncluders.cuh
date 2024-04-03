@@ -11,6 +11,7 @@
 #include "Bond2/Fene.cuh"
 #include "Bond2/Gaussian.cuh"
 #include "Bond2/Harmonic.cuh"
+#include "Bond2/HarmonicAnisotropic.cuh"
 #include "Bond2/Helix.cuh"
 #include "Bond2/LambdaHarmonic.cuh"
 #include "Bond2/LennardJones.cuh"
