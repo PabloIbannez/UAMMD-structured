@@ -391,7 +391,7 @@ namespace Interactor{
                                                      listStart,
                                                      n,
                                                      nGroups,
-                                                     pot->getComputationalData(comp),
+                                                     pot->getComputationalData(comp,st),
                                                      setParam_ptr,
                                                      pot->getEnergyTransverser());
 
@@ -431,7 +431,7 @@ namespace Interactor{
                                                      listStart,
                                                      n,
                                                      nGroups,
-                                                     pot->getComputationalData(comp),
+                                                     pot->getComputationalData(comp,st),
                                                      setParam_ptr,
                                                      pot->getForceTransverser());
 
@@ -475,7 +475,7 @@ namespace Interactor{
                         <<<Nblocks,Nthreads,0, st>>>(id2index,
                                                      listStart,
                                                      n,
-                                                     pot->getComputationalData(comp),
+                                                     pot->getComputationalData(comp,st),
                                                      setParam_ptr,
                                                      pot->getEnergyTransverser());
                         CudaCheckError();
@@ -515,7 +515,7 @@ namespace Interactor{
                         <<<Nblocks,Nthreads,0, st>>>(id2index,
                                                      listStart,
                                                      n,
-                                                     pot->getComputationalData(comp),
+                                                     pot->getComputationalData(comp,st),
                                                      setParam_ptr,
                                                      pot->getForceTransverser());
                         CudaCheckError();

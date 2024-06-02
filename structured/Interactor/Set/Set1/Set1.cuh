@@ -194,8 +194,9 @@ class CenterOfMass_{
 
         ///////////////////////////
 
-        ComputationalData getComputationalData(const Computables& comp){
-            return SetType::getComputationalData(this->gd,this->pd,storage,comp);
+        ComputationalData getComputationalData(const Computables& comp,
+                                               const cudaStream_t& st){
+            return SetType::getComputationalData(this->gd,this->pd,storage,comp,st);
         }
 
         template<typename T>

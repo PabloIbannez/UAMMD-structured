@@ -215,9 +215,10 @@ class ExternalBase_{
 
         ///////////////////////////
 
-        ComputationalData getComputationalData(const Computables& comp){
+        ComputationalData getComputationalData(const Computables& comp,
+                                               const cudaStream_t& st){
             return ExternalType::getComputationalData(this->gd,this->pg,
-                                                      storage,comp);
+                                                      storage,comp,st);
         }
 
     protected:

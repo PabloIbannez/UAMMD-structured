@@ -28,7 +28,8 @@ namespace Bond4{
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
                                                                const StorageData&  storage,
-                                                               const Computables& computables){
+                                                               const Computables& computables,
+                                                               const cudaStream_t& st){
 
             ComputationalData computational;
 
@@ -173,10 +174,11 @@ namespace Bond4{
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
                                                                const StorageData&  storage,
-                                                               const Computables& computables){
+                                                               const Computables& computables,
+                                                               const cudaStream_t& st){
             ComputationalData computational;
-            static_cast<Dihedral_::ComputationalData&>(computational) = Dihedral_::getComputationalData(gd,pg,
-                                                                                                        storage,computables);
+            static_cast<Dihedral_::ComputationalData&>(computational) =
+            Dihedral_::getComputationalData(gd,pg,storage,computables,st);
 
             computational.n    = storage.n;
             computational.K    = storage.K;
@@ -268,10 +270,12 @@ namespace Bond4{
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
                                                                const StorageData&  storage,
-                                                               const Computables& computables){
+                                                               const Computables& computables,
+                                                               const cudaStream_t& st){
 
             return Dihedral_::getComputationalData(gd,pg,
-                                                   storage,computables);
+                                                   storage,
+                                                   computables,st);
         }
 
         //Storage data reader

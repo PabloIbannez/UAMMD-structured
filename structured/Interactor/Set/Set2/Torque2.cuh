@@ -237,7 +237,8 @@ class Torque_{
 
         ///////////////////////////
 
-        ComputationalData getComputationalData(const Computables& comp){
+        ComputationalData getComputationalData(const Computables& comp,
+                                               const cudaStream_t& st){
             ComputationalData computational;
 
             computational.pos  = pd->getPos(access::location::gpu, access::mode::read).raw();

@@ -26,7 +26,8 @@ namespace External{
     static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
 							   std::shared_ptr<ParticleGroup> pg,
                                                            const StorageData&  storage,
-                                                           const Computables& comp){
+                                                           const Computables& comp,
+                                                           const cudaStream_t& st){
 
       ComputationalData computational;
       std::shared_ptr<ParticleData> pd = pg->getParticleData();

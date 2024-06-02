@@ -29,7 +29,8 @@ namespace Bond2{
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
                                                                const StorageData&  storage,
-                                                               const Computables& computables){
+                                                               const Computables& computables,
+                                                               const cudaStream_t& st){
 
             ComputationalData computational;
 
@@ -169,9 +170,11 @@ namespace Bond2{
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
                                                                const StorageData&  storage,
-                                                               const Computables& computables){
+                                                               const Computables& computables,
+                                                               const cudaStream_t& st){
             ComputationalData computational;
-            static_cast<Fene_::ComputationalData&>(computational) = Fene_::getComputationalData(gd,pg,storage,computables);
+            static_cast<Fene_::ComputationalData&>(computational) =
+            Fene_::getComputationalData(gd,pg,storage,computables,st);
 
             computational.K  = storage.K;
             computational.R0 = storage.R0;
@@ -274,10 +277,12 @@ namespace Bond2{
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
                                                                const StorageData&  storage,
-                                                               const Computables& computables){
+                                                               const Computables& computables,
+                                                               const cudaStream_t& st){
 
             ComputationalData computational;
-            static_cast<Fene_::ComputationalData&>(computational) = Fene_::getComputationalData(gd,pg,storage,computables);
+            static_cast<Fene_::ComputationalData&>(computational) =
+            Fene_::getComputationalData(gd,pg,storage,computables,st);
 
             computational.K  = storage.K;
             computational.R0 = storage.R0;

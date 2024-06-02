@@ -44,7 +44,8 @@ namespace NonBonded{
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
                                                                const StorageData&  storage,
-                                                               const Computables& comp){
+                                                               const Computables& comp,
+                                                               const cudaStream_t& st){
 
             ComputationalData computational;
 
@@ -179,15 +180,15 @@ namespace NonBonded{
 
       static inline __device__ tensor3 hessian(int index_i, int index_j,
 					       const ComputationalData& computational){
-	
+
 	const real4 posi = computational.pos[index_i];
 	const real4 posj = computational.pos[index_j];
-	
+
 	const real3 rij = computational.box.apply_pbc(make_real3(posj)-make_real3(posi));
 
 	const real epsilon_r = computational.epsilon_r;
 	const real epsilon_a = computational.epsilon_a;
-	
+
 	const real epsilon = computational.paramPairIterator(index_i,index_j).epsilon;
 	const real sigma   = computational.paramPairIterator(index_i,index_j).sigma;
 
@@ -208,10 +209,10 @@ namespace NonBonded{
 	    eps = eps_a;
 	  }
 	  H = LennardJonesType::hessian(rij,r2,eps,sigma);
-	}	    
+	}
 	return H;
       }
-      
+
 
     };
 

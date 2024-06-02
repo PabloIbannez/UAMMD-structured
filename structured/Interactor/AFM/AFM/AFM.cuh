@@ -24,9 +24,10 @@ class AFM_{
 
         ///////////////////////////
 
-        ComputationalData getComputationalData(const Computables& comp){
+        ComputationalData getComputationalData(const Computables& comp,
+                                               const cudaStream_t& st){
             return AFMType::getComputationalData(this->gd,this->pg,
-                                                 storage,comp);
+                                                 storage,comp,st);
         }
 
         template<typename T>

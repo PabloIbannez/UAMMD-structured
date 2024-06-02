@@ -66,7 +66,8 @@ namespace NonBondedPatches{
                                                       std::shared_ptr<GlobalData>    patchesGd,
                                                       std::shared_ptr<ParticleGroup> patchesPg,
                                                       const StorageData&  storage,
-                                                      const Computables& comp){
+                                                      const Computables& comp,
+                                                      const cudaStream_t& st){
 
             ComputationalData computational;
 
@@ -178,7 +179,8 @@ namespace NonBondedPatches{
                                                       std::shared_ptr<GlobalData>    patchesGd,
                                                       std::shared_ptr<ParticleGroup> patchesPg,
                                                       const StorageData&  storage,
-                                                      const Computables& comp){
+                                                      const Computables& comp,
+                                                      const cudaStream_t& st){
 
             ComputationalData computational;
 

@@ -112,7 +112,7 @@ namespace Interactor{
                                              typename PotentialType::EnergyTransverser>
                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
                                                      groupMask,
-                                                     pot->getComputationalData(comp),
+                                                     pot->getComputationalData(comp,st),
                                                      nlData,
                                                      pot->getEnergyTransverser());
 
@@ -149,7 +149,7 @@ namespace Interactor{
                                                  typename PotentialType::ForceTransverser>
                             <<<Nblocks,Nthreads,0, st>>>(numberParticles,
                                                          groupMask,
-                                                         pot->getComputationalData(comp),
+                                                         pot->getComputationalData(comp,st),
                                                          nlData,
                                                          pot->getForceTransverser());
 
@@ -182,7 +182,7 @@ namespace Interactor{
                                                  typename PotentialType::ForceTorqueMagneticFieldTransverser>
                             <<<Nblocks,Nthreads,0, st>>>(numberParticles,
                                                          groupMask,
-                                                         pot->getComputationalData(comp),
+                                                         pot->getComputationalData(comp,st),
                                                          nlData,
                                                          pot->getForceTorqueMagneticFieldTransverser());
 
@@ -216,7 +216,7 @@ namespace Interactor{
 			  typename PotentialType::MagneticFieldTransverser>
 			  <<<Nblocks,Nthreads,0, st>>>(numberParticles,
 						       groupMask,
-						       pot->getComputationalData(comp),
+						       pot->getComputationalData(comp,st),
 						       nlData,
 						       pot->getMagneticFieldTransverser());
 
@@ -250,7 +250,7 @@ namespace Interactor{
                                              typename PotentialType::LambdaTransverser>
                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
                                                      groupMask,
-                                                     pot->getComputationalData(comp),
+                                                     pot->getComputationalData(comp,st),
                                                      nlData,
                                                      pot->getLambdaTransverser());
 
@@ -284,7 +284,7 @@ namespace Interactor{
                                              typename PotentialType::StressTransverser>
                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
                                                      groupMask,
-                                                     pot->getComputationalData(comp),
+                                                     pot->getComputationalData(comp,st),
                                                      nlData,
                                                      pot->getStressTransverser());
 
@@ -318,7 +318,7 @@ namespace Interactor{
                                              typename PotentialType::HessianTransverser>
                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
                                                      groupMask,
-                                                     pot->getComputationalData(comp),
+                                                     pot->getComputationalData(comp,st),
                                                      nlData,
                                                      pot->getHessianTransverser());
 
@@ -352,7 +352,7 @@ namespace Interactor{
                                              typename PotentialType::PairwiseForceTransverser>
                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
                                                      groupMask,
-                                                     pot->getComputationalData(comp),
+                                                     pot->getComputationalData(comp,st),
                                                      nlData,
                                                      pot->getPairwiseForceTransverser());
 
@@ -386,7 +386,7 @@ namespace Interactor{
                                              typename PotentialType::MagneticFieldTransverser>
                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
                                                      groupMask,
-                                                     pot->getComputationalData(comp),
+                                                     pot->getComputationalData(comp,st),
                                                      nlData,
                                                      pot->getMagneticFieldTransverser());
 

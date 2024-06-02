@@ -242,7 +242,7 @@ namespace Interactor{
                                             typename BondType::BondParameters,
                                             typename BondType::EnergyTransverser>
                         <<<Nblocks,Nthreads,0,st>>>(nParticlesWithBonds,
-                                                    pot->getComputationalData(comp),
+                                                    pot->getComputationalData(comp,st),
                                                     id2index,
                                                     partLocalIndex2id_ptr,
                                                     bondList_ptr,
@@ -277,7 +277,7 @@ namespace Interactor{
                                             typename BondType::BondParameters,
                                             typename BondType::ForceTransverser>
                         <<<Nblocks,Nthreads,0,st>>>(nParticlesWithBonds,
-                                                    pot->getComputationalData(comp),
+                                                    pot->getComputationalData(comp,st),
                                                     id2index,
                                                     partLocalIndex2id_ptr,
                                                     bondList_ptr,
@@ -312,7 +312,7 @@ namespace Interactor{
                                             typename BondType::BondParameters,
                                             typename BondType::LambdaTransverser>
                         <<<Nblocks,Nthreads,0,st>>>(nParticlesWithBonds,
-                                                    pot->getComputationalData(comp),
+                                                    pot->getComputationalData(comp,st),
                                                     id2index,
                                                     partLocalIndex2id_ptr,
                                                     bondList_ptr,
@@ -345,7 +345,7 @@ namespace Interactor{
                                             typename BondType::BondParameters,
                                             typename BondType::StressTransverser>
                         <<<Nblocks,Nthreads,0,st>>>(nParticlesWithBonds,
-                                                    pot->getComputationalData(comp),
+                                                    pot->getComputationalData(comp,st),
                                                     id2index,
                                                     partLocalIndex2id_ptr,
                                                     bondList_ptr,
@@ -379,7 +379,7 @@ namespace Interactor{
                                             typename BondType::BondParameters,
                                             typename BondType::MagneticFieldTransverser>
                         <<<Nblocks,Nthreads,0,st>>>(nParticlesWithBonds,
-                                                    pot->getComputationalData(comp),
+                                                    pot->getComputationalData(comp,st),
                                                     id2index,
                                                     partLocalIndex2id_ptr,
                                                     bondList_ptr,
@@ -413,7 +413,7 @@ namespace Interactor{
                                             typename BondType::BondParameters,
                                             typename BondType::HessianTransverser>
                         <<<Nblocks,Nthreads,0,st>>>(nParticlesWithBonds,
-                                                    pot->getComputationalData(comp),
+                                                    pot->getComputationalData(comp,st),
                                                     id2index,
                                                     partLocalIndex2id_ptr,
                                                     bondList_ptr,
@@ -444,7 +444,7 @@ namespace Interactor{
 		      typename BondType::BondParameters,
 		      typename BondType::PairwiseForceTransverser>
 		      <<<Nblocks,Nthreads,0,st>>>(nParticlesWithBonds,
-						  pot->getComputationalData(comp),
+						  pot->getComputationalData(comp,st),
 						  id2index,
 						  partLocalIndex2id_ptr,
 						  bondList_ptr,

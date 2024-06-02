@@ -29,7 +29,8 @@ namespace Set1{
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>           gd,
                                                                std::shared_ptr<ExtendedParticleData> pd,
                                                                const StorageData&  storage,
-                                                               const Computables& comp){
+                                                               const Computables& comp,
+                                                               const cudaStream_t& st){
 
             ComputationalData computational;
 
@@ -116,13 +117,14 @@ namespace Set1{
         //Computational data getter
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>           gd,
-                                                                 std::shared_ptr<ExtendedParticleData> pd,
-                                                                 const StorageData&  storage,
-                                                                 const Computables& comp){
+                                                               std::shared_ptr<ExtendedParticleData> pd,
+                                                               const StorageData&  storage,
+                                                               const Computables& comp,
+                                                               const cudaStream_t& st){
 
             ComputationalData computational;
-            static_cast<HarmonicAnisotropic_::ComputationalData&>(computational) = HarmonicAnisotropic_::getComputationalData(gd,pd,
-                                                                                                                              storage,comp);
+            static_cast<HarmonicAnisotropic_::ComputationalData&>(computational) =
+            HarmonicAnisotropic_::getComputationalData(gd,pd,storage,comp,st);
 
             computational.K  = storage.K;
             computational.r0 = storage.r0;

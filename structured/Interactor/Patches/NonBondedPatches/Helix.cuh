@@ -172,11 +172,12 @@ namespace NonBondedPatches{
         }
 
         static ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
-                                                        std::shared_ptr<ParticleGroup> pg,
-                                                        std::shared_ptr<GlobalData>    patchesGd,
-                                                        std::shared_ptr<ParticleGroup> patchesPg,
-                                                        const StorageData&  storage,
-                                                        const Computables& comp){
+                                                      std::shared_ptr<ParticleGroup> pg,
+                                                      std::shared_ptr<GlobalData>    patchesGd,
+                                                      std::shared_ptr<ParticleGroup> patchesPg,
+                                                      const StorageData&  storage,
+                                                      const Computables& comp,
+                                                      const cudaStream_t& st){
 
             ComputationalData computational;
 
@@ -409,7 +410,8 @@ namespace NonBondedPatches{
                                                       std::shared_ptr<GlobalData>    patchesGd,
                                                       std::shared_ptr<ParticleGroup> patchesPg,
                                                       const StorageData&  storage,
-                                                      const Computables& comp){
+                                                      const Computables& comp,
+                                                      const cudaStream_t& st){
             ComputationalData computational;
 
             computational.box = patchesGd->getEnsemble()->getBox();

@@ -84,10 +84,11 @@ class SurfacePatchyParticles_{
         //Potential parameters
         using StorageData       = typename SurfaceType::StorageData;
 
-        ComputationalData getComputationalData(const Computables& comp){
+        ComputationalData getComputationalData(const Computables& comp,
+                                               const cudaStream_t& st){
             return SurfaceType::getComputationalData(this->gd, this->pg,
                                                      this->patchesGd,this->patchesPg,
-                                                     storage,comp);
+                                                     storage,comp,st);
         }
 
     private:

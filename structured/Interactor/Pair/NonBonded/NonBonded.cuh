@@ -343,8 +343,9 @@ namespace NonBonded{
 
     ///////////////////////////
 
-    ComputationalData getComputationalData(const Computables& comp){
-      return NonBondedType::getComputationalData(this->gd,this->pg,storage,comp);
+    ComputationalData getComputationalData(const Computables& comp,
+                                           const cudaStream_t& st){
+      return NonBondedType::getComputationalData(this->gd,this->pg,storage,comp,st);
     }
 
   protected:
