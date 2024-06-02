@@ -535,9 +535,9 @@ class Bond3Base_ {
 
         ///////////////////////////
 
-        ComputationalData getComputationalData(){
+        ComputationalData getComputationalData(const Computables& computables){
             return BondType::getComputationalData(this->gd,
-                                                  this->pg,storage);
+                                                  this->pg,storage,computables);
         }
 
         template<typename T>

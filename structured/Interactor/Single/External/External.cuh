@@ -90,25 +90,25 @@ struct ForceTorqueTransverser_{
 
   template <class ExternalType_>
   struct HessianTransverser_{
-    
+
     tensor3*  hessian;
     const int*  id;
     const int*  selectedId;
     const int*  id2index;
-    
+
     using ExternalType = ExternalType_;
     using resultType   = tensor3;
-    
+
     HessianTransverser_(tensor3*  hessian, int* id, int* selectedId, int* id2index):hessian(hessian),id(id),
 										    selectedId(selectedId),
 										    id2index(id2index){}
-    
+
     inline __device__ resultType zero(){return tensor3(0.0);}
-    
+
     inline __device__ void accumulate(resultType& total,const resultType current){
       total  += current;
     }
-    
+
     inline __device__ resultType compute(const int& index_i,
                                          const typename ExternalType::ComputationalData& computational){
       tensor3 H = tensor3(0.0);
@@ -121,7 +121,7 @@ struct ForceTorqueTransverser_{
       }
       return H;
     }
-    
+
     inline __device__ void set(const int& index_i,resultType& quantity){
       hessian[index_i]  += quantity;
     }
@@ -215,8 +215,9 @@ class ExternalBase_{
 
         ///////////////////////////
 
-        ComputationalData getComputationalData(){
-            return ExternalType::getComputationalData(this->gd,this->pg,storage);
+        ComputationalData getComputationalData(const Computables& comp){
+            return ExternalType::getComputationalData(this->gd,this->pg,
+                                                      storage,comp);
         }
 
     protected:
@@ -280,7 +281,7 @@ class External_ : public ExternalBase_<ExternalType_>{
 
   template<class ExternalType_>
   class ExternalTorque_ : public ExternalBase_<ExternalType_>{
-    
+
     public:
 
         using ExternalType = typename ExternalBase_<ExternalType_>::ExternalType;
@@ -318,7 +319,7 @@ class External_ : public ExternalBase_<ExternalType_>{
 
   template<class ExternalType_>
   class ExternalHessian_ : public External_<ExternalType_>{
-    
+
     public:
 
         using ExternalType = typename ExternalBase_<ExternalType_>::ExternalType;
@@ -328,7 +329,7 @@ class External_ : public ExternalBase_<ExternalType_>{
         //Transversers
 
         using HessianTransverser = HessianTransverser_<ExternalType>;
-        
+
         ///////////////////////////
 
         ExternalHessian_(std::shared_ptr<GlobalData>    gd,

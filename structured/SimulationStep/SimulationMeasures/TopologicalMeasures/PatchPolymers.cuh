@@ -803,7 +803,7 @@ namespace SimulationMeasures{
                                                                         currentState,
                                                                         thrust::raw_pointer_cast(previousSurfaceEnergy.data()),
                                                                         linker->getEnergyTransverser(),
-                                                                        linker->getComputationalData(),
+                                                                        linker->getComputationalData(Computables()),
                                                                         surfaceEnergyThreshold,
                                                                         thrust::raw_pointer_cast(eventBufferGPU.data()),
                                                                         thrust::raw_pointer_cast(nEventsPerMonomerGPU.data()),

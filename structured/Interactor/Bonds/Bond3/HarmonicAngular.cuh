@@ -26,7 +26,8 @@ namespace Bond3{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
-                                                               const StorageData&  storage){
+                                                               const StorageData&  storage,
+                                                               const Computables& computables){
 
             ComputationalData computational;
 
@@ -64,11 +65,11 @@ namespace Bond3{
         }
 
       //Energy and force definition
-      
+
       static inline __device__ real energy(const real& ang,
 					   const ComputationalData &computational,
 					   const BondParameters &bondParam){
-	
+
 	real adiff = ang - bondParam.theta0;
 	return real(0.5)*bondParam.K*adiff*adiff;
       }
@@ -76,7 +77,7 @@ namespace Bond3{
       static inline __device__ real energyDerivate(const real& ang,
 						   const ComputationalData &computational,
 						   const BondParameters &bondParam){
-	
+
 	real adiff = ang - bondParam.theta0;
 	return bondParam.K*adiff;
       }
@@ -84,11 +85,11 @@ namespace Bond3{
       static inline __device__ real energySecondDerivate(const real& ang,
 							 const ComputationalData &computational,
 							 const BondParameters &bondParam){
-	
+
 	return bondParam.K;
       }
 
-      
+
     };
 
     struct HarmonicAngularCommon_K_{
@@ -111,9 +112,11 @@ namespace Bond3{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
-                                                               const StorageData&  storage){
+                                                               const StorageData&  storage,
+                                                               const Computables& computables){
             ComputationalData computational;
-            static_cast<HarmonicAngular_::ComputationalData&>(computational) = HarmonicAngular_::getComputationalData(gd, pg, storage);
+            static_cast<HarmonicAngular_::ComputationalData&>(computational) = HarmonicAngular_::getComputationalData(gd, pg,
+                                                                                                                      storage, computables);
 
             computational.K = storage.K;
 
@@ -176,7 +179,7 @@ namespace Bond3{
 	return computational.K;
       }
     };
-  
+
     struct HarmonicAngularCommon_K_theta0_{
 
         //Potential parameters
@@ -197,10 +200,11 @@ namespace Bond3{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
-                                                               const StorageData&  storage){
+                                                               const StorageData&  storage,
+                                                               const Computables& computables){
             ComputationalData computational;
             static_cast<HarmonicAngular_::ComputationalData&>(computational) =
-            HarmonicAngular_::getComputationalData(gd, pg, storage);
+            HarmonicAngular_::getComputationalData(gd, pg, storage, computables);
 
             computational.K      = storage.K;
             computational.theta0 = storage.theta0;
@@ -259,7 +263,7 @@ namespace Bond3{
       static inline __device__ real energySecondDerivate(const real& ang,
 							 const ComputationalData &computational,
 							 const BondParameters &bondParam){
-	
+
 	return computational.K;
       }
     };

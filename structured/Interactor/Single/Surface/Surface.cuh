@@ -99,29 +99,29 @@ struct ForceTorqueTransverser_{
 										    id2index(id2index){}
 
     inline __device__ resultType zero(){return tensor3(0.0);}
-    
+
     inline __device__ void accumulate(resultType& total,const resultType current){
       total  += current;
     }
-    
+
     inline __device__ resultType compute(const int& index_i,
                                          const typename SurfaceType::ComputationalData& computational){
       tensor3 H = tensor3(0.0);
-      
+
       const int id_i  = id[index_i];
       const int selId = selectedId[index_i];
-      
+
       if (selId == id_i){
 	H = SurfaceType::hessian(index_i, computational);
       }
       return H;
     }
-    
+
     inline __device__ void set(const int& index_i,resultType& quantity){
       hessian[index_i]  += quantity;
     }
   };
-  
+
 template <class SurfaceType_>
 struct MagneticFieldTransverser_{
 
@@ -161,8 +161,9 @@ class SurfaceBase_{
 
         ///////////////////////////
 
-        ComputationalData getComputationalData(){
-            return SurfaceType::getComputationalData(this->gd,this->pg,storage);
+        ComputationalData getComputationalData(const Computables& comp){
+            return SurfaceType::getComputationalData(this->gd,this->pg,
+                                                     storage,comp);
         }
 
     protected:
@@ -224,10 +225,10 @@ class Surface_ : public SurfaceBase_<SurfaceType_>{
         }
 };
 
-  
+
   template<class SurfaceType_>
   class SurfaceHessian_ : public Surface_<SurfaceType_>{
-    
+
     public:
 
         using SurfaceType = typename SurfaceBase_<SurfaceType_>::SurfaceType;
@@ -237,7 +238,7 @@ class Surface_ : public SurfaceBase_<SurfaceType_>{
         //Transversers
 
         using HessianTransverser = HessianTransverser_<SurfaceType>;
-        
+
         ///////////////////////////
 
         SurfaceHessian_(std::shared_ptr<GlobalData>    gd,
@@ -256,7 +257,7 @@ class Surface_ : public SurfaceBase_<SurfaceType_>{
 	    return HessianTransverser(hessian, id, selectedId, id2index);
         }
 };
-  
+
 template<class SurfaceType_>
 class SurfaceTorque_ : public SurfaceBase_<SurfaceType_>{
 

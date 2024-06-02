@@ -216,9 +216,9 @@ struct HessianTransverser_{
 						    id(id),
 						    selectedId(selectedId),
 						    id2index(id2index){}
-    
+
     inline __device__ resultType zero(){return real4();}
-    
+
     inline __device__ void accumulate(resultType& total,const resultType current){
       total+=current;
     }
@@ -232,26 +232,26 @@ struct HessianTransverser_{
 
       const int currentId = id[currentParticleIndex];
       const int selId     = selectedId[currentParticleIndex];
-      
+
       real4 f = real4();
       if ((currentParticleIndex == i and bondParam.id_j == selId) or (currentParticleIndex == j and bondParam.id_i == selId)){
 	f = -make_real4(BondType::force(i,j,currentParticleIndex,computational,bondParam),0.0); //Force that particle currentId makes over particle selId
       }
       return f;
     }
-    
+
     inline __device__ void set(const int& index_i,resultType& quantity){
       pairwiseForce[index_i] += quantity;
     }
   };
-  
+
   template <class BondType_>
   struct ForceTorqueTransverser_{
 
     real4*  force;
     real4*  torque;
     const int* id2index;
-    
+
     using BondType   = BondType_;
     using resultType = ForceTorque;
 
@@ -326,9 +326,9 @@ class Bond2Base_ {
 
         ///////////////////////////
 
-        ComputationalData getComputationalData(){
+        ComputationalData getComputationalData(const Computables& computables){
             return BondType::getComputationalData(this->gd,
-                                                  this->pg,storage);
+                                                  this->pg,storage,computables);
         }
 
         template<typename T>
@@ -416,8 +416,8 @@ class Bond2_ : public Bond2Base_<BondType_>{
             const int* id2index   = this->pd->getIdOrderedIndices(access::location::gpu);
 	    const int* id         = this->pd->getId(access::location::gpu, access::mode::read).raw();
             const int* selectedId = this->pd->getSelectedId(access::location::gpu, access::mode::read).raw();
-            
-	    
+
+
             return PairwiseForceTransverser(pforce,
 					    id,
 					    selectedId,id2index);

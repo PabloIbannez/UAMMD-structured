@@ -47,7 +47,8 @@ namespace Bond2{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>           gd,
                                                                std::shared_ptr<ParticleGroup>        pg,
-                                                               const StorageData&  storage){
+                                                               const StorageData&  storage,
+                                                               const Computables& computables){
 
             ComputationalData computational;
 

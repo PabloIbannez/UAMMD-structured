@@ -220,10 +220,10 @@ class NonBondedDynamicallyBondedPatchyParticles_{
         using EnergyTransverser = EnergyTransverser_<NonBondedType>;
         using ForceTransverser  = ForceTorqueTransverser_<NonBondedType>;
 
-        ComputationalData getComputationalData(){
+        ComputationalData getComputationalData(const Computables& comp){
             return NonBondedType::getComputationalData(this->gd, this->pg,
                                                         this->patchesGd,this->patchesPg,
-                                                        storage);
+                                                        storage,comp);
         }
 
     private:

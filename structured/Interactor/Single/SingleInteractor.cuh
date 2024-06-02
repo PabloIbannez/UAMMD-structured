@@ -78,7 +78,7 @@ namespace Interactor{
                          typename PotentialType::EnergyTransverser>
                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
                                                      groupIndexIterator,
-                                                     pot->getComputationalData(),
+                                                     pot->getComputationalData(comp),
                                                      pot->getEnergyTransverser());
                         CudaCheckError();
                     } else {
@@ -107,7 +107,7 @@ namespace Interactor{
                              typename PotentialType::ForceTransverser>
                             <<<Nblocks,Nthreads,0, st>>>(numberParticles,
                                                          groupIndexIterator,
-                                                         pot->getComputationalData(),
+                                                         pot->getComputationalData(comp),
                                                          pot->getForceTransverser());
                             CudaCheckError();
 
@@ -134,7 +134,7 @@ namespace Interactor{
                              typename PotentialType::ForceTorqueMagneticFieldTransverser>
                             <<<Nblocks,Nthreads,0, st>>>(numberParticles,
                                                          groupIndexIterator,
-                                                         pot->getComputationalData(),
+                                                         pot->getComputationalData(comp),
                                                          pot->getForceTorqueMagneticFieldTransverser());
                             CudaCheckError();
 
@@ -164,7 +164,7 @@ namespace Interactor{
                          typename PotentialType::MagneticFieldTransverser>
                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
                                                      groupIndexIterator,
-                                                     pot->getComputationalData(),
+                                                     pot->getComputationalData(comp),
                                                      pot->getMagneticFieldTransverser());
                         CudaCheckError();
 
@@ -192,7 +192,7 @@ namespace Interactor{
                          typename PotentialType::HessianTransverser>
                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
                                                      groupIndexIterator,
-                                                     pot->getComputationalData(),
+                                                     pot->getComputationalData(comp),
                                                      pot->getHessianTransverser());
                         CudaCheckError();
 

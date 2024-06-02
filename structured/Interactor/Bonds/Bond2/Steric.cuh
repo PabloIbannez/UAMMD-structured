@@ -27,7 +27,8 @@ namespace Bond2{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>           gd,
                                                                std::shared_ptr<ParticleGroup>        pg,
-                                                               const StorageData&  storage){
+                                                               const StorageData&  storage,
+                                                               const Computables& computables){
 
             ComputationalData computational;
 
@@ -116,12 +117,12 @@ namespace Bond2{
 	tensor3 H = tensor3(0.0);
 	real3 posi = make_real3(computational.pos[index_i]);
 	real3 posj = make_real3(computational.pos[index_j]);
-	
+
 	const real3 rij = computational.box.apply_pbc(posj-posi);
 
 	const real epsilon = bondParam.epsilon;
 	const real sigma   = bondParam.sigma;
-	
+
 	const real r2 = dot(rij, rij);
 
 	if        (currentParticleIndex == index_i){
@@ -129,7 +130,7 @@ namespace Bond2{
 	} else if (currentParticleIndex == index_j){
 	  H = BasicPotentials::Steric::Steric::hessian<power>(-rij, r2, epsilon, sigma);
 	}
-	
+
 	return H;
         }
     };
@@ -155,9 +156,10 @@ namespace Bond2{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>           gd,
                                                                std::shared_ptr<ParticleGroup>        pg,
-                                                               const StorageData&  storage){
+                                                               const StorageData&  storage,
+                                                               const Computables& computables){
             ComputationalData computational;
-            static_cast<typename Steric_<power>::ComputationalData&>(computational) = Steric_<power>::getComputationalData(gd,pg,storage);
+            static_cast<typename Steric_<power>::ComputationalData&>(computational) = Steric_<power>::getComputationalData(gd,pg,storage,computables);
 
             computational.epsilon = storage.epsilon;
             computational.sigma   = storage.sigma;

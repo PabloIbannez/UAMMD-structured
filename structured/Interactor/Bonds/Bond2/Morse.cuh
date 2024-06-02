@@ -28,7 +28,8 @@ namespace Bond2{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>           gd,
                                                                std::shared_ptr<ParticleGroup>        pg,
-                                                               const StorageData&  storage){
+                                                               const StorageData&  storage,
+                                                               const Computables& computables){
 
             ComputationalData computational;
 
@@ -140,10 +141,12 @@ namespace Bond2{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
-                                                               const StorageData&  storage){
+                                                               const StorageData&  storage,
+                                                               const Computables& computables){
 
             ComputationalData computational;
-            static_cast<Morse_::ComputationalData&>(computational) = Morse_::getComputationalData(gd,pg,storage);
+            static_cast<Morse_::ComputationalData&>(computational) = Morse_::getComputationalData(gd,pg,
+                                                                                                  storage,computables);
 
             computational.D = storage.D;
 
@@ -230,9 +233,11 @@ namespace Bond2{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
-                                                               const StorageData&  storage){
+                                                               const StorageData&  storage,
+                                                               const Computables& computables){
             ComputationalData computational;
-            static_cast<Morse_::ComputationalData&>(computational) = Morse_::getComputationalData(gd,pg,storage);
+            static_cast<Morse_::ComputationalData&>(computational) = Morse_::getComputationalData(gd,pg,
+                                                                                                  storage,computables);
 
             computational.r0 = storage.r0;
             computational.E  = storage.E;
@@ -322,7 +327,8 @@ namespace Bond2{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>           gd,
                                                                std::shared_ptr<ParticleGroup>        pg,
-                                                               const StorageData&  storage){
+                                                               const StorageData&  storage,
+                                                               const Computables& computables){
 
             ComputationalData computational;
 

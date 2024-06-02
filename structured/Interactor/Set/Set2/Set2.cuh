@@ -207,8 +207,8 @@ class CenterOfMass_ {
 
         ///////////////////////////
 
-        ComputationalData getComputationalData(){
-            return SetType::getComputationalData(this->gd,this->pd,storage);
+        ComputationalData getComputationalData(const Computables& comp){
+            return SetType::getComputationalData(this->gd,this->pd,storage,comp);
         }
 
         StorageData getStorageData(){

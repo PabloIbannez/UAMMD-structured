@@ -32,7 +32,8 @@ namespace NonBonded{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
-                                                               const StorageData&  storage){
+                                                               const StorageData& storage,
+                                                               const Computables& comp){
 
             ComputationalData computational;
 
@@ -125,7 +126,7 @@ namespace NonBonded{
 
 	const real4 posi =  computational.pos[index_i];
 	const real4 posj =  computational.pos[index_j];
-	
+
 	const real3 rij = computational.box.apply_pbc(make_real3(posj)-make_real3(posi));
 	const real r2   = dot(rij, rij);
 	const real r    = sqrt(r2);
@@ -138,10 +139,10 @@ namespace NonBonded{
 	if(r2>0 and d2>=r2){
 	  const real invr2 = real(1.0)/r2;
 	  const real invr  = real(1.0)/r;
-	  
+
 	  real energyDerivative       = -real(4.0)*(d2-r2)*r;
 	  real energySecondDerivative = -real(4.0)*(d2-real(3.0)*r2);
-	  
+
 	  H = computeHessianRadialPotential(rij, invr, invr2,
 					    energyDerivative,
 					    energySecondDerivative);

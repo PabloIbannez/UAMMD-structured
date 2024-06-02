@@ -27,8 +27,9 @@ namespace Set1{
         //Computational data getter
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>           gd,
-                                                                 std::shared_ptr<ExtendedParticleData> pd,
-                                                                 const StorageData&  storage){
+                                                               std::shared_ptr<ExtendedParticleData> pd,
+                                                               const StorageData&  storage,
+                                                               const Computables& comp){
 
             ComputationalData computational;
 
@@ -116,10 +117,12 @@ namespace Set1{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>           gd,
                                                                  std::shared_ptr<ExtendedParticleData> pd,
-                                                                 const StorageData&  storage){
+                                                                 const StorageData&  storage,
+                                                                 const Computables& comp){
 
             ComputationalData computational;
-            static_cast<HarmonicAnisotropic_::ComputationalData&>(computational) = HarmonicAnisotropic_::getComputationalData(gd,pd,storage);
+            static_cast<HarmonicAnisotropic_::ComputationalData&>(computational) = HarmonicAnisotropic_::getComputationalData(gd,pd,
+                                                                                                                              storage,comp);
 
             computational.K  = storage.K;
             computational.r0 = storage.r0;

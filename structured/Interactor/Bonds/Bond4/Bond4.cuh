@@ -198,7 +198,7 @@ struct AngularForceTransverser_{
         const real3 dij = computational.box.apply_pbc(posi - posj);
         const real3 djk = computational.box.apply_pbc(posj - posk);
         const real3 dlk = computational.box.apply_pbc(posl - posk);
-	
+
         const real3 aijk = cross(dij,djk);
         const real3 ajkl = cross(dlk,djk);
 
@@ -269,17 +269,17 @@ struct AngularForceTransverser_{
 
   template <class BondType_>
   struct AngularHessianTransverser_{
-  
+
       tensor3*    hessian;
       const int*  id;
       const int*  selectedId;
       const int*  id2index;
-  
+
       using BondType   = BondType_;
       using resultType = tensor3;
 
     enum ParticleBondIndex {p_i = 0, p_j = 1, p_k = 2, p_l = 3, none = -1};
-  
+
     AngularHessianTransverser_(tensor3* hessian,
 			       const int* id,
 			       const int* selectedId,
@@ -305,7 +305,7 @@ struct AngularForceTransverser_{
     inline __device__ void accumulate(resultType& total,const resultType current){
         total+=current;
     }
-    
+
     inline __device__ resultType compute(const int currentParticleIndex,
                                          const typename BondType::ComputationalData& computational,
                                          const typename BondType::BondParameters&    bondParam){
@@ -316,7 +316,7 @@ struct AngularForceTransverser_{
         const int l = id2index[bondParam.id_l];
 
 	const int selId     = selectedId[currentParticleIndex];
-	
+
 	ParticleBondIndex id1 = (currentParticleIndex == bondParam.id_i) ? p_i :
 	                        (currentParticleIndex == bondParam.id_j) ? p_j :
 	                        (currentParticleIndex == bondParam.id_k) ? p_k :
@@ -328,7 +328,7 @@ struct AngularForceTransverser_{
 	                        (selId == bondParam.id_l) ? p_l : none;
 
 	if (id2==none) return tensor3();
-	
+
         real3 posi = make_real3(computational.pos[i]);
         real3 posj = make_real3(computational.pos[j]);
         real3 posk = make_real3(computational.pos[k]);
@@ -341,7 +341,7 @@ struct AngularForceTransverser_{
         const real3 dlk = computational.box.apply_pbc(posl - posk);
 	const real3 dik = computational.box.apply_pbc(posi - posk);
 	const real3 dlj = computational.box.apply_pbc(posl - posj);
-	
+
         const real3 aijk = cross(dij,djk);
         const real3 ajkl = cross(dlk,djk);
 
@@ -359,7 +359,7 @@ struct AngularForceTransverser_{
 	const real rik2     = (dot(dik,dik));
 	const real rlj2     = (dot(dlj,dlj));
 	const real rlk2     = (dot(dlk,dlk));
-	
+
 	const real rjk      = sqrt(rjk2);
 	const real rij      = sqrt(rij2);
 	const real rik      = sqrt(rik2);
@@ -379,7 +379,7 @@ struct AngularForceTransverser_{
 	const real inv_raijk3=inv_raijk2*inv_raijk;
 	const real inv_rajkl3=inv_rajkl2*inv_rajkl;
 
-	
+
         const real inv_rjk  = real(1.0)/rjk;
 
         //
@@ -390,7 +390,7 @@ struct AngularForceTransverser_{
         const real3 grad_i  = -rjk*inv_raijk2*aijk;
         const real3 grad_jk = -(-dot_ijk*inv_raijk2*aijk+dot_jkl*inv_rajkl2*ajkl)*inv_rjk;
         const real3 grad_l  =  rjk*inv_rajkl2*ajkl;
-	
+
 	const real3 derivi_raijk = inv_raijk*(rjk2*dij+0.5*(rij2+rjk2-rik2)*djk);
 	const real3 derivj_raijk = inv_raijk*(-rjk2*dij+rij2*djk-0.5*(rij2+rjk2-rik2)*(djk-dij));
 	const real3 derivk_raijk = inv_raijk*(-rij2*djk-0.5*(rij2+rjk2-rik2)*(-djk+dik));
@@ -401,7 +401,7 @@ struct AngularForceTransverser_{
 
 	const real rjk_inv_raijk3_2 = real(2.0)*rjk*inv_raijk3;
 	const real rjk_inv_rajkl3_2 = real(2.0)*rjk*inv_rajkl3;
-	
+
 	const tensor3 grad_i_outer_grad_i = rjk_inv_raijk3_2*outer(derivi_raijk, aijk)-
 	                                    rjk*inv_raijk2*levi_civita_contraction(djk);
 
@@ -416,11 +416,11 @@ struct AngularForceTransverser_{
 	const tensor3 grad_l_outer_grad_j = -rjk_inv_rajkl3_2*outer(ajkl, derivj_rajkl)+
 	                                    rjk*inv_rajkl2*levi_civita_contraction(dlk)+
 	                                    inv_rajkl2*inv_rjk*outer(ajkl,djk);
-	
+
 	const tensor3 grad_l_outer_grad_k = -rjk_inv_rajkl3_2*outer(ajkl, derivk_rajkl)-
 	                                    rjk*inv_rajkl2*levi_civita_contraction(dlj)-
 	                                    inv_rajkl2*inv_rjk*outer(ajkl,djk);
-	
+
 	const tensor3 grad_l_outer_grad_l = rjk*inv_rajkl2*(levi_civita_contraction(djk) +
 					    real(-2.0)*inv_rajkl*outer(derivl_rajkl, ajkl));
 
@@ -437,11 +437,11 @@ struct AngularForceTransverser_{
 					     dot(djk,dlk)*(levi_civita_contraction(dlj)*inv_rajkl2+
 					     real(-2.0)*inv_rajkl3*outer(derivk_rajkl, ajkl))-
 					     inv_rajkl2*outer(djk+dlk,ajkl))*inv_rjk;
-	
+
         real du_ddhi   = BondType::energyDerivate(cos_dih, sin_dih, computational, bondParam);
 	real du2_d2dhi = BondType::energySecondDerivate(cos_dih, sin_dih, computational, bondParam);
 
-      	bool id2_smaller = id2 < id1;      
+      	bool id2_smaller = id2 < id1;
 	if (id2 < id1) {
 	  ParticleBondIndex temp = id1;
 	  id1 = id2;
@@ -470,12 +470,12 @@ struct AngularForceTransverser_{
 	                      (id1 == p_k && id2 == p_k) ? -grad_l_outer_grad_k.transpose()-grad_k_outer_grad_jk :
 	                      (id1 == p_k && id2 == p_l) ?  grad_l_outer_grad_k :
 	                                                    grad_l_outer_grad_l; //ll
-	                                                    
+
 	H = computeHessianBox(grad1, grad2, grad_2_outer_grad_1, du2_d2dhi, du_ddhi);
 	if (id2_smaller) H = H.transpose();
         return H;
     }
-    
+
     inline __device__ void set(const int& index_i,resultType& quantity){
       hessian[index_i] += quantity;
     }
@@ -493,7 +493,7 @@ struct AngularForceTransverser_{
     using resultType = real4;
 
     enum ParticleBondIndex {p_i = 0, p_j = 1, p_k = 2, p_l = 3, none = -1};
-    
+
     PairwiseForceTransverser_(real4* pairwiseForce,
 			       const int* id,
 			       const int* selectedId,
@@ -501,9 +501,9 @@ struct AngularForceTransverser_{
 						    id(id),
 						    selectedId(selectedId),
 						    id2index(id2index){}
-    
+
     inline __device__ resultType zero(){return real4();}
-    
+
     inline __device__ void accumulate(resultType& total,const resultType current){
       total+=current;
     }
@@ -518,7 +518,7 @@ struct AngularForceTransverser_{
         const int l = id2index[bondParam.id_l];
 
 	const int selId     = selectedId[currentParticleIndex];
-	
+
 	ParticleBondIndex id1 = (currentParticleIndex == bondParam.id_i) ? p_i :
 	                        (currentParticleIndex == bondParam.id_j) ? p_j :
 	                        (currentParticleIndex == bondParam.id_k) ? p_k :
@@ -530,7 +530,7 @@ struct AngularForceTransverser_{
 	                        (selId == bondParam.id_l) ? p_l : none;
 
 	if (id2==none) return real4();
-	
+
         real3 posi = make_real3(computational.pos[i]);
         real3 posj = make_real3(computational.pos[j]);
         real3 posk = make_real3(computational.pos[k]);
@@ -544,7 +544,7 @@ struct AngularForceTransverser_{
 	const real3 dik = computational.box.apply_pbc(posi - posk);
 	const real3 dil = computational.box.apply_pbc(posi - posl);
 	const real3 dlj = computational.box.apply_pbc(posl - posj);
-	
+
         const real3 aijk = cross(dij,djk);
         const real3 ajkl = cross(dlk,djk);
 
@@ -562,7 +562,7 @@ struct AngularForceTransverser_{
 	const real rik2     = (dot(dik,dik));
 	const real rlj2     = (dot(dlj,dlj));
 	const real rlk2     = (dot(dlk,dlk));
-	
+
 	const real rjk      = sqrt(rjk2);
 	const real rij      = sqrt(rij2);
 	const real rik      = sqrt(rik2);
@@ -582,7 +582,7 @@ struct AngularForceTransverser_{
 	const real inv_raijk3=inv_raijk2*inv_raijk;
 	const real inv_rajkl3=inv_rajkl2*inv_rajkl;
 
-	
+
         const real inv_rjk  = real(1.0)/rjk;
 
         //
@@ -596,7 +596,7 @@ struct AngularForceTransverser_{
 	const real dot_ijik = dot(dij,dik);
 	const real dot_lklj = dot(dlk,dlj);
 	const real dot_ikjk = dot(dik,djk);
-	
+
 	const real3 fij = ( inv_raijkl*dot_jklk-cos_dih*dot_jkik*inv_raijk2)*dij;
 	const real3 fik = (-inv_raijkl*dot_jklj+cos_dih*dot_ijjk*inv_raijk2)*dik;
 	const real3 fil =  -rjk2*inv_raijkl*dil;
@@ -604,12 +604,12 @@ struct AngularForceTransverser_{
 								     inv_rajkl2*dot_lklj))*djk;
 	const real3 fjl =  -( inv_raijkl*dot_ikjk - cos_dih*dot_jklk*inv_rajkl2)*dlj;
 	const real3 fkl =  -(-inv_raijkl*dot_ijjk + cos_dih*dot_jklj*inv_rajkl2)*dlk;
-	
 
-	
+
+
         real du_ddhi   = BondType::energyDerivate(cos_dih, sin_dih, computational, bondParam);
-	
-      	bool id2_smaller = id2 < id1;      
+
+      	bool id2_smaller = id2 < id1;
 	if (id2 < id1) {
 	  ParticleBondIndex temp = id1;
 	  id1 = id2;
@@ -623,12 +623,12 @@ struct AngularForceTransverser_{
 	               (id1 == p_j && id2 == p_l) ?  fjl/sin_dih :
 	               (id1 == p_k && id2 == p_l) ?  fkl/sin_dih :
 	               real3(); //self terms
-	                                                    
+
 	real4 pairforce = make_real4(-grad_u*du_ddhi, real(0.0));
 	if (id2_smaller) pairforce = -pairforce;
         return pairforce;
     }
-      
+
     inline __device__ void set(const int& index_i,resultType& quantity){
       pairwiseForce[index_i] += quantity;
     }
@@ -677,9 +677,9 @@ class Bond4Base_ {
 
         ///////////////////////////
 
-        ComputationalData getComputationalData(){
+        ComputationalData getComputationalData(const Computables& computables){
             return BondType::getComputationalData(this->gd,
-                                                  this->pg,storage);
+                                                  this->pg,storage,computables);
         }
 
         template<typename T>
@@ -796,8 +796,8 @@ class AngularBond4_ : public Bond4Base_<BondType_>{
             const int* id2index   = this->pd->getIdOrderedIndices(access::location::gpu);
 	    const int* id         = this->pd->getId(access::location::gpu, access::mode::read).raw();
             const int* selectedId = this->pd->getSelectedId(access::location::gpu, access::mode::read).raw();
-            
-	    
+
+
             return PairwiseForceTransverser(pforce,
 					    id,
 					    selectedId,id2index);
@@ -874,7 +874,7 @@ template<class BondType_>
 				selectedId,id2index);
     }
   };
-  
+
 }}}}
 
 #endif

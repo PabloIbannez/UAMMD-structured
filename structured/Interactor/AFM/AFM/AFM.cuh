@@ -24,8 +24,9 @@ class AFM_{
 
         ///////////////////////////
 
-        ComputationalData getComputationalData(){
-            return AFMType::getComputationalData(this->gd,this->pg,storage);
+        ComputationalData getComputationalData(const Computables& comp){
+            return AFMType::getComputationalData(this->gd,this->pg,
+                                                 storage,comp);
         }
 
         template<typename T>

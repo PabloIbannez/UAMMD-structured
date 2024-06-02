@@ -175,7 +175,8 @@ namespace NonBondedPatches{
                                                         std::shared_ptr<ParticleGroup> pg,
                                                         std::shared_ptr<GlobalData>    patchesGd,
                                                         std::shared_ptr<ParticleGroup> patchesPg,
-                                                        const StorageData&      storage){
+                                                        const StorageData&  storage,
+                                                        const Computables& comp){
 
             ComputationalData computational;
 
@@ -407,7 +408,8 @@ namespace NonBondedPatches{
                                                       std::shared_ptr<ParticleGroup> pg,
                                                       std::shared_ptr<GlobalData>    patchesGd,
                                                       std::shared_ptr<ParticleGroup> patchesPg,
-                                                      const StorageData&      storage){
+                                                      const StorageData&  storage,
+                                                      const Computables& comp){
             ComputationalData computational;
 
             computational.box = patchesGd->getEnsemble()->getBox();

@@ -54,7 +54,8 @@ namespace Surface{
         //Computational data getter
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
-                                                               StorageData&  storage){
+                                                               StorageData&  storage,
+                                                               const Computables& comp){
 
             static bool computedAbsorbed = false;
 

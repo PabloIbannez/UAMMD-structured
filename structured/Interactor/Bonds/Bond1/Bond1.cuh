@@ -87,7 +87,7 @@ struct LambdaTransverser_{
     }
 };
 
-  
+
 template <class BondType_>
 struct HessianTransverser_{
 
@@ -214,9 +214,9 @@ class Bond1Base_ {
 
         ///////////////////////////
 
-        ComputationalData getComputationalData(){
+        ComputationalData getComputationalData(const Computables& comp){
             return BondType::getComputationalData(this->gd,
-                                                  this->pg,storage);
+                                                  this->pg,storage,comp);
         }
 
         template<typename T>
@@ -307,7 +307,7 @@ class Bond1_ : public Bond1Base_<BondType_>{
 		      DataEntry& data):Bond1_<BondType_>(gd,pg,data){}
 
     HessianTransverser getHessianTransverser(){
-      
+
       tensor3*  hessian     = this->pd->getHessian(access::location::gpu, access::mode::readwrite).raw();
       const int* id         = this->pd->getId(access::location::gpu, access::mode::read).raw();
       const int* selectedId = this->pd->getSelectedId(access::location::gpu, access::mode::read).raw();
@@ -317,9 +317,9 @@ class Bond1_ : public Bond1Base_<BondType_>{
 				id,
 				selectedId,id2index);
     }
-    
+
 };
-  
+
 template<class BondType_>
 class Bond1Lambda_ : public Bond1_<BondType_> {
 

@@ -242,7 +242,7 @@ namespace Interactor{
                                             typename BondType::BondParameters,
                                             typename BondType::EnergyTransverser>
                         <<<Nblocks,Nthreads,0,st>>>(nParticlesWithBonds,
-                                                    pot->getComputationalData(),
+                                                    pot->getComputationalData(comp),
                                                     id2index,
                                                     partLocalIndex2id_ptr,
                                                     bondList_ptr,
@@ -277,7 +277,7 @@ namespace Interactor{
                                             typename BondType::BondParameters,
                                             typename BondType::ForceTransverser>
                         <<<Nblocks,Nthreads,0,st>>>(nParticlesWithBonds,
-                                                    pot->getComputationalData(),
+                                                    pot->getComputationalData(comp),
                                                     id2index,
                                                     partLocalIndex2id_ptr,
                                                     bondList_ptr,
@@ -312,7 +312,7 @@ namespace Interactor{
                                             typename BondType::BondParameters,
                                             typename BondType::LambdaTransverser>
                         <<<Nblocks,Nthreads,0,st>>>(nParticlesWithBonds,
-                                                    pot->getComputationalData(),
+                                                    pot->getComputationalData(comp),
                                                     id2index,
                                                     partLocalIndex2id_ptr,
                                                     bondList_ptr,
@@ -345,7 +345,7 @@ namespace Interactor{
                                             typename BondType::BondParameters,
                                             typename BondType::StressTransverser>
                         <<<Nblocks,Nthreads,0,st>>>(nParticlesWithBonds,
-                                                    pot->getComputationalData(),
+                                                    pot->getComputationalData(comp),
                                                     id2index,
                                                     partLocalIndex2id_ptr,
                                                     bondList_ptr,
@@ -379,7 +379,7 @@ namespace Interactor{
                                             typename BondType::BondParameters,
                                             typename BondType::MagneticFieldTransverser>
                         <<<Nblocks,Nthreads,0,st>>>(nParticlesWithBonds,
-                                                    pot->getComputationalData(),
+                                                    pot->getComputationalData(comp),
                                                     id2index,
                                                     partLocalIndex2id_ptr,
                                                     bondList_ptr,
@@ -413,7 +413,7 @@ namespace Interactor{
                                             typename BondType::BondParameters,
                                             typename BondType::HessianTransverser>
                         <<<Nblocks,Nthreads,0,st>>>(nParticlesWithBonds,
-                                                    pot->getComputationalData(),
+                                                    pot->getComputationalData(comp),
                                                     id2index,
                                                     partLocalIndex2id_ptr,
                                                     bondList_ptr,
@@ -433,18 +433,18 @@ namespace Interactor{
 		}
 		if(comp.pairwiseForce == true){
 		  if constexpr (has_getPairwiseForceTransverser<BondType>::value){
-		    
+
 		    auto id2index = pd->getIdOrderedIndices(access::location::gpu);
-		    
+
 		    int Nthreads=THREADS_PER_BLOCK;
 		    int Nblocks=nParticlesWithBonds/Nthreads + ((nParticlesWithBonds%Nthreads)?1:0);
-		    
+
 		    BondsInteractor_ns::transverseBondListThreadPerParticle<
 		      typename BondType::ComputationalData,
 		      typename BondType::BondParameters,
 		      typename BondType::PairwiseForceTransverser>
 		      <<<Nblocks,Nthreads,0,st>>>(nParticlesWithBonds,
-						  pot->getComputationalData(),
+						  pot->getComputationalData(comp),
 						  id2index,
 						  partLocalIndex2id_ptr,
 						  bondList_ptr,
@@ -453,8 +453,8 @@ namespace Interactor{
 						  partLocalIndex2nBondsInvolved_ptr,
 						  pot->getPairwiseForceTransverser());
 		    CudaCheckError();
-		    
-		    
+
+
 		  } else {
 		    if(!warningPairwiseForces){
 		      System::log<System::WARNING>("[BondsInteractor] (%s) Requested non-implemented transverser (pairwiseForces)",
@@ -462,7 +462,7 @@ namespace Interactor{
 		    }
 		  }
 		}
-	    }	    
+	    }
     };
 }}}
 

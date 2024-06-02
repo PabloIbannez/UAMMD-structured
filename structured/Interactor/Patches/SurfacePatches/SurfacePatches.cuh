@@ -84,10 +84,10 @@ class SurfacePatchyParticles_{
         //Potential parameters
         using StorageData       = typename SurfaceType::StorageData;
 
-        ComputationalData getComputationalData(){
+        ComputationalData getComputationalData(const Computables& comp){
             return SurfaceType::getComputationalData(this->gd, this->pg,
-                                                      this->patchesGd,this->patchesPg,
-                                                      storage);
+                                                     this->patchesGd,this->patchesPg,
+                                                     storage,comp);
         }
 
     private:

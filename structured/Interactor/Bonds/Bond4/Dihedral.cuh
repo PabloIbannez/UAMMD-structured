@@ -27,7 +27,8 @@ namespace Bond4{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
-                                                               const StorageData&  storage){
+                                                               const StorageData&  storage,
+                                                               const Computables& computables){
 
             ComputationalData computational;
 
@@ -171,9 +172,11 @@ namespace Bond4{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
-                                                               const StorageData&  storage){
+                                                               const StorageData&  storage,
+                                                               const Computables& computables){
             ComputationalData computational;
-            static_cast<Dihedral_::ComputationalData&>(computational) = Dihedral_::getComputationalData(gd,pg,storage);
+            static_cast<Dihedral_::ComputationalData&>(computational) = Dihedral_::getComputationalData(gd,pg,
+                                                                                                        storage,computables);
 
             computational.n    = storage.n;
             computational.K    = storage.K;
@@ -232,7 +235,7 @@ namespace Bond4{
 
             return Dihedral_::energyDerivate(cos_dih,sin_dih,computational,bP);
         }
-      
+
       static inline __device__ real energySecondDerivate(const real& cos_dih,const real& sin_dih,
 							 const ComputationalData &computational,
 							 const BondParameters &bondParam){
@@ -264,9 +267,11 @@ namespace Bond4{
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
                                                                std::shared_ptr<ParticleGroup> pg,
-                                                               const StorageData&  storage){
+                                                               const StorageData&  storage,
+                                                               const Computables& computables){
 
-            return Dihedral_::getComputationalData(gd,pg,storage);
+            return Dihedral_::getComputationalData(gd,pg,
+                                                   storage,computables);
         }
 
         //Storage data reader

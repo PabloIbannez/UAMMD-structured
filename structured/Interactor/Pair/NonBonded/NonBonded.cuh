@@ -343,8 +343,8 @@ namespace NonBonded{
 
     ///////////////////////////
 
-    ComputationalData getComputationalData(){
-      return NonBondedType::getComputationalData(this->gd,this->pg,storage);
+    ComputationalData getComputationalData(const Computables& comp){
+      return NonBondedType::getComputationalData(this->gd,this->pg,storage,comp);
     }
 
   protected:
