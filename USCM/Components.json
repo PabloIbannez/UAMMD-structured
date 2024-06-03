@@ -155,6 +155,7 @@
             ["External", "SphericalShell", "SphericalShell.cuh"],
             ["Surface", "Absorbed", "Absorbed.cuh"],
             ["External", "Plates", "Plates.cuh"],
+            ["External", "ExternalTabulated", "ExternalTabulated.cuh"],
             ["External", "ConstantTorque", "ConstantTorque.cuh"]
         ],
         "Set": [
