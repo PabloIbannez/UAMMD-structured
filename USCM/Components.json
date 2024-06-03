@@ -141,6 +141,7 @@
             ["Bond1", "FixedHarmonicAnisotropic", "FixedHarmonicAnisotropic.cuh"]
         ],
         "Single": [
+            ["External", "PolarizationTabulated", "PolarizationTabulated.cuh"],
             ["External", "ConstantForce", "ConstantForce.cuh"],
             ["Surface", "SurfaceLennardJonesType1", "LennardJonesSurface.cuh"],
             ["Surface", "SurfaceLennardJonesType2", "LennardJonesSurface.cuh"],

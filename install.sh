@@ -7,7 +7,7 @@ DEST_DIR="$DEST_DIR_MAIN/extensions"
 
 # Define CUDA target architecture, if not set, it will be compile for all architectures
 # If more than one architecture is desired, separate them with a semicolon, e.g. "60;61;70;75;80;86"
-export CUDA_ARCH=
+export CUDA_ARCH="86"
 
 # Check if DEST_DIR_MAIN exists. If it exists, stop the installation
 if [ -d "$DEST_DIR_MAIN" ]; then
