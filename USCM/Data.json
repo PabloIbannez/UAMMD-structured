@@ -26,6 +26,7 @@
         ["selectedId", "SelectedId", "int"],
         ["hessian", "Hessian", "tensor3"],
         ["lambdaDerivative","LambdaDerivative","real"],
+        ["polarizability","Polarizability","real"],
 	["pairwiseForce","PairwiseForce","real4"]
     ],
     "State": [
@@ -35,6 +36,7 @@
         ["magnetization", "Magnetization", "real4"],
         ["anisotropy", "Anisotropy", "real"],
         ["mass", "Mass", "real"],
+        ["polarizability","Polarizability","real"],
         ["radius", "Radius", "real"],
         ["charge", "Charge", "real"]
     ],
