@@ -5,7 +5,8 @@
             ["Units", "KcalMol_A", "KcalMol_A.cuh"]
         ],
         "Types": [
-            ["Types", "Basic", "Basic.cuh"]
+            ["Types", "Basic", "Basic.cuh"],
+            ["Types", "Polarizable", "Polarizable.cuh"]
         ],
         "Fundamental": [
             ["Fundamental", "Time", "Time.cuh"],
@@ -73,6 +74,7 @@
             ["GeometricalMeasure", "MeanSquareDisplacement", "MeanSquareDisplacement.cuh"],
             ["GeometricalMeasure", "MeanAngularCorrelation", "MeanAngularCorrelation.cuh"],
             ["GeometricalMeasure", "CenterOfMassPosition", "CenterOfMassPosition.cuh"],
+            ["GeometricalMeasure", "EscapeTime", "EscapeTime.cuh"],
             ["GeometricalMeasure", "Height", "Height.cuh"],
             ["TopologicalMeasures", "PatchPolymers", "PatchPolymers.cuh"],
             ["ParticlesListMeasure", "PotentialMeasure", "PotentialMeasure.cuh"],
@@ -156,6 +158,7 @@
             ["External", "SphericalShell", "SphericalShell.cuh"],
             ["Surface", "Absorbed", "Absorbed.cuh"],
             ["External", "Plates", "Plates.cuh"],
+            ["External", "HelixBoundaries","HelixBoundaries.cuh"],
             ["External", "ExternalTabulated", "ExternalTabulated.cuh"],
             ["External", "ConstantTorque", "ConstantTorque.cuh"]
         ],
