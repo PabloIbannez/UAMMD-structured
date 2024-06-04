@@ -100,6 +100,7 @@ class LambdaCycle: public SimulationStepBase{
             real lambda = this->lambdaValues[lambdaIndex];
             if(this->gd->getEnsemble()->getLambda() != lambda or state != State::ACTIVATION){
               this->gd->getEnsemble()->setLambda(lambda);
+              cudaDeviceSynchronize();
               state = State::ACTIVATION;
               System::log<System::MESSAGE>("[LambdaCycle] Step %llu (activation): lambda = %f",step,lambda);
             }
@@ -107,6 +108,7 @@ class LambdaCycle: public SimulationStepBase{
             real lambda = 1.0;
             if(this->gd->getEnsemble()->getLambda() != lambda){
               this->gd->getEnsemble()->setLambda(lambda);
+              cudaDeviceSynchronize();
               state = State::MEASURE;
               System::log<System::MESSAGE>("[LambdaCycle] Step %llu (measure): lambda = %f",step,lambda);
             }
@@ -114,6 +116,7 @@ class LambdaCycle: public SimulationStepBase{
             real lambda = 0.0;
             if(this->gd->getEnsemble()->getLambda() != lambda){
               this->gd->getEnsemble()->setLambda(lambda);
+              cudaDeviceSynchronize();
               state = State::PAUSE;
               System::log<System::MESSAGE>("[LambdaCycle] Step %llu (pause): lambda = %f",step,lambda);
             }

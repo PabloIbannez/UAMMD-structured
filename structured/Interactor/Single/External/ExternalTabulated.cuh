@@ -27,13 +27,15 @@ namespace External{
 
         static __host__ StorageData getStorageData(std::shared_ptr<GlobalData> gd,
                                                    std::shared_ptr<ParticleGroup> pg,
-                                                   DataEntry& data) {
+                                                   const int& nx,const int& ny,const int& nz,
+                                                   const real& scale,
+                                                   const std::vector<int>& id_x,
+                                                   const std::vector<int>& id_y,
+                                                   const std::vector<int>& id_z,
+                                                   const std::vector<real>& energy,
+                                                   const std::vector<real3>& force) {
 
                 Box box = gd->getEnsemble()->getBox();
-
-                int nx = data.getParameter<int>("nx");
-                int ny = data.getParameter<int>("ny");
-                int nz = data.getParameter<int>("nz");
 
                 System::log<System::MESSAGE>("[External tabulated] Number of cells: (%d,%d,%d).", nx, ny, nz);
 
@@ -57,21 +59,6 @@ namespace External{
 
                 auto kernel = std::make_shared<Kernel>(h);
 
-                real scale = 1.0;
-                if (data.isParameterAdded("scale")) {
-                    scale = data.getParameter<real>("scale");
-                    System::log<System::MESSAGE>("[External tabulated] Scaling factor (energy and force): %f.", scale);
-                } else {
-                    System::log<System::MESSAGE>("[External tabulated] No scaling factor provided."
-                                                 " Assuming energy and force are in the correct units.");
-                }
-
-                std::vector<int> id_x  = data.getData<int>("i");
-                std::vector<int> id_y  = data.getData<int>("j");
-                std::vector<int> id_z  = data.getData<int>("k");
-
-                std::vector<real> energy = data.getData<real>("energy");
-                std::vector<real3> force = data.getData<real3>("force");
 
                 if (id_x.size() != nx*ny*nz) {
                     System::log<System::CRITICAL>("[External tabulated] The number of given data values does not match the number of cells.");
@@ -102,6 +89,34 @@ namespace External{
                 storage.interpolator = std::make_shared<uammd::IBM<Kernel>>(kernel,grid);
 
                 return storage;
+        }
+
+        static __host__ StorageData getStorageData(std::shared_ptr<GlobalData> gd,
+                                                   std::shared_ptr<ParticleGroup> pg,
+                                                   DataEntry& data) {
+
+
+                int nx = data.getParameter<int>("nx");
+                int ny = data.getParameter<int>("ny");
+                int nz = data.getParameter<int>("nz");
+
+                real scale = 1.0;
+                if (data.isParameterAdded("scale")) {
+                    scale = data.getParameter<real>("scale");
+                    System::log<System::MESSAGE>("[External tabulated] Scaling factor (energy and force): %f.", scale);
+                } else {
+                    System::log<System::MESSAGE>("[External tabulated] No scaling factor provided."
+                                                 " Assuming energy and force are in the correct units.");
+                }
+
+                std::vector<int> id_x  = data.getData<int>("i");
+                std::vector<int> id_y  = data.getData<int>("j");
+                std::vector<int> id_z  = data.getData<int>("k");
+
+                std::vector<real> energy = data.getData<real>("energy");
+                std::vector<real3> force = data.getData<real3>("force");
+
+                return getStorageData(gd,pg,nx,ny,nz,scale,id_x,id_y,id_z,energy,force);
         };
 
         //Computational data
@@ -133,7 +148,7 @@ namespace External{
             computational.energy_i = thrust::raw_pointer_cast(storage.energy_i->data());
             computational.force_i  = thrust::raw_pointer_cast(storage.force_i->data());
 
-            if (comp.energy) {
+            if (comp.energy == true or comp.lambdaDerivative == true) {
                 storage.interpolator->gather(computational.pos,
                                              computational.energy_i,
                                              thrust::raw_pointer_cast(storage.energyData.data()),
@@ -142,7 +157,7 @@ namespace External{
                 cudaDeviceSynchronize();
             }
 
-            if (comp.force) {
+            if (comp.force == true) {
                 storage.interpolator->gather(computational.pos,
                                              computational.force_i,
                                              thrust::raw_pointer_cast(storage.forceData.data()),

@@ -60,11 +60,13 @@ class LambdaActivation: public SimulationStepBase{
             real lambda = this->lambdaValues[localStep/this->lambdaValueStep];
             if(this->gd->getEnsemble()->getLambda() != lambda){
               this->gd->getEnsemble()->setLambda(lambda);
+              cudaDeviceSynchronize();
               System::log<System::MESSAGE>("[LambdaActivation] Lambda set to %f",lambda);
             }
           } else {
             if(this->gd->getEnsemble()->getLambda() != 1){
               this->gd->getEnsemble()->setLambda(1);
+              cudaDeviceSynchronize();
               System::log<System::MESSAGE>("[LambdaActivation] Lambda set to 1");
             }
           }

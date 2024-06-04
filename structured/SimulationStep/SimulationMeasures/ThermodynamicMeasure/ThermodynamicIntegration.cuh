@@ -76,6 +76,7 @@ class ThermodynamicIntegration: public SimulationStepBase{
 
                 // Update lambda
                 this->gd->getEnsemble()->setLambda(lambda);
+                cudaDeviceSynchronize();
                 // Write data
                 outputFile << "# " << lambda << std::endl;
             }
