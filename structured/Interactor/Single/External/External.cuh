@@ -89,6 +89,32 @@ struct ForceTorqueTransverser_{
 };
 
   template <class ExternalType_>
+  struct LambdaTransverser_{
+
+    real* lambdaDerivative;
+
+    using ExternalType  = ExternalType_;
+    using resultType = real;
+
+    LambdaTransverser_(real* lambdaDerivative):lambdaDerivative(lambdaDerivative){}
+
+    inline __device__ resultType zero(){return real(0.0);}
+
+    inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
+
+    inline __device__ resultType compute(const int& index_i,
+                                         const typename ExternalType::ComputationalData& computational){
+      return ExternalType::lambdaDerivative(index_i, computational);
+    }
+
+    inline __device__ void set(const int& index_i,resultType& quantity){
+      lambdaDerivative[index_i] += quantity;
+    }
+  };
+
+
+
+  template <class ExternalType_>
   struct HessianTransverser_{
 
     tensor3*  hessian;
@@ -278,7 +304,36 @@ class External_ : public ExternalBase_<ExternalType_>{
 
             return ForceTransverser(force);
         }
-};
+  };
+
+  template<class ExternalType_>
+  class ExternalLambda_ : public External_<ExternalType_>{
+
+  public:
+
+    using ExternalType = typename External_<ExternalType_>::ExternalType;
+
+    ///////////////////////////
+
+    //Transversers
+
+    using LambdaTransverser = LambdaTransverser_<ExternalType>;
+
+    ///////////////////////////
+
+    ExternalLambda_(std::shared_ptr<GlobalData>    gd,
+		    std::shared_ptr<ParticleGroup> pg,
+		    DataEntry& data):External_<ExternalType_>(gd,pg,data){}
+
+    ///////////////////////////
+
+    LambdaTransverser getLambdaTransverser(){
+
+      real*  lambdaDerivative = this->pd->getLambdaDerivative(access::location::gpu, access::mode::readwrite).raw();
+
+      return LambdaTransverser(lambdaDerivative);
+    }
+  };
 
   template<class ExternalType_>
   class ExternalTorque_ : public ExternalBase_<ExternalType_>{
