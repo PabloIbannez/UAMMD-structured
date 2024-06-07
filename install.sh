@@ -7,13 +7,14 @@ DEST_DIR="$DEST_DIR_MAIN/extensions"
 
 # Define CUDA target architecture, if not set, it will be compile for all architectures
 # If more than one architecture is desired, separate them with a semicolon, e.g. "60;61;70;75;80;86"
-export CUDA_ARCH=
+export CUDA_ARCH="86"
 
 # Check if DEST_DIR_MAIN exists. If it exists, stop the installation
-if [ -d "$DEST_DIR_MAIN" ]; then
-                echo "UAMMD is already installed in $DEST_DIR_MAIN"
-                exit 1
-fi
+rm -rf $DEST_DIR_MAIN
+#if [ -d "$DEST_DIR_MAIN" ]; then
+#                echo "UAMMD is already installed in $DEST_DIR_MAIN"
+#                exit 1
+#fi
 
 # Create the destination directories if they do not exist
 mkdir -p "$DEST_DIR"
@@ -26,14 +27,14 @@ cp "$SOURCE_DIR/preamble.h" "$DEST_DIR_MAIN/extensions"
 
 # Download the UAMMD source code
 
-mkdir TMP
+#mkdir TMP
 cd TMP
-git clone https://github.com/PabloIbannez/UAMMD.git
+# git clone https://github.com/PabloIbannez/UAMMD.git
 
 # Copy UAMMD/src to the destination directory
 cp -r UAMMD/src "$DEST_DIR_MAIN/"
 cd ..
-rm -rf TMP
+#rm -rf TMP
 
 # Create the folder bin at the destination directory
 mkdir -p "$DEST_DIR_MAIN/bin"
@@ -87,10 +88,10 @@ fi
 
 if [ -z "$UAMMD_STRUCTURED_PATH" ]; then
 		echo "Adding UAMMD_STRUCTURED_PATH to .bashrc"
-		echo "export UAMMD_STRUCTURED_PATH=$DEST_DIR/structured" >> ~/.bashrc
+		echo "export UAMMD_STRUCTURED_PATH=$DEST_DIR/structured/src" >> ~/.bashrc
 		export UAMMD_STRUCTURED_PATH=$DEST_DIR/structured
 else
-		if [ "$UAMMD_STRUCTURED_PATH" != "$DEST_DIR/structured" ]; then
+		if [ "$UAMMD_STRUCTURED_PATH" != "$DEST_DIR/structured/src" ]; then
 				echo "WARNING: UAMMD_STRUCTURED_PATH is not set to $DEST_DIR"
 		else
 				echo "UAMMD_STRUCTURED_PATH found and set to $DEST_DIR"
@@ -110,11 +111,11 @@ else
 		echo "$DEST_DIR_MAIN/bin found in PATH"
 fi
 
-python -m pip install --no-cache-dir colorama -U
-python -m pip install --no-cache-dir setuptools_cuda_cpp -U
-
-# Install pyUAMMD python lib
-python -m pip install --no-cache-dir pyUAMMD -U
+#python -m pip install --no-cache-dir colorama -U
+#python -m pip install --no-cache-dir setuptools_cuda_cpp -U
+#
+## Install pyUAMMD python lib
+#python -m pip install --no-cache-dir pyUAMMD -U
 
 # If folder ./build exists, remove it
 if [ -d "./build" ]; then

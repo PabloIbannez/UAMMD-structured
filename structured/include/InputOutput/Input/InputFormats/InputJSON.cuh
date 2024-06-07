@@ -1,65 +1,74 @@
 #ifndef __INPUT_JSON__
 #define __INPUT_JSON__
 
+#include<string>
+#include<fstream>
+
+#include<vector>
+#include<set>
+#include<map>
+
 #include"ThirdParty/json.hpp"
+
+#include"DataStructures/GroupsList/GroupsList.cuh"
 
 #define JSON_TYPE nlohmann::json
 
-void to_json(JSON_TYPE& j, const float2& p) {
+inline void to_json(JSON_TYPE& j, const float2& p) {
     j = JSON_TYPE{p.x,p.y};
 }
 
-void from_json(const JSON_TYPE& j, float2& p) {
+inline void from_json(const JSON_TYPE& j, float2& p) {
     p.x=float(j[0]);
     p.y=float(j[1]);
 }
 
 
-void to_json(JSON_TYPE& j, const float3& p) {
+inline void to_json(JSON_TYPE& j, const float3& p) {
     j = JSON_TYPE{p.x,p.y,p.z};
 }
 
-void from_json(const JSON_TYPE& j, float3& p) {
+inline void from_json(const JSON_TYPE& j, float3& p) {
     p.x=float(j[0]);
     p.y=float(j[1]);
     p.z=float(j[2]);
 }
 
-void to_json(JSON_TYPE& j, const float4& p) {
+inline void to_json(JSON_TYPE& j, const float4& p) {
     j = JSON_TYPE{p.x,p.y,p.z,p.w};
 }
 
-void from_json(const JSON_TYPE& j, float4& p) {
+inline void from_json(const JSON_TYPE& j, float4& p) {
     p.x=float(j[0]);
     p.y=float(j[1]);
     p.z=float(j[2]);
     p.w=float(j[3]);
 }
 
-void to_json(JSON_TYPE& j, const double2& p) {
+inline void to_json(JSON_TYPE& j, const double2& p) {
     j = JSON_TYPE{p.x,p.y};
 }
 
-void from_json(const JSON_TYPE& j, double2& p) {
+inline void from_json(const JSON_TYPE& j, double2& p) {
     p.x=double(j[0]);
     p.y=double(j[1]);
 }
 
-void to_json(JSON_TYPE& j, const double3& p) {
+inline void to_json(JSON_TYPE& j, const double3& p) {
     j = JSON_TYPE{p.x,p.y,p.z};
 }
 
-void from_json(const JSON_TYPE& j, double3& p) {
+inline void from_json(const JSON_TYPE& j, double3& p) {
     p.x=double(j[0]);
     p.y=double(j[1]);
     p.z=double(j[2]);
 }
 
-void to_json(JSON_TYPE& j, const double4& p) {
+inline void to_json(JSON_TYPE& j, const double4& p) {
     j = JSON_TYPE{p.x,p.y,p.z,p.w};
 }
 
-void from_json(const JSON_TYPE& j, double4& p) {
+inline void from_json(const JSON_TYPE& j, double4& p) {
     p.x=double(j[0]);
     p.y=double(j[1]);
     p.z=double(j[2]);
@@ -71,7 +80,7 @@ namespace structured{
 namespace InputJSON{
 
     namespace InputJSON_ns{
-        std::string strip(const std::string& str_in)
+        inline std::string strip(const std::string& str_in)
         {
             std::string str = str_in;
 
@@ -96,7 +105,7 @@ namespace InputJSON{
             return str;
         }
 
-        nlohmann::json_pointer<nlohmann::json::basic_json::string_t> path2jsonPointer(const std::vector<std::string>& path){
+        inline nlohmann::json_pointer<nlohmann::json::basic_json::string_t> path2jsonPointer(const std::vector<std::string>& path){
             std::string path_ptr = "";
 
             for(const std::string& p : path){

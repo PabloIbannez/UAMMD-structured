@@ -1,6 +1,6 @@
 import json
 
-def generateHandler(typ,componentsPath,particleDataComponentPath,outputFolder,outputName,genGetter=True,genSetter=True):
+def generateHandler(typ,componentsPath,particleDataComponentPath,outputFolder,outputName,additionalIncludes=[],genGetter=True,genSetter=True):
 
     # First letter uppercase
     Typ = typ[0].upper() + typ[1:]
@@ -36,9 +36,19 @@ def generateHandler(typ,componentsPath,particleDataComponentPath,outputFolder,ou
         if genSetter:
             update = whitespace + f"""virtual void updateDataEntry(DataEntry data) = 0;\n"""
 
+        addIncludes = ""
+        for include in additionalIncludes:
+            addIncludes += f"""#include \"{include}\"\n"""
+
         template = f"""
 #ifndef __{typ.upper()}_HANDLER__
 #define __{typ.upper()}_HANDLER__
+
+#include <string>
+
+#include "System/ExtendedSystem.cuh"
+
+{addIncludes}
 
 namespace uammd{{
 namespace structured{{

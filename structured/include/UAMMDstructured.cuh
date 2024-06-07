@@ -10,7 +10,7 @@
 #include <limits>
 
 //Third party
-#include"ThirdParty/json.hpp"
+//#include"ThirdParty/json.hpp"
 
 //UAMMD BASE
 #include"uammd.cuh"

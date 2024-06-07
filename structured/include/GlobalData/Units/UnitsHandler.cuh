@@ -2,6 +2,10 @@
 #ifndef __UNITS_HANDLER__
 #define __UNITS_HANDLER__
 
+#include <string>
+
+#include "InputOutput/Input/InputFormats/InputJSON.cuh"
+
 namespace uammd{
 namespace structured{
 namespace Units{

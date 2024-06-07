@@ -93,16 +93,28 @@ set(LIBRARIES cufft cublas curand cusolver cusparse stdc++fs)
 # Source files
 set(SOURCE_FILES ${UAMMD_PATH}/launcher/UAMMDlauncher.cu)
 
+# Recursively find all .cu files in the structured directory and subdirectories
+file(GLOB_RECURSE STRUCTURED_CU_FILES ${UAMMD_PATH}/extensions/structured/src/*.cu)
+
+# Check if any .cu files were found
+if(NOT STRUCTURED_CU_FILES)
+  message(FATAL_ERROR "No .cu files found in ${UAMMD_PATH}/extensions/structured/src/")
+endif()
+
 # Print all paths
 message(STATUS "UAMMD_PATH: " ${UAMMD_PATH})
 message(STATUS "UAMMD_STRUCTURED_PATH: " ${UAMMD_STRUCTURED_PATH})
 message(STATUS "CUDA_INCLUDE_DIRS: " ${CUDA_INCLUDE_DIRS})
+message(STATUS "UAMMD_STRUCTURED OBJECTS: " ${STRUCTURED_CU_FILES})
 
 # Define the executable
 add_executable(UAMMDlauncher ${SOURCE_FILES})
 
+# Create an object library for the structured .cu files
+cuda_add_library(structured_objects SHARED ${STRUCTURED_CU_FILES})
+
 # Link libraries
-target_link_libraries(UAMMDlauncher ${LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+target_link_libraries(UAMMDlauncher structured_objects ${LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 
 # Installation rules
 install(TARGETS UAMMDlauncher
@@ -121,3 +133,4 @@ endif()
 if(NOT result EQUAL 0)
   message(FATAL_ERROR "USCM --generate failed.")
 endif()
+

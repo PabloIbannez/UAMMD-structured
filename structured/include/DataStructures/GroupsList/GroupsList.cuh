@@ -2,6 +2,13 @@
 #ifndef __GROUPS_LIST__
 #define __GROUPS_LIST__
 
+#include <thrust/host_vector.h>
+#include <thrust/device_vector.h>
+
+#include <numeric>
+
+#include "System/System.h"
+
 namespace uammd{
 namespace structured{
 

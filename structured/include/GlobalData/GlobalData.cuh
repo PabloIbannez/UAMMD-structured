@@ -1,8 +1,6 @@
 #ifndef __GLOBAL_DATA__
 #define __GLOBAL_DATA__
 
-#include"ThirdParty/json.hpp"
-
 namespace uammd{
 namespace structured{
 

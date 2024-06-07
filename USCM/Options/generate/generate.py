@@ -201,14 +201,17 @@ def generate(args,
 
     ##Generate units
     generateHandler("units",DATA_PATH+"/Data.json","Units",UAMMD_STRUCTURED_PATH+"/GlobalData/Units/","UnitsHandler.cuh",
+                    additionalIncludes=[],
                     genGetter=True,genSetter=False)
 
     ##Generate fundamental
     generateHandler("fundamental",DATA_PATH+"/Data.json","Fundamental",UAMMD_STRUCTURED_PATH+"/GlobalData/Fundamental/","FundamentalHandler.cuh",
+                    additionalIncludes=[],
                     genGetter=True,genSetter=True)
 
     ##Generate ensemble
     generateHandler("ensemble",DATA_PATH+"/Data.json","Ensemble",UAMMD_STRUCTURED_PATH+"/GlobalData/Ensemble/","EnsembleHandler.cuh",
+                    additionalIncludes=["utils/Box.cuh"],
                     genGetter=True,genSetter=True)
 
 

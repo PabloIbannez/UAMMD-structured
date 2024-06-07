@@ -1,7 +1,11 @@
 #ifndef __EXTENDED_SYSTEM__
 #define __EXTENDED_SYSTEM__
 
-#include"ThirdParty/json.hpp"
+#include <fstream>
+
+#include"System/System.h"
+
+#include"InputOutput/Input/InputFormats/InputJSON.cuh"
 
 namespace uammd{
 namespace structured{
@@ -317,7 +321,7 @@ namespace structured{
     using TypeEntry       = ExtendedSystem::InputType::typeEntry;
     using DataEntry       = ExtendedSystem::InputType::dataEntry;
 
-    std::shared_ptr<ExtendedSystem> getExtendedSystem(std::shared_ptr<uammd::System> sys){
+    inline std::shared_ptr<ExtendedSystem> getExtendedSystem(std::shared_ptr<uammd::System> sys){
         return std::static_pointer_cast<ExtendedSystem>(sys);
     }
 }}
