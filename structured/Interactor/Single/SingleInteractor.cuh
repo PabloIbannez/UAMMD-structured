@@ -40,11 +40,12 @@ namespace Interactor{
             ////////////////////////////////////
             //Warnings
 
-            bool warningEnergy        = false;
-            bool warningForce         = false;
-            bool warningForceMagnetic = false;
-            bool warningMagneticField = false;
-            bool warningHessian       = false;
+            bool warningEnergy           = false;
+            bool warningForce            = false;
+            bool warningForceMagnetic    = false;
+            bool warningMagneticField    = false;
+            bool warningHessian          = false;
+            bool warningLambdaDerivative = false;
 
         public:
 
@@ -203,6 +204,35 @@ namespace Interactor{
                             warningHessian = true;
                         }
                     }
+                }
+
+                if(comp.lambdaDerivative == true){
+
+                    if constexpr (has_getLambdaTransverser<PotentialType>::value){
+
+                        int numberParticles     = pg->getNumberParticles();
+                        auto groupIndexIterator = pg->getIndexIterator(access::location::gpu);
+
+                        int Nthreads=THREADS_PER_BLOCK;
+                        int Nblocks=numberParticles/Nthreads + ((numberParticles%Nthreads)?1:0);
+
+                        SingleInteractor_ns::transverseThreadPerParticle
+                        <typename PotentialType::ComputationalData,
+                         typename PotentialType::LambdaTransverser>
+                        <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                     groupIndexIterator,
+                                                     pot->getComputationalData(comp,st),
+                                                     pot->getLambdaTransverser());
+                        CudaCheckError();
+
+                    } else {
+                        if(!warningLambdaDerivative){
+                            System::log<System::WARNING>("[SingleInteractor] (%s) Requested non-implemented transverser (lambdaDerivative)",
+                                                         name.c_str());
+                            warningLambdaDerivative = true;
+                        }
+                    }
+
                 }
             }
     };
