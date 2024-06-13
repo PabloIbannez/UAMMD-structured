@@ -4,6 +4,36 @@
 #include"ThirdParty/json.hpp"
 
 #define JSON_TYPE nlohmann::json
+void to_json(JSON_TYPE& j, const int2& p) {
+    j = JSON_TYPE{p.x,p.y};
+}
+
+void from_json(const JSON_TYPE& j, int2& p) {
+    p.x=int(j[0]);
+    p.y=int(j[1]);
+}
+
+
+void to_json(JSON_TYPE& j, const int3& p) {
+    j = JSON_TYPE{p.x,p.y,p.z};
+}
+
+void from_json(const JSON_TYPE& j, int3& p) {
+    p.x=int(j[0]);
+    p.y=int(j[1]);
+    p.z=int(j[2]);
+}
+
+void to_json(JSON_TYPE& j, const int4& p) {
+    j = JSON_TYPE{p.x,p.y,p.z,p.w};
+}
+
+void from_json(const JSON_TYPE& j, int4& p) {
+    p.x=int(j[0]);
+    p.y=int(j[1]);
+    p.z=int(j[2]);
+    p.w=int(j[3]);
+}
 
 void to_json(JSON_TYPE& j, const float2& p) {
     j = JSON_TYPE{p.x,p.y};
