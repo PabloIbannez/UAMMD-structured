@@ -149,6 +149,7 @@
             ["Surface", "SurfaceLennardJonesType2", "LennardJonesSurface.cuh"],
             ["Surface", "SurfaceWCAType1", "LennardJonesSurface.cuh"],
             ["Surface", "SurfaceWCAType2", "LennardJonesSurface.cuh"],
+	    ["Surface", "WCA_PlainCylinder", "WCA_Custom.cuh"],
             ["Surface", "SurfaceGeneralLennardJonesType1", "LennardJonesSurface.cuh"],
             ["Surface", "SurfaceGeneralLennardJonesType2", "LennardJonesSurface.cuh"],
             ["Surface", "SurfaceAnchorage", "ParabolaSurface.cuh"],
@@ -158,7 +159,6 @@
             ["External", "SphericalShell", "SphericalShell.cuh"],
             ["Surface", "Absorbed", "Absorbed.cuh"],
             ["External", "Plates", "Plates.cuh"],
-            ["External", "HelixBoundaries","HelixBoundaries.cuh"],
             ["External", "ExternalTabulated", "ExternalTabulated.cuh"],
             ["External", "ConstantTorque", "ConstantTorque.cuh"]
         ],
