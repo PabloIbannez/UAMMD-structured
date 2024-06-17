@@ -108,7 +108,7 @@ namespace SimulationMeasures{
 				//Write data
 
 				for(int i = 0; i < ids.size(); i++){
-					outputFile << std::setw(24) << ids[i];
+					outputFile << std::setw(24) << ids[i] << " ";
 
 					for(std::string& interactorName : interactorNames){
 						outputFile << std::setw(24) << energyData[i][interactorName] << " ";
