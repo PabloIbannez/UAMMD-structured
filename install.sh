@@ -27,9 +27,10 @@ cp "$SOURCE_DIR/preamble.h" "$DEST_DIR_MAIN/extensions"
 
 # Download the UAMMD source code
 
+rm -rf TMP
 mkdir TMP
 cd TMP
- git clone https://github.com/PabloIbannez/UAMMD.git
+git clone https://github.com/PabloIbannez/UAMMD.git
 
 # Copy UAMMD/src to the destination directory
 cp -r UAMMD/src "$DEST_DIR_MAIN/"

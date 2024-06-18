@@ -1,8 +1,115 @@
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
-project(UAMMD_launcher LANGUAGES CXX CUDA)
+project(UAMMDstructured LANGUAGES CXX CUDA)
 
 set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
 
+# By default, install is done at ~/bin
+set(INSTALL_DIR "$ENV{HOME}/bin" CACHE PATH "Installation directory")
+
+set(UAMMD_REPO_URL "https://github.com/PabloIbannez/UAMMD.git")
+set(UAMMD_TAG "v2.x")
+
+###############################################################
+# Download UAMMD
+include(ExternalProject)
+
+ExternalProject_Add(
+    UAMMD
+    GIT_REPOSITORY ${UAMMD_REPO_URL}
+    GIT_TAG ${UAMMD_TAG}
+    PREFIX ${CMAKE_BINARY_DIR}/external
+    UPDATE_DISCONNECTED 1
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
+    LOG_DOWNLOAD ON
+    LOG_CONFIGURE ON
+    LOG_BUILD ON
+    LOG_INSTALL ON
+    GIT_SHALLOW 1
+)
+
+###############################################################
+# Create UAMMDstructured folder
+
+set(UAMMD_STRUCTURED_PATH "${CMAKE_BINARY_DIR}/UAMMDstructured")
+file(MAKE_DIRECTORY ${UAMMD_STRUCTURED_PATH})
+file(MAKE_DIRECTORY ${UAMMD_STRUCTURED_PATH}/uammd)
+file(MAKE_DIRECTORY ${UAMMD_STRUCTURED_PATH}/extensions)
+###############################################################
+# Copy structured/ folder to UAMMDstructured/
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/structured DESTINATION ${UAMMD_STRUCTURED_PATH}/extensions)
+###############################################################
+# File generation
+
+## preamble.h
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/preamble.h DESTINATION ${UAMMD_STRUCTURED_PATH}/extensions)
+
+set(USCM_PATH "${CMAKE_CURRENT_SOURCE_DIR}/USCM/USCM.py")
+
+execute_process(COMMAND sh -c "python ${USCM_PATH} --generate"
+                RESULT_VARIABLE result)
+
+if(NOT result EQUAL 0)
+  message(FATAL_ERROR "USCM --generate failed.")
+endif()
+
+###############################################################
+# Copy external/src/UAMMD/src/ to UAMMDstructured/src
+# (done at build time)
+add_custom_command(
+    OUTPUT ${UAMMD_STRUCTURED_PATH}/uammd/uammd.cuh
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_BINARY_DIR}/external/src/UAMMD/src ${UAMMD_STRUCTURED_PATH}/uammd
+    DEPENDS UAMMD
+)
+
+add_custom_target(
+    CopyUAMMD ALL
+    DEPENDS ${UAMMD_STRUCTURED_PATH}/uammd/uammd.cuh
+)
+
+add_dependencies(CopyUAMMD UAMMD)
+################################################################
+# Create UAMMDlauncher
+
+# Set paths for generated files
+set(LAUNCHER_DIR "${CMAKE_BINARY_DIR}/launcher")
+file(MAKE_DIRECTORY ${LAUNCHER_DIR})
+
+# Generate launcher code
+file(GENERATE OUTPUT ${LAUNCHER_DIR}/UAMMDlauncher.cu CONTENT "
+#include \"UAMMDstructured.cuh\"
+
+using namespace uammd::structured;
+
+int main(int argc, char *argv[]) {
+
+    if (argc < 2) {
+        uammd::System::log<uammd::System::CRITICAL>(\"No input file provided!\");
+        return EXIT_FAILURE;
+    }
+
+    std::string inputFilePath = argv[1];
+    startSelfStartingSimulation(inputFilePath);
+
+    return EXIT_SUCCESS;
+}
+")
+################################################################
+# Include necessary directories
+
+# Include UAMMD
+include_directories(${UAMMD_STRUCTURED_PATH}/uammd/)
+# Include UAMMD third party
+include_directories(${UAMMD_STRUCTURED_PATH}/uammd/third_party/)
+# Include UAMMD structured
+include_directories(${UAMMD_STRUCTURED_PATH}/extensions/structured/include/)
+# Include CUDA
+include_directories(${CUDA_INCLUDE_DIRS})
+
+################################################################
 # Set the precision of UAMMD, SINGLE or DOUBLE
 set(UAMMD_PRECISION "SINGLE" CACHE STRING "Choose the precision of UAMMD, SINGLE or DOUBLE")
 
@@ -16,43 +123,14 @@ if(UAMMD_PRECISION STREQUAL "DOUBLE")
   add_definitions(-DDOUBLE_PRECISION)
 endif()
 
-# Check if UAMMD_PATH and UAMMD_STRUCTURED_PATH are defined
-if(NOT DEFINED ENV{UAMMD_PATH})
-  message(FATAL_ERROR "UAMMD_PATH is not defined")
-endif()
-if(NOT DEFINED ENV{UAMMD_STRUCTURED_PATH})
-  message(FATAL_ERROR "UAMMD_STRUCTURED_PATH is not defined")
-endif()
-
-# Include directories
-set(UAMMD_PATH $ENV{UAMMD_PATH} CACHE PATH "Path to UAMMD")
-set(UAMMD_STRUCTURED_PATH $ENV{UAMMD_STRUCTURED_PATH} CACHE PATH "Path to UAMMD Structured")
-
-include_directories(${UAMMD_PATH}/src/)
-include_directories(${UAMMD_PATH}/src/third_party/)
-include_directories(${UAMMD_STRUCTURED_PATH}/)
-include_directories(${CUDA_INCLUDE_DIRS})
-
+################################################################
+# Compilation flags
 # Set C++ Standard
 set(CMAKE_CXX_STANDARD 14)
 
-# Find CUDA
-find_package(CUDA REQUIRED)
-
-# Check if MKLROOT is defined
-if(DEFINED ENV{MKLROOT})
-  set(BLA_VENDOR Intel10_64lp_seq)
-  add_definitions(-DUSE_MKL)
-endif()
-
-# Find BLAS and LAPACK
-find_package(BLAS REQUIRED)
-find_package(LAPACK REQUIRED)
-
-# Link libraries
-set(LIBRARIES cufft cublas curand cusolver cusparse stdc++fs ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
-
+################################################################
 # CUDA Compiler options
+
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr --expt-extended-lambda -O3 -DUAMMD_EXTENSIONS -DMAXLOGLEVEL=5 -Xcompiler=\"-O3 -fPIC\" -w")
 
 # Specify the CUDA architecture(s)
@@ -87,50 +165,51 @@ endforeach()
 # Set the filtered architectures
 set(CMAKE_CUDA_ARCHITECTURES ${FILTERED_CUDA_ARCHITECTURES})
 
-# Libraries
-set(LIBRARIES cufft cublas curand cusolver cusparse stdc++fs)
+################################################################
+# Packages
 
-# Source files
-set(SOURCE_FILES ${UAMMD_PATH}/launcher/UAMMDlauncher.cu)
-
-# Recursively find all .cu files in the structured directory and subdirectories
-file(GLOB_RECURSE STRUCTURED_CU_FILES ${UAMMD_PATH}/extensions/structured/src/*.cu)
-
-# Check if any .cu files were found
-if(NOT STRUCTURED_CU_FILES)
-  message(FATAL_ERROR "No .cu files found in ${UAMMD_PATH}/extensions/structured/src/")
+# Check if MKLROOT is defined
+if(DEFINED ENV{MKLROOT})
+  set(BLA_VENDOR Intel10_64lp_seq)
+  add_definitions(-DUSE_MKL)
 endif()
 
-# Print all paths
-message(STATUS "UAMMD_PATH: " ${UAMMD_PATH})
-message(STATUS "UAMMD_STRUCTURED_PATH: " ${UAMMD_STRUCTURED_PATH})
-message(STATUS "CUDA_INCLUDE_DIRS: " ${CUDA_INCLUDE_DIRS})
-message(STATUS "UAMMD_STRUCTURED OBJECTS: " ${STRUCTURED_CU_FILES})
-
-# Define the executable
-add_executable(UAMMDlauncher ${SOURCE_FILES})
-
-# Create an object library for the structured .cu files
-cuda_add_library(structured_objects SHARED ${STRUCTURED_CU_FILES})
+# Find BLAS and LAPACK
+find_package(BLAS REQUIRED)
+find_package(LAPACK REQUIRED)
 
 # Link libraries
-target_link_libraries(UAMMDlauncher structured_objects ${LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+set(LIBRARIES cufft cublas curand cusolver cusparse stdc++fs ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 
-# Installation rules
+################################################################
+# Source files
+set(SOURCE_FILES ${DEST_DIR_MAIN}/launcher/UAMMDlauncher.cu)
+
+# Recursively find all .cpp or .cu files in the structured directory and subdirectories
+set(UAMMD_STRUCTURED_SRC_PATH "${UAMMD_STRUCTURED_PATH}/extensions/structured/src")
+file(GLOB_RECURSE STRUCTURED_CPP_FILES "${UAMMD_STRUCTURED_SRC_PATH}/*.cpp")
+file(GLOB_RECURSE STRUCTURED_CU_FILES "${UAMMD_STRUCTURED_SRC_PATH}/*.cu")
+
+# Check if any .cu files were found
+if(NOT STRUCTURED_CPP_FILES AND NOT STRUCTURED_CU_FILES)
+    message(FATAL_ERROR "No .cpp or .cu files found in the structured directory.")
+endif()
+
+# Create an object library for the structured .cpp and .cu files
+add_library(structured_objects STATIC ${STRUCTURED_CPP_FILES} ${STRUCTURED_CU_FILES})
+add_dependencies(structured_objects CopyUAMMD)
+
+# Define the executable
+add_executable(UAMMDlauncher ${LAUNCHER_DIR}/UAMMDlauncher.cu)
+add_dependencies(UAMMDlauncher CopyUAMMD)
+
+# Link libraries
+target_link_libraries(UAMMDlauncher structured_objects ${LIBRARIES})
+
+# Specify that the main build depends on the external project
+add_dependencies(UAMMDlauncher UAMMD)
+
+################################################################
+## Installation rules
 install(TARGETS UAMMDlauncher
-        RUNTIME DESTINATION ${UAMMD_PATH}/bin)
-
-if(UNIX)
-    # For Unix-like systems
-    execute_process(COMMAND sh -c "USCM --generate"
-                    RESULT_VARIABLE result)
-elseif(WIN32)
-    # For Windows
-    execute_process(COMMAND cmd /c "USCM --generate"
-                    RESULT_VARIABLE result)
-endif()
-
-if(NOT result EQUAL 0)
-  message(FATAL_ERROR "USCM --generate failed.")
-endif()
-
+        RUNTIME DESTINATION ${INSTALL_DIR})

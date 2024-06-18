@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import sys,os
 
 import argparse
@@ -61,12 +60,8 @@ logger.info(f"Welcome to \"UAMMD Structured Components Manager\" (USCM)")
 
 ##############################################################
 
-try:
-    UAMMD_STRUCTURED_PATH    = os.getenv('UAMMD_STRUCTURED_PATH')
-    UAMMD_STRUCTURED_INCLUDE = os.path.join(UAMMD_STRUCTURED_PATH,"UAMMDstructured.cuh")
-except:
-    logger.error(f"UAMMD_STRUCTURED_PATH environment variable not found")
-    raise Exception(f"UAMMD_STRUCTURED_PATH environment variable not found")
+UAMMD_STRUCTURED_PATH    = "/home/pablo/Desktop/UAMMD-structured/build/UAMMDstructured/extensions/structured/include"
+UAMMD_STRUCTURED_INCLUDE = os.path.join(UAMMD_STRUCTURED_PATH,"UAMMDstructured.cuh")
 
 logger.info(f"#########################################################\n")
 
@@ -219,7 +214,7 @@ elif args.upgrade:
     from Options import upgrade
     upgrade(args)
 
-    
+
 elif args.extensions:
 
     from Options import extensions

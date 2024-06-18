@@ -9,9 +9,9 @@ namespace Fundamental{
 
         public:
 
-            None(DataEntry& data):FundamentalHandler(data){}
+            None(DataEntry& data);
 
-            void updateDataEntry(DataEntry data){}
+            void updateDataEntry(DataEntry data);
 
     };
 
