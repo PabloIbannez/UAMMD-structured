@@ -150,6 +150,7 @@
             ["Surface", "SurfaceWCAType1", "LennardJonesSurface.cuh"],
             ["Surface", "SurfaceWCAType2", "LennardJonesSurface.cuh"],
 	    ["Surface", "WCA_PlainCylinder", "WCA_Custom.cuh"],
+	    ["Surface", "WCA_Polyhedron", "WCA_Custom.cuh"],
             ["Surface", "SurfaceGeneralLennardJonesType1", "LennardJonesSurface.cuh"],
             ["Surface", "SurfaceGeneralLennardJonesType2", "LennardJonesSurface.cuh"],
             ["Surface", "SurfaceAnchorage", "ParabolaSurface.cuh"],
