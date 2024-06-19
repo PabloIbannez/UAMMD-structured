@@ -39,12 +39,9 @@ file(MAKE_DIRECTORY ${UAMMD_STRUCTURED_PATH}/extensions)
 ###############################################################
 # Copy structured/ folder to UAMMDstructured/
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/structured DESTINATION ${UAMMD_STRUCTURED_PATH}/extensions)
+file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/structured ${UAMMD_STRUCTURED_PATH}/extensions/structured SYMBOLIC)
 ###############################################################
 # File generation
-
-## preamble.h
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/preamble.h DESTINATION ${UAMMD_STRUCTURED_PATH}/extensions)
 
 set(USCM_PATH "${CMAKE_CURRENT_SOURCE_DIR}/USCM/USCM.py")
 
@@ -58,6 +55,7 @@ endif()
 ###############################################################
 # Copy external/src/UAMMD/src/ to UAMMDstructured/src
 # (done at build time)
+# If UAMMDstructured/uammd/uammd.cuh is not found, copy the UAMMD source files to UAMMDstructured/uammd
 add_custom_command(
     OUTPUT ${UAMMD_STRUCTURED_PATH}/uammd/uammd.cuh
     COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -122,6 +120,10 @@ endif()
 if(UAMMD_PRECISION STREQUAL "DOUBLE")
   add_definitions(-DDOUBLE_PRECISION)
 endif()
+################################################################
+# Debug mode
+
+# TODO: Add debug mode
 
 ################################################################
 # Compilation flags
@@ -131,7 +133,9 @@ set(CMAKE_CXX_STANDARD 14)
 ################################################################
 # CUDA Compiler options
 
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr --expt-extended-lambda -O3 -DUAMMD_EXTENSIONS -DMAXLOGLEVEL=5 -Xcompiler=\"-O3 -fPIC\" -w")
+# Add definitions: UAMMD_EXTENSIONS, UAMMD_EXTENSIONS_PREAMBLE=${UAMMD_STRUCTURED_PATH}/extensions/structured/preamble.h, MAXLOGLEVEL=5
+add_definitions(-DUAMMD_EXTENSIONS -DUAMMD_EXTENSIONS_PREAMBLE=${UAMMD_STRUCTURED_PATH}/extensions/structured/preamble.h -DMAXLOGLEVEL=5)
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr --expt-extended-lambda -O3 -Xcompiler=\"-O3 -fPIC\" -w")
 
 # Specify the CUDA architecture(s)
 set(CUDA_ARCHITECTURES 60 61 62 70 72 75 80 86 87 89 CACHE STRING "CUDA architectures to compile for")

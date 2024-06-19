@@ -1,32 +1,24 @@
 #ifndef __DYNAMICALLY_BONDED_PATCHY_PARTICLES_FUNDAMENTAL__
 #define __DYNAMICALLY_BONDED_PATCHY_PARTICLES_FUNDAMENTAL__
 
-namespace uammd{
-namespace structured{
-namespace Fundamental{
+namespace uammd {
+namespace structured {
+namespace Fundamental {
 
-    class DynamicallyBondedPatchyParticles: public FundamentalHandler{
+class DynamicallyBondedPatchyParticles : public FundamentalHandler {
 
-        private:
+private:
 
-            double energyThreshold;
+    double energyThreshold;
 
-        public:
+public:
+    DynamicallyBondedPatchyParticles(DataEntry& data);
 
-            DynamicallyBondedPatchyParticles(DataEntry& data):FundamentalHandler(data){
+    void setEnergyThreshold(real newEnergyThreshold) override;
+    real getEnergyThreshold() override;
 
-                this->setEnergyThreshold(data.getParameter<real>("energyThreshold",0.0));
-            }
-
-            void setEnergyThreshold(real newEnergyThreshold) override{energyThreshold = newEnergyThreshold;}
-
-            real getEnergyThreshold()  override {return energyThreshold;}
-
-            void updateDataEntry(DataEntry data){
-                data.setParameter("energyThreshold",energyThreshold);
-            }
-
-    };
+    void updateDataEntry(DataEntry data);
+};
 
 }}}
 

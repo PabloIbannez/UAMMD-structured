@@ -1,6 +1,11 @@
 #ifndef __EXTENDED_PARTICLE_DATA__
 #define __EXTENDED_PARTICLE_DATA__
 
+#include"../preamble.h"
+#include"ParticleData/ParticleData.cuh"
+#include"ParticleData/ParticleGroup.cuh"
+#include"ParticleData/StateLoader.cuh"
+
 namespace uammd{
 namespace structured{
 
@@ -34,11 +39,11 @@ namespace structured{
             }
     };
 
-    std::shared_ptr<ExtendedParticleData> getExtendedParticleData(std::shared_ptr<uammd::ParticleData> pd){
+    inline std::shared_ptr<ExtendedParticleData> getExtendedParticleData(std::shared_ptr<uammd::ParticleData> pd){
         return std::static_pointer_cast<ExtendedParticleData>(pd);
     }
 
-    std::shared_ptr<ExtendedParticleData> getExtendedParticleData(std::shared_ptr<uammd::ParticleGroup> pg){
+    inline std::shared_ptr<ExtendedParticleData> getExtendedParticleData(std::shared_ptr<uammd::ParticleGroup> pg){
         return std::static_pointer_cast<ExtendedParticleData>(pg->getParticleData());
     }
 

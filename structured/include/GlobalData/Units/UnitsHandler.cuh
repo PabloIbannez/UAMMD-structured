@@ -4,7 +4,9 @@
 
 #include <string>
 
-#include "InputOutput/Input/InputFormats/InputJSON.cuh"
+#include "System/ExtendedSystem.cuh"
+
+
 
 namespace uammd{
 namespace structured{

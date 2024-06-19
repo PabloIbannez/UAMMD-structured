@@ -60,8 +60,8 @@ logger.info(f"Welcome to \"UAMMD Structured Components Manager\" (USCM)")
 
 ##############################################################
 
-UAMMD_STRUCTURED_PATH    = "/home/pablo/Desktop/UAMMD-structured/build/UAMMDstructured/extensions/structured/include"
-UAMMD_STRUCTURED_INCLUDE = os.path.join(UAMMD_STRUCTURED_PATH,"UAMMDstructured.cuh")
+UAMMD_STRUCTURED_PATH    = "/home/pablo/Desktop/UAMMD-structured/build/UAMMDstructured/extensions/structured"
+UAMMD_STRUCTURED_INCLUDE = os.path.join(UAMMD_STRUCTURED_PATH+"/include","UAMMDstructured.cuh")
 
 logger.info(f"#########################################################\n")
 
@@ -197,7 +197,8 @@ elif args.generate:
     from Options import generate
     generate(args,
              COMPONENTS_PATH,DATA_PATH,
-             UAMMD_STRUCTURED_PATH,UAMMD_STRUCTURED_INCLUDE)
+             UAMMD_STRUCTURED_PATH + "/include",
+             UAMMD_STRUCTURED_INCLUDE)
 
 elif args.compile:
 
@@ -206,7 +207,8 @@ elif args.compile:
 
     generate(args,
              COMPONENTS_PATH,DATA_PATH,
-             UAMMD_STRUCTURED_PATH,UAMMD_STRUCTURED_INCLUDE)
+             UAMMD_STRUCTURED_PATH + "/include",
+             UAMMD_STRUCTURED_INCLUDE)
     compile(args)
 
 elif args.upgrade:

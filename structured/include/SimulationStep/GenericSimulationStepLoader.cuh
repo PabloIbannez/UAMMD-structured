@@ -65,6 +65,9 @@ namespace SimulationStepLoader{
         if("GeometricalMeasure" == simulationStepType and "CenterOfMassPosition" == simulationStepSubType){
             return true;
         }
+        if("GeometricalMeasure" == simulationStepType and "EscapeTime" == simulationStepSubType){
+            return true;
+        }
         if("GeometricalMeasure" == simulationStepType and "Height" == simulationStepSubType){
             return true;
         }
@@ -101,6 +104,7 @@ namespace SimulationStepLoader{
         if("MechanicalMeasure" == simulationStepType and "ForceBetweenSetsMeasure" == simulationStepSubType){
             return true;
         }
+        
         return false;
 
     }
@@ -213,6 +217,11 @@ namespace SimulationStepLoader{
             simulationStep = std::make_shared<SimulationStep::SimulationMeasures::CenterOfMassPosition>(pg,integrator,ff,data,path.back());
             found = true;
         }
+        if("GeometricalMeasure" == simulationStepType and "EscapeTime" == simulationStepSubType){
+            System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected GeometricalMeasure::EscapeTime simulationStep",path.back().c_str());
+            simulationStep = std::make_shared<SimulationStep::SimulationMeasures::EscapeTime>(pg,integrator,ff,data,path.back());
+            found = true;
+        }
         if("GeometricalMeasure" == simulationStepType and "Height" == simulationStepSubType){
             System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected GeometricalMeasure::Height simulationStep",path.back().c_str());
             simulationStep = std::make_shared<SimulationStep::SimulationMeasures::Height>(pg,integrator,ff,data,path.back());
@@ -273,7 +282,7 @@ namespace SimulationStepLoader{
             simulationStep = std::make_shared<SimulationStep::SimulationMeasures::ForceBetweenSetsMeasure>(pg,integrator,ff,data,path.back());
             found = true;
         }
-        
+
         if(not found){
             System::log<System::CRITICAL>("[SimulationStepLoader] (%s) Could not find simulationStep %s::%s",
                                             path.back().c_str(),simulationStepType.c_str(),simulationStepSubType.c_str());

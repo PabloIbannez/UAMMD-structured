@@ -213,6 +213,10 @@ namespace GenericLoader{
             return true;
         }
             
+        if("External" == potType and "PolarizationTabulated" == potSubType){
+            return true;
+        }
+            
         if("External" == potType and "ConstantForce" == potSubType){
             return true;
         }
@@ -266,6 +270,14 @@ namespace GenericLoader{
         }
             
         if("External" == potType and "Plates" == potSubType){
+            return true;
+        }
+            
+        if("External" == potType and "HelixBoundaries" == potSubType){
+            return true;
+        }
+            
+        if("External" == potType and "ExternalTabulated" == potSubType){
             return true;
         }
             
@@ -893,6 +905,15 @@ namespace GenericLoader{
             interactor = std::make_shared<typename Interactor::BondsInteractor<Bond1::FixedHarmonicAnisotropic>>(gd,pg,data,pot,path.back());
             found = true;
         }
+        if("External" == potType and "PolarizationTabulated" == potSubType){
+            System::log<System::MESSAGE>("[GenericLoader] (%s) Detected External::PolarizationTabulated potential",path.back().c_str());
+
+            std::shared_ptr<External::PolarizationTabulated> pot =
+            std::make_shared<External::PolarizationTabulated>(gd,pg,data);
+
+            interactor = std::make_shared<typename Interactor::SingleInteractor<External::PolarizationTabulated>>(gd,pg,data,pot,path.back());
+            found = true;
+        }
         if("External" == potType and "ConstantForce" == potSubType){
             System::log<System::MESSAGE>("[GenericLoader] (%s) Detected External::ConstantForce potential",path.back().c_str());
 
@@ -1017,6 +1038,24 @@ namespace GenericLoader{
             std::make_shared<External::Plates>(gd,pg,data);
 
             interactor = std::make_shared<typename Interactor::SingleInteractor<External::Plates>>(gd,pg,data,pot,path.back());
+            found = true;
+        }
+        if("External" == potType and "HelixBoundaries" == potSubType){
+            System::log<System::MESSAGE>("[GenericLoader] (%s) Detected External::HelixBoundaries potential",path.back().c_str());
+
+            std::shared_ptr<External::HelixBoundaries> pot =
+            std::make_shared<External::HelixBoundaries>(gd,pg,data);
+
+            interactor = std::make_shared<typename Interactor::SingleInteractor<External::HelixBoundaries>>(gd,pg,data,pot,path.back());
+            found = true;
+        }
+        if("External" == potType and "ExternalTabulated" == potSubType){
+            System::log<System::MESSAGE>("[GenericLoader] (%s) Detected External::ExternalTabulated potential",path.back().c_str());
+
+            std::shared_ptr<External::ExternalTabulated> pot =
+            std::make_shared<External::ExternalTabulated>(gd,pg,data);
+
+            interactor = std::make_shared<typename Interactor::SingleInteractor<External::ExternalTabulated>>(gd,pg,data,pot,path.back());
             found = true;
         }
         if("External" == potType and "ConstantTorque" == potSubType){

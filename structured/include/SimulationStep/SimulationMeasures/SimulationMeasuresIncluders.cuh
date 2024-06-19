@@ -4,6 +4,7 @@
 #include "ExperimentMeasures/AFMMeasure.cuh"
 #include "GeometricalMeasure/CenterOfMassPosition.cuh"
 #include "GeometricalMeasure/DistanceBetweenCentersOfMass.cuh"
+#include "GeometricalMeasure/EscapeTime.cuh"
 #include "GeometricalMeasure/GyrationRadius.cuh"
 #include "GeometricalMeasure/Height.cuh"
 #include "GeometricalMeasure/MeanAngularCorrelation.cuh"

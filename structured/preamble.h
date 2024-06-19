@@ -28,8 +28,8 @@
                                   ((SelectedId,selectedId,int))\
                                   ((Hessian,hessian,tensor3))\
                                   ((LambdaDerivative,lambdaDerivative,real))\
-                                  ((PairwiseForce,pairwiseForce,real4))\
                                   ((Polarizability,polarizability,real))\
+                                  ((PairwiseForce,pairwiseForce,real4))\
 
 
 

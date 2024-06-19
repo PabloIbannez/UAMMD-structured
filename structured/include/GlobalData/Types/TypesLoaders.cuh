@@ -22,6 +22,11 @@ namespace TypesLoader{
             types = std::make_shared<Types::Basic>(data);
             found = true;
         }
+        if("Types" == typesType and "Polarizable" == typesSubType){
+            System::log<System::MESSAGE>("[TypesLoader] (%s) Detected Polarizable types",path.back().c_str());
+            types = std::make_shared<Types::Polarizable>(data);
+            found = true;
+        }
 
         if(not found){
             System::log<System::CRITICAL>("[TypesLoader] (%s) Could not find types %s::%s",path.back().c_str(),

@@ -69,7 +69,7 @@ def generateStateLoader(componentsPath,stateLoaderComponentPath,outputFolder,out
 namespace uammd{{
 namespace structured{{
 
-void stateLoader(ParticleData* pd,DataEntry& data){{
+inline void stateLoader(ParticleData* pd,DataEntry& data){{
 
     std::vector<std::string>   labels = data.getLabels();
     std::map<std::string,bool> isLabelLoaded;
@@ -145,7 +145,7 @@ void stateLoader(ParticleData* pd,DataEntry& data){{
 
 }}
 
-void updateState(ParticleData* pd,DataEntry& data){{
+inline void updateState(ParticleData* pd,DataEntry& data){{
     System::log<System::DEBUG>("[StateLoader] Updating state.");
 
     std::vector<std::string> labels = data.getLabels();

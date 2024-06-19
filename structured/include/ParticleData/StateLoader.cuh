@@ -7,7 +7,7 @@
 namespace uammd{
 namespace structured{
 
-void stateLoader(ParticleData* pd,DataEntry& data){
+inline void stateLoader(ParticleData* pd,DataEntry& data){
 
     std::vector<std::string>   labels = data.getLabels();
     std::map<std::string,bool> isLabelLoaded;
@@ -151,6 +151,19 @@ void stateLoader(ParticleData* pd,DataEntry& data){
         isLabelLoaded["mass"] = true;
     }
 
+    if(std::find(labels.begin(), labels.end(), "polarizability") != labels.end()){
+        System::log<System::MESSAGE>("[StateLoader] Loading property \"polarizability\".");
+        std::vector<real> polarizability = data.getData<real>("polarizability");
+
+        //Load polarizability
+        auto pPolarizability = pd->getPolarizability(access::location::cpu, access::mode::write);
+        for(int i = 0; i < N; i++){
+            pPolarizability[i] = polarizability[id2index[i]];
+        }
+
+        isLabelLoaded["polarizability"] = true;
+    }
+
     if(std::find(labels.begin(), labels.end(), "radius") != labels.end()){
         System::log<System::MESSAGE>("[StateLoader] Loading property \"radius\".");
         std::vector<real> radius = data.getData<real>("radius");
@@ -187,7 +200,7 @@ void stateLoader(ParticleData* pd,DataEntry& data){
 
 }
 
-void updateState(ParticleData* pd,DataEntry& data){
+inline void updateState(ParticleData* pd,DataEntry& data){
     System::log<System::DEBUG>("[StateLoader] Updating state.");
 
     std::vector<std::string> labels = data.getLabels();
@@ -216,6 +229,10 @@ void updateState(ParticleData* pd,DataEntry& data){
 
     if(pd->isMassAllocated()){
         toUpdate.push_back("mass");
+    }
+
+    if(pd->isPolarizabilityAllocated()){
+        toUpdate.push_back("polarizability");
     }
 
     if(pd->isRadiusAllocated()){
@@ -303,6 +320,14 @@ void updateState(ParticleData* pd,DataEntry& data){
             for(int id=0;id<pd->getNumParticles();id++){
                 int index = sortedIndex[id];
                 data.setData(id, i, pMass[index]);
+            }
+        }
+
+        if(lbl == "polarizability"){
+            auto pPolarizability = pd->getPolarizability(access::location::cpu, access::mode::read);
+            for(int id=0;id<pd->getNumParticles();id++){
+                int index = sortedIndex[id];
+                data.setData(id, i, pPolarizability[index]);
             }
         }
 

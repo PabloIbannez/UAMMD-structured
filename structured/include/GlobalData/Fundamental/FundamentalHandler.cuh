@@ -2,6 +2,12 @@
 #ifndef __FUNDAMENTAL_HANDLER__
 #define __FUNDAMENTAL_HANDLER__
 
+#include <string>
+
+#include "System/ExtendedSystem.cuh"
+
+
+
 namespace uammd{
 namespace structured{
 namespace Fundamental{

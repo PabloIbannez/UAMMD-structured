@@ -1,6 +1,12 @@
 #ifndef __TYPES_HANDLER__
 #define __TYPES_HANDLER__
 
+#include <string>
+#include <map>
+
+#include "System/ExtendedSystem.cuh"
+#include "ParticleData/ExtendedParticleData.cuh"
+
 namespace uammd{
 namespace structured{
 namespace Types{
