@@ -1,6 +1,29 @@
 #ifndef __GLOBAL_DATA__
 #define __GLOBAL_DATA__
 
+#include"InputOutput/Input/Input.cuh"
+
+//Units
+#include"GlobalData/Units/UnitsHandler.cuh"
+#include"GlobalData/Units/UnitsIncluders.cuh"
+#include"GlobalData/Units/UnitsLoaders.cuh"
+
+//Fundamental
+#include"GlobalData/Fundamental/FundamentalHandler.cuh"
+#include"GlobalData/Fundamental/FundamentalIncluders.cuh"
+#include"GlobalData/Fundamental/FundamentalLoaders.cuh"
+
+//Ensemble
+#include"GlobalData/Ensemble/EnsembleHandler.cuh"
+#include"GlobalData/Ensemble/EnsembleIncluders.cuh"
+#include"GlobalData/Ensemble/EnsembleLoaders.cuh"
+
+//Types
+#include"GlobalData/Types/TypesHandler.cuh"
+#include"GlobalData/Types/TypesIncluders.cuh"
+#include"GlobalData/Types/TypesLoaders.cuh"
+
+
 namespace uammd{
 namespace structured{
 

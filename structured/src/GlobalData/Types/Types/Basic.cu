@@ -64,6 +64,6 @@ namespace Types {
     // Explicitly instantiate the template for nlohmann::json
     template void Basic_::loadType<ExtendedSystem::InputType::DataType>(
     std::map<std::string, std::map<std::string, real>>&,
-    std::map<std::string, nlohmann::json>&);
+    std::map<std::string, ExtendedSystem::InputType::DataType>&);
 
 }}}
