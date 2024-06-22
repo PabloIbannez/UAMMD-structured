@@ -1,5 +1,11 @@
-#ifndef __CONDITION_INTRA_INTER__
-#define __CONDITION_INTRA_INTER__
+#include "System/ExtendedSystem.cuh"
+#include "GlobalData/GlobalData.cuh"
+#include "ParticleData/ExtendedParticleData.cuh"
+#include "ParticleData/ParticleGroup.cuh"
+#include "ParticleGroup/ParticleGroupUtils.cuh"
+
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSet.cuh"
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSetFactory.cuh"
 
 namespace uammd{
 namespace structured{
@@ -85,4 +91,7 @@ namespace conditions{
 
 }}}
 
-#endif
+REGISTER_VERLET_CONDITIONAL_LIST_SET(
+    intra_inter,
+    uammd::structured::VerletConditionalListSet<uammd::structured::conditions::intra_inter>
+)

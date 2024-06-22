@@ -5,6 +5,7 @@ namespace structured{
 namespace FundamentalLoader{
 
     std::shared_ptr<typename Fundamental::FundamentalHandler>
+    inline
     loadFundamental(std::shared_ptr<ExtendedSystem> sys,
               std::vector<std::string>       path){
 

@@ -1,8 +1,6 @@
 #ifndef __PAIR_INTERACTION__
 #define __PAIR_INTERACTION__
 
-#include"Interactor/NeighbourList/CellList.cuh"
-
 namespace uammd{
 namespace structured{
 namespace Interactor{

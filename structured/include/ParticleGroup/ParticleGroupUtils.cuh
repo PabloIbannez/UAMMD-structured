@@ -148,6 +148,7 @@ namespace GroupUtils{
     }
 
     template<class selector>
+    inline
     std::shared_ptr<uammd::ParticleGroup> createSubGroup(std::shared_ptr<uammd::ParticleGroup> pg,
                                                          selector sel,
                                                          std::string newGroupName){
@@ -175,7 +176,7 @@ namespace GroupUtils{
     }
 
 
-    std::map<int,std::shared_ptr<uammd::ParticleGroup>> BatchGroupLoader(std::shared_ptr<ParticleGroup> pg){
+    inline std::map<int,std::shared_ptr<uammd::ParticleGroup>> BatchGroupLoader(std::shared_ptr<ParticleGroup> pg){
 
         std::shared_ptr<ParticleData> pd = pg->getParticleData();
 
@@ -223,7 +224,7 @@ namespace GroupUtils{
         return batGroup;
     }
 
-    std::vector<int> getBatchesInGroup(std::shared_ptr<ParticleGroup> pg){
+    inline std::vector<int> getBatchesInGroup(std::shared_ptr<ParticleGroup> pg){
 
         std::shared_ptr<ParticleData> pd = pg->getParticleData();
 
@@ -240,7 +241,7 @@ namespace GroupUtils{
         return std::vector<int>(batchList.begin(),batchList.end());
     }
 
-    std::vector<int> getBatchesInParticleData(std::shared_ptr<ParticleData> pd){
+    inline std::vector<int> getBatchesInParticleData(std::shared_ptr<ParticleData> pd){
 
         std::set<int> batchList;
         {
@@ -254,12 +255,12 @@ namespace GroupUtils{
         return std::vector<int>(batchList.begin(),batchList.end());
     }
 
-    int BatchGroupNumber(std::shared_ptr<ParticleGroup> pg){
+    inline int BatchGroupNumber(std::shared_ptr<ParticleGroup> pg){
         return getBatchesInGroup(pg).size();
     }
 
     //Stop simulation if BatchGroupNumber is larger than n
-    void BatchGroupNumberCheck(std::shared_ptr<ParticleGroup> pg, int n){
+    inline void BatchGroupNumberCheck(std::shared_ptr<ParticleGroup> pg, int n){
         int batchGroupNumber = BatchGroupNumber(pg);
         if( batchGroupNumber > n){
             System::log<System::CRITICAL>("[BatchGroupNumberCheck] The number of batches in the group"
@@ -267,10 +268,11 @@ namespace GroupUtils{
         }
     }
 
-    int BatchNumber(std::shared_ptr<ParticleData> pd){
+    inline int BatchNumber(std::shared_ptr<ParticleData> pd){
         return getBatchesInParticleData(pd).size();
     }
 
+    inline
     std::map<std::string,std::shared_ptr<ParticleGroup>> loadGroupsList(std::shared_ptr<ExtendedSystem>      sys,
                                                                         std::shared_ptr<GlobalData>           gd,
                                                                         std::shared_ptr<ExtendedParticleData> pd,
@@ -407,6 +409,7 @@ namespace GroupUtils{
         return groups;
     }
 
+    inline
     std::map<std::string,std::shared_ptr<ParticleGroup>> loadGroupsListFromInputEntries(std::shared_ptr<ExtendedSystem>        sys,
                                                                                         std::shared_ptr<GlobalData>             gd,
                                                                                         std::shared_ptr<ExtendedParticleData>   pd,
@@ -442,6 +445,7 @@ namespace GroupUtils{
         return groups;
     }
 
+    inline
     std::shared_ptr<ParticleGroup> getParticleGroupFromGroupsList(std::map<std::string,std::shared_ptr<ParticleGroup>>& groups,
                                                                   DataEntry& data,
                                                                   std::string defaultGroup){

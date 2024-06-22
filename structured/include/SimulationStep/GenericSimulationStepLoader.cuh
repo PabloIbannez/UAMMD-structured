@@ -41,9 +41,6 @@ namespace SimulationStepLoader{
         if("ParticlesListMeasure" == simulationStepType and "DihedralsMeasure" == simulationStepSubType){
             return true;
         }
-        if("MechanicalMeasure" == simulationStepType and "StressMeasure" == simulationStepSubType){
-            return true;
-        }
         if("ThermodynamicMeasure" == simulationStepType and "ThermodynamicQuantityMeasure" == simulationStepSubType){
             return true;
         }
@@ -175,11 +172,6 @@ namespace SimulationStepLoader{
         if("ParticlesListMeasure" == simulationStepType and "DihedralsMeasure" == simulationStepSubType){
             System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected ParticlesListMeasure::DihedralsMeasure simulationStep",path.back().c_str());
             simulationStep = std::make_shared<SimulationStep::SimulationMeasures::DihedralsMeasure>(pg,integrator,ff,data,path.back());
-            found = true;
-        }
-        if("MechanicalMeasure" == simulationStepType and "StressMeasure" == simulationStepSubType){
-            System::log<System::MESSAGE>("[SimulationStepLoader] (%s) Detected MechanicalMeasure::StressMeasure simulationStep",path.back().c_str());
-            simulationStep = std::make_shared<SimulationStep::SimulationMeasures::StressMeasure>(pg,integrator,ff,data,path.back());
             found = true;
         }
         if("ThermodynamicMeasure" == simulationStepType and "ThermodynamicQuantityMeasure" == simulationStepSubType){

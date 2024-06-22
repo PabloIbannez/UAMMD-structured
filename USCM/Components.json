@@ -66,7 +66,6 @@
             ["ParticlesListMeasure", "DistancesMeasure", "DistancesMeasure.cuh"],
             ["ParticlesListMeasure", "AnglesMeasure", "AnglesMeasure.cuh"],
             ["ParticlesListMeasure", "DihedralsMeasure", "DihedralsMeasure.cuh"],
-            ["MechanicalMeasure", "StressMeasure", "StressMeasure.cuh"],
             ["ThermodynamicMeasure", "ThermodynamicQuantityMeasure", "ThermodynamicQuantityMeasure.cuh"],
             ["ThermodynamicMeasure", "ThermodynamicIntegration", "ThermodynamicIntegration.cuh"],
             ["GeometricalMeasure", "MeanRadius", "MeanRadius.cuh"],
@@ -219,14 +218,6 @@
     },
     "DataStructures": {
         "VerletConditionalListSet": [
-            ["Condition", "all", "All.cuh"],
-            ["Condition", "intra_inter", "Intra_Inter.cuh"],
-            ["Condition", "nonExcluded", "NonExcluded.cuh"],
-            ["Condition", "nonExclIntra_nonExclInter", "NonExclIntra_NonExclInter.cuh"],
-            ["Condition", "nonExclTypeGroup1Intra_nonExclTypeGroup2Intra_nonExclInter_nonExclNoGroup", "NonExclTypeGroup1Intra_NonExclTypeGroup2Intra_NonExclInter_NonExclNoGroup.cuh"],
-            ["Condition", "nonExclIntra_nonExclInter_nonExclCharged", "NonExclIntra_NonExclInter_NonExclCharged.cuh"],
-            ["Condition", "nonExclIntra_nonExclInter_nonExclInterCharged", "NonExclIntra_NonExclInter_NonExclInterCharged.cuh"],
-            ["Condition", "interDifferentType", "InterDifferentType.cuh"]
         ]
     }
 }

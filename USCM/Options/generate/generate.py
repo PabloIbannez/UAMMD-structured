@@ -287,9 +287,9 @@ def generate(args,
     checkIncludeInFile(generateIncludeFile(COMPONENTS_PATH+"/Components.json",
                                            "DataStructures",
                                            UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
-    checkIncludeInFile(generateVerletConditionalListSetLoaders(COMPONENTS_PATH+"/Components.json",
-                                                               ["DataStructures","VerletConditionalListSet"],
-                                                               UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
+    #checkIncludeInFile(generateVerletConditionalListSetLoaders(COMPONENTS_PATH+"/Components.json",
+    #                                                           ["DataStructures","VerletConditionalListSet"],
+    #                                                           UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
 
     #SimulationStep
     checkIncludeInFile(generateIncludeFile(COMPONENTS_PATH+"/Components.json",

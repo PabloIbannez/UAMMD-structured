@@ -1,12 +1,18 @@
-#ifndef __CONDITION_NEINTRE_NEINTER_NEINTERCHARGED__
-#define __CONDITION_NEINTRE_NEINTER_NEINTERCHARGED__
+#include "System/ExtendedSystem.cuh"
+#include "GlobalData/GlobalData.cuh"
+#include "ParticleData/ExtendedParticleData.cuh"
+#include "ParticleData/ParticleGroup.cuh"
+#include "ParticleGroup/ParticleGroupUtils.cuh"
+
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSet.cuh"
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSetFactory.cuh"
+#include "DataStructures/VerletConditionalListSet/Condition/Condition.cuh"
 
 namespace uammd{
 namespace structured{
 namespace conditions{
 
-    class nonExclIntra_nonExclInter_nonExclInterCharged: public excludedConditionBase{
-
+    class nonExclIntra_nonExclInter_nonExclCharged : public excludedConditionBase {
 
         public:
 
@@ -17,11 +23,13 @@ namespace conditions{
 
             /////////////////////////////
 
-            nonExclIntra_nonExclInter_nonExclInterCharged(std::shared_ptr<GlobalData>            gd,
-                                                          std::shared_ptr<ExtendedParticleData>  pd,
-                                                          DataEntry& dataEntry):excludedConditionBase(gd,pd,dataEntry){
 
-                System::log<System::MESSAGE>("[Condition] Condition \"nonExclIntra_nonExclInter_nonExclInterCharged\" initialized");
+            nonExclIntra_nonExclInter_nonExclCharged(std::shared_ptr<GlobalData>            gd,
+                                                     std::shared_ptr<ExtendedParticleData>  pd,
+                                                     DataEntry& dataEntry):excludedConditionBase(gd,pd,dataEntry){
+
+                System::log<System::MESSAGE>("[Condition] Condition \"nonExclIntra_nonExclInter_nonExclCharged\" initialized");
+
             }
 
             ////////////////////////////////////////////
@@ -35,11 +43,12 @@ namespace conditions{
                 System::log<System::CRITICAL>("[Condition] Requested a condition"
                                               " that is not present, %s",
                                               conditionName.c_str());
+
                 return -1;
 
             }
 
-            ////////////////////////////////////////////
+            /////////////////////////////
 
             struct conditionChecker{
 
@@ -65,9 +74,10 @@ namespace conditions{
                             cond[INTRA]=true;
                         } else {
                             cond[INTER]=true;
-                            if(abs(charge[i]*charge[j]) > std::numeric_limits<real>::min()){
-                                cond[CHARGED]=true;
-                            }
+                        }
+
+                        if(abs(charge[i]*charge[j]) > std::numeric_limits<real>::min()){
+                            cond[CHARGED]=true;
                         }
                     }
                 }
@@ -81,7 +91,6 @@ namespace conditions{
 
             };
 
-
             conditionChecker getConditionChecker(){
 
                 auto id      = pd->getId(access::location::gpu, access::mode::read);
@@ -93,9 +102,11 @@ namespace conditions{
                                         exclusionList->getMaxExclusions());
             }
 
-
     };
 
 }}}
 
-#endif
+REGISTER_VERLET_CONDITIONAL_LIST_SET(
+    nonExclIntra_nonExclInter_nonExclCharged,
+    uammd::structured::VerletConditionalListSet<uammd::structured::conditions::nonExclIntra_nonExclInter_nonExclCharged>
+)

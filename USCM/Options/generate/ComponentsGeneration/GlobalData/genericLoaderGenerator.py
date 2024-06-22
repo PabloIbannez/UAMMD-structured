@@ -20,6 +20,7 @@ def getLoader(tpy,comp):
 
     loaderTemplate=f"""
     std::shared_ptr<typename {Tpy}::{Tpy}Handler>
+    inline
     load{Tpy}(std::shared_ptr<ExtendedSystem> sys,
               std::vector<std::string>       path){{
 

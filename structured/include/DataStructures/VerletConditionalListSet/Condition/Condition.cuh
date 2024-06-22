@@ -1,6 +1,8 @@
 #ifndef __CONDITIONS__
 #define __CONDITIONS__
 
+#include "DataStructures/ExclusionsList/ExclusionsList.cuh"
+
 namespace uammd{
 namespace structured{
 namespace conditions{

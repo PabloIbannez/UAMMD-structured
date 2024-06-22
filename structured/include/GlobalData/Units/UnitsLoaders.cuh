@@ -5,6 +5,7 @@ namespace structured{
 namespace UnitsLoader{
 
     std::shared_ptr<typename Units::UnitsHandler>
+    inline
     loadUnits(std::shared_ptr<ExtendedSystem> sys,
               std::vector<std::string>       path){
 

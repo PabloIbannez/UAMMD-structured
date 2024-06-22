@@ -5,6 +5,7 @@ namespace structured{
 namespace EnsembleLoader{
 
     std::shared_ptr<typename Ensemble::EnsembleHandler>
+    inline
     loadEnsemble(std::shared_ptr<ExtendedSystem> sys,
               std::vector<std::string>       path){
 

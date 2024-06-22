@@ -1,5 +1,12 @@
-#ifndef __CONDITION_NEINTRA_NEINTER__
-#define __CONDITION_NEINTRA_NEINTER__
+#include "System/ExtendedSystem.cuh"
+#include "GlobalData/GlobalData.cuh"
+#include "ParticleData/ExtendedParticleData.cuh"
+#include "ParticleData/ParticleGroup.cuh"
+#include "ParticleGroup/ParticleGroupUtils.cuh"
+
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSet.cuh"
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSetFactory.cuh"
+#include "DataStructures/VerletConditionalListSet/Condition/Condition.cuh"
 
 namespace uammd{
 namespace structured{
@@ -91,4 +98,7 @@ namespace conditions{
 
 }}}
 
-#endif
+REGISTER_VERLET_CONDITIONAL_LIST_SET(
+    nonExclIntra_nonExclInter,
+    uammd::structured::VerletConditionalListSet<uammd::structured::conditions::nonExclIntra_nonExclInter>
+)

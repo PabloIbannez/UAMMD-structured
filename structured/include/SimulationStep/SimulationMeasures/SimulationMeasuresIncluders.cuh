@@ -15,7 +15,6 @@
 #include "MechanicalMeasure/ForceBetweenSetsMeasure.cuh"
 #include "MechanicalMeasure/HessianMeasure.cuh"
 #include "MechanicalMeasure/PairwiseForceMeasure.cuh"
-#include "MechanicalMeasure/StressMeasure.cuh"
 #include "ParticlesListMeasure/AnglesMeasure.cuh"
 #include "ParticlesListMeasure/ContactsMeasure.cuh"
 #include "ParticlesListMeasure/DihedralsMeasure.cuh"

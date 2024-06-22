@@ -5,6 +5,7 @@ namespace uammd{
 namespace structured{
 namespace VerletConditionalListSetUtils{
 
+    inline
     std::map<std::string,std::shared_ptr<VerletConditionalListSetBase>> loadVerletConditionalListSetsFromInputEntries(std::shared_ptr<ExtendedSystem>        sys,
                                                                                                                       std::shared_ptr<GlobalData>             gd,
                                                                                                                       std::map<std::string,std::shared_ptr<ParticleGroup>> groups,
@@ -38,6 +39,7 @@ namespace VerletConditionalListSetUtils{
         return neigLists;
     }
 
+    inline
     std::shared_ptr<VerletConditionalListSetBase> getNeighbourListFromNeighbourListsList(std::map<std::string,std::shared_ptr<VerletConditionalListSetBase>>& nls,
                                                                                          DataEntry& data){
         if(nls.size() == 0){

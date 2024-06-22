@@ -1,5 +1,12 @@
-#ifndef __CONDITION_NETG1INTRA_NETG2INTRA_NEINTER_NENOGROUP__
-#define __CONDITION_NETG1INTRA_NETG2INTRA_NEINTER_NENOGROUP__
+#include "System/ExtendedSystem.cuh"
+#include "GlobalData/GlobalData.cuh"
+#include "ParticleData/ExtendedParticleData.cuh"
+#include "ParticleData/ParticleGroup.cuh"
+#include "ParticleGroup/ParticleGroupUtils.cuh"
+
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSet.cuh"
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSetFactory.cuh"
+#include "DataStructures/VerletConditionalListSet/Condition/Condition.cuh"
 
 namespace uammd{
 namespace structured{
@@ -212,4 +219,7 @@ namespace conditions{
 
 }}}
 
-#endif
+REGISTER_VERLET_CONDITIONAL_LIST_SET(
+    nonExclTypeGroup1Intra_nonExclTypeGroup2Intra_nonExclInter_nonExclNoGroup,
+    uammd::structured::VerletConditionalListSet<uammd::structured::conditions::nonExclTypeGroup1Intra_nonExclTypeGroup2Intra_nonExclInter_nonExclNoGroup>
+)

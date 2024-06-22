@@ -5,6 +5,7 @@ namespace structured{
 namespace TypesLoader{
 
     std::shared_ptr<typename Types::TypesHandler>
+    inline
     loadTypes(std::shared_ptr<ExtendedSystem> sys,
               std::vector<std::string>       path){
 

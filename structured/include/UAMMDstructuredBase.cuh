@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iomanip>
 #include <limits>
+#include <functional>
 
 //Third party
 //#include"ThirdParty/json.hpp"

@@ -151,8 +151,8 @@ SFINAE_DEFINE_HAS_MEMBER(getPairwiseForceTransverser);
 
 //NeighbourList
 #include"DataStructures/ExclusionsList/ExclusionsList.cuh"
-#include"DataStructures/VerletConditionalListSet/VerletConditionalListSetIncluders.cuh"
-#include"DataStructures/VerletConditionalListSet/VerletConditionalListSet.cuh"
+#include"DataStructures/VerletConditionalListSet/VerletConditionalListSetBase.cuh"
+#include"DataStructures/VerletConditionalListSet/VerletConditionalListSetFactory.cuh"
 #include"DataStructures/VerletConditionalListSet/VerletConditionalListSetLoaders.cuh"
 #include"DataStructures/VerletConditionalListSet/VerletConditionalListSetUtils.cuh"
 

@@ -1,5 +1,11 @@
-#ifndef __CONDITION_INTER_DIFFER_TYPE__
-#define __CONDITION_INTER_DIFFER_TYPE__
+#include "System/ExtendedSystem.cuh"
+#include "GlobalData/GlobalData.cuh"
+#include "ParticleData/ExtendedParticleData.cuh"
+#include "ParticleData/ParticleGroup.cuh"
+#include "ParticleGroup/ParticleGroupUtils.cuh"
+
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSet.cuh"
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSetFactory.cuh"
 
 namespace uammd{
 namespace structured{
@@ -81,4 +87,7 @@ namespace conditions{
 
 }}}
 
-#endif
+REGISTER_VERLET_CONDITIONAL_LIST_SET(
+    interDifferentType,
+    uammd::structured::VerletConditionalListSet<uammd::structured::conditions::interDifferentType>
+)

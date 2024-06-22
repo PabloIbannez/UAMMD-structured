@@ -208,7 +208,10 @@ add_executable(UAMMDlauncher ${LAUNCHER_DIR}/UAMMDlauncher.cu)
 add_dependencies(UAMMDlauncher CopyUAMMD)
 
 # Link libraries
-target_link_libraries(UAMMDlauncher structured_objects ${LIBRARIES})
+target_link_libraries(UAMMDlauncher PRIVATE
+    structured_objects 
+    $<TARGET_OBJECTS:structured_objects>
+    ${LIBRARIES})
 
 # Specify that the main build depends on the external project
 add_dependencies(UAMMDlauncher UAMMD)
