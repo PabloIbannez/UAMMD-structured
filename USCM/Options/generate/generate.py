@@ -275,29 +275,29 @@ def generate(args,
 
     #Integrator
 
-    checkIncludeInFile(generateIncludeFile(COMPONENTS_PATH+"/Components.json",
-                                           "Integrator",
-                                           UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
-    checkIncludeInFile(generateGenericIntegratorLoader(COMPONENTS_PATH+"/Components.json",
-                                                       ["Integrator"],
-                                                       UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
+    #checkIncludeInFile(generateIncludeFile(COMPONENTS_PATH+"/Components.json",
+    #                                       "Integrator",
+    #                                       UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
+    #checkIncludeInFile(generateGenericIntegratorLoader(COMPONENTS_PATH+"/Components.json",
+    #                                                   ["Integrator"],
+    #                                                   UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
 
     #DataStructures
 
-    checkIncludeInFile(generateIncludeFile(COMPONENTS_PATH+"/Components.json",
-                                           "DataStructures",
-                                           UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
+    #checkIncludeInFile(generateIncludeFile(COMPONENTS_PATH+"/Components.json",
+    #                                       "DataStructures",
+    #                                       UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
     #checkIncludeInFile(generateVerletConditionalListSetLoaders(COMPONENTS_PATH+"/Components.json",
     #                                                           ["DataStructures","VerletConditionalListSet"],
     #                                                           UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
 
     #SimulationStep
-    checkIncludeInFile(generateIncludeFile(COMPONENTS_PATH+"/Components.json",
-                                           "SimulationStep",
-                                           UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
-    checkIncludeInFile(generateGenericSimulationStepLoader(COMPONENTS_PATH+"/Components.json",
-                                                           ["SimulationStep"],
-                                                           UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
+    #checkIncludeInFile(generateIncludeFile(COMPONENTS_PATH+"/Components.json",
+    #                                       "SimulationStep",
+    #                                       UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
+    #checkIncludeInFile(generateGenericSimulationStepLoader(COMPONENTS_PATH+"/Components.json",
+    #                                                       ["SimulationStep"],
+    #                                                       UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
 
     #Interactors
     checkIncludeInFile(generateIncludeFile(COMPONENTS_PATH+"/Components.json",

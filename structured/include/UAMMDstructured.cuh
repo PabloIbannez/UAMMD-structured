@@ -202,19 +202,18 @@ SFINAE_DEFINE_HAS_MEMBER(getPairwiseForceTransverser);
 #include"Utils/Backup/Backup.cuh"
 
 //Integrators
-#include"Integrator/IntegratorBasic.cuh"
-#include"Integrator/Minimization/MinimizationIncluders.cuh"
-#include"Integrator/Special/SpecialIncluders.cuh"
-#include"Integrator/NVE/NVEIncluders.cuh"
-#include"Integrator/NVT/NVTIncluders.cuh"
+#include"Integrator/IntegratorBase.cuh"
+//#include"Integrator/Minimization/MinimizationIncluders.cuh"
+//#include"Integrator/Special/SpecialIncluders.cuh"
+//#include"Integrator/NVE/NVEIncluders.cuh"
+//#include"Integrator/NVT/NVTIncluders.cuh"
+#include"Integrator/IntegratorFactory.cuh"
 #include"Integrator/IntegratorLoaders.cuh"
 #include"Integrator/IntegratorManager.cuh"
 
 //Simulations
 #include"SimulationStep/SimulationStep.cuh"
-#include"SimulationStep/SimulationOutput/SimulationOutputIncluders.cuh"
-#include"SimulationStep/SimulationUtils/SimulationUtilsIncluders.cuh"
-#include"SimulationStep/SimulationMeasures/SimulationMeasuresIncluders.cuh"
+#include"SimulationStep/SimulationStepFactory.cuh"
 
 #include"Utils/Backup/BackupStep.cuh"
 

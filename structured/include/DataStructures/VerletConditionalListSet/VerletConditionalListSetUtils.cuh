@@ -1,6 +1,9 @@
 #ifndef __VERLET_CONDITIONAL_LIST_SET_UTILS__
 #define __VERLET_CONDITIONAL_LIST_SET_UTILS__
 
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSetBase.cuh"
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSetLoaders.cuh"
+
 namespace uammd{
 namespace structured{
 namespace VerletConditionalListSetUtils{

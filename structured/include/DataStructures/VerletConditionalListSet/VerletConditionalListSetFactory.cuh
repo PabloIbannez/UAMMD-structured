@@ -11,8 +11,8 @@ class VerletConditionalListSetFactory{
         std::shared_ptr<VerletConditionalListSetBase>(
                 std::shared_ptr<GlobalData>,
                 std::shared_ptr<ParticleGroup>,
-                DataEntry& data,
-                std::string name)>;
+                DataEntry&,
+                std::string)>;
 
         static VerletConditionalListSetFactory& getInstance() {
             static VerletConditionalListSetFactory instance;

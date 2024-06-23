@@ -3,6 +3,14 @@
 
 //TODO Check groups
 
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSetBase.cuh"
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSetUtils.cuh"
+
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSetUtils.cuh"
+
+#include "Interactor/Patches/PatchesIncluders.cuh"
+#include "Interactor/Patches/GenericPatchesPotentialLoader.cuh"
+
 namespace uammd{
 namespace structured{
 namespace Interactor{

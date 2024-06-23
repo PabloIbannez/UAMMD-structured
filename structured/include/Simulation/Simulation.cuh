@@ -137,7 +137,7 @@ class Simulation{
                                                      name.c_str(), steps);
                     }
 
-                    std::shared_ptr<Integrator> currentIntegrator = integrators->getIntegrator(name);
+                    std::shared_ptr<uammd::Integrator> currentIntegrator = integrators->getIntegrator(name);
 
                     //Load force field into integrators
                     currentIntegrator->addInteractor(ff);

@@ -1,5 +1,7 @@
-#ifndef __INTEGRATOR_MANAGER__
-#define __INTEGRATOR_MANAGER__
+#pragma once
+
+#include"Integrator/IntegratorBase.cuh"
+#include"Integrator/IntegratorLoaders.cuh"
 
 namespace uammd{
 namespace structured{
@@ -21,7 +23,7 @@ class IntegratorManager{
         //////////////////////////////////////////
 
         std::map<std::string,std::shared_ptr<ParticleGroup>> groups;
-        std::map<std::string,std::shared_ptr<Integrator>> integrators;
+        std::map<std::string,std::shared_ptr<uammd::Integrator>> integrators;
 
         struct stepsInfo{
             std::string name;
@@ -92,7 +94,7 @@ class IntegratorManager{
 
             for(auto& entry : integratorsInfo->getEntriesInfo()){
                 if(IntegratorLoader::isIntegratorAvailable(sys,entry.second.path)){
-                    std::shared_ptr<Integrator> integrator = IntegratorLoader::loadIntegrator(sys,gd,groups,entry.second.path);
+                    std::shared_ptr<uammd::Integrator> integrator = IntegratorLoader::loadIntegrator(sys,gd,groups,entry.second.path);
 
                     if(integrators.count(entry.second.name) == 0){
                         //Check if integrator is in schedule
@@ -142,7 +144,7 @@ class IntegratorManager{
                           std::shared_ptr<ExtendedParticleData>  pd):IntegratorManager(sys,gd,pd,{"integrator"}){}
 
         //Add a new interactor to the system
-        void addIntegrator(std::shared_ptr<Integrator> integrator, std::string name, int steps){
+        void addIntegrator(std::shared_ptr<uammd::Integrator> integrator, std::string name, int steps){
             if(integrators.count(name) == 0){
                 //Order of added integrators is the number of integrators already added plus one
                 stepsInfo info;
@@ -164,11 +166,11 @@ class IntegratorManager{
             }
         }
 
-        std::map<std::string,std::shared_ptr<Integrator>>& getIntegrators(){
+        std::map<std::string,std::shared_ptr<uammd::Integrator>>& getIntegrators(){
             return integrators;
         }
 
-        std::shared_ptr<Integrator> getIntegrator(std::string name){
+        std::shared_ptr<uammd::Integrator> getIntegrator(std::string name){
             if(integrators.count(name) == 0){
                 System::log<System::CRITICAL>("[IntegratorManager] (%s) Requested integrator \"%s\" has not been added.",
                                               path.back().c_str(),name.c_str());
@@ -212,5 +214,3 @@ class IntegratorManager{
 };
 
 }}
-
-#endif
