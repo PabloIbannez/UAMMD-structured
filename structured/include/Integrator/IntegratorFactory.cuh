@@ -64,6 +64,12 @@ public:
         throw std::runtime_error("Unknown Integrator type");
     }
 
+    bool isIntegratorRegistered(const std::string& integratorType,
+                                const std::string& integratorSubType) const {
+        std::pair<std::string, std::string> key(integratorType, integratorSubType);
+        return getCreatorsRef().find(key) != getCreatorsRef().end();
+    }
+
     const std::unordered_map<std::pair<std::string, std::string>,
                              Creator,
                              PairHash>& getCreators() const {
