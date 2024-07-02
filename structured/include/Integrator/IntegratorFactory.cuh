@@ -1,4 +1,5 @@
 #pragma once
+
 #include <functional>
 #include <memory>
 #include <string>
@@ -8,16 +9,6 @@
 namespace uammd {
 namespace structured {
 namespace Integrator {
-
-// Custom hash function for std::pair<std::string, std::string>
-struct PairHash {
-    template <class T1, class T2>
-    std::size_t operator()(const std::pair<T1, T2>& p) const {
-        auto h1 = std::hash<T1>{}(p.first);
-        auto h2 = std::hash<T2>{}(p.second);
-        return h1 ^ (h2 << 1);
-    }
-};
 
 class IntegratorFactory {
 public:
@@ -93,8 +84,8 @@ private:
 
 #define REGISTER_INTEGRATOR(type, subType, ...) \
     namespace { \
-        struct registerVCLS##type##subType { \
-            registerVCLS##type##subType() { \
+        struct registerIntegrator##type##subType { \
+            registerIntegrator##type##subType() { \
                 uammd::structured::Integrator::IntegratorFactory::getInstance().registerIntegrator( \
                     #type,#subType,\
                         [](std::shared_ptr<uammd::structured::GlobalData>    gd, \
@@ -106,5 +97,5 @@ private:
                 }); \
             } \
         }; \
-        registerVCLS##type##subType registerVCLS##type##subType##Instance; \
+        registerIntegrator##type##subType registerIntegrator##type##subType##Instance; \
     }

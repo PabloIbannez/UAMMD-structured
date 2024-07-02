@@ -1,10 +1,16 @@
-#ifndef __EXTENDED_PARTICLE_DATA__
-#define __EXTENDED_PARTICLE_DATA__
+#pragma once
 
-#include"../preamble.h"
+#include"uammd.cuh"
+
+#include"System/ExtendedSystem.cuh"
+
 #include"ParticleData/ParticleData.cuh"
 #include"ParticleData/ParticleGroup.cuh"
 #include"ParticleData/StateLoader.cuh"
+
+#include<vector>
+#include<string>
+#include<memory>
 
 namespace uammd{
 namespace structured{
@@ -18,37 +24,17 @@ namespace structured{
         public:
 
             ExtendedParticleData(std::shared_ptr<ExtendedSystem> sys,
-                                 std::vector<std::string>       path):uammd::ParticleData((sys->getInput()->getDataEntry(path)).getDataSize(),sys),
-                                                                      path(path){
+                                 std::vector<std::string>       path);
 
-                auto data = this->getSystem()->getInput()->getDataEntry(path);
-                stateLoader(this, data);
+            ExtendedParticleData(std::shared_ptr<ExtendedSystem> sys);
 
-            }
+            std::shared_ptr<ExtendedSystem> getSystem();
 
-            ExtendedParticleData(std::shared_ptr<ExtendedSystem> sys):ExtendedParticleData(sys,{"state"}){
-            }
-
-            std::shared_ptr<ExtendedSystem> getSystem(){
-                return getExtendedSystem(uammd::ParticleData::getSystem());
-            }
-
-            void updateInputState(){
-                auto data = this->getSystem()->getInput()->getDataEntry(path);
-                updateState(this, data);
-            }
+            void updateInputState();
     };
 
-    inline std::shared_ptr<ExtendedParticleData> getExtendedParticleData(std::shared_ptr<uammd::ParticleData> pd){
-        return std::static_pointer_cast<ExtendedParticleData>(pd);
-    }
-
-    inline std::shared_ptr<ExtendedParticleData> getExtendedParticleData(std::shared_ptr<uammd::ParticleGroup> pg){
-        return std::static_pointer_cast<ExtendedParticleData>(pg->getParticleData());
-    }
-
+    std::shared_ptr<ExtendedParticleData> getExtendedParticleData(std::shared_ptr<uammd::ParticleData> pd);
+    std::shared_ptr<ExtendedParticleData> getExtendedParticleData(std::shared_ptr<uammd::ParticleGroup> pg);
 
 }}
-
-#endif
 

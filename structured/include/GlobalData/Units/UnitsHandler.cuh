@@ -1,12 +1,8 @@
-
-#ifndef __UNITS_HANDLER__
-#define __UNITS_HANDLER__
-
-#include <string>
+#pragma once
 
 #include "System/ExtendedSystem.cuh"
 
-
+#include <string>
 
 namespace uammd{
 namespace structured{
@@ -49,4 +45,5 @@ class UnitsHandler{
 };
 
 }}}
-#endif
+
+

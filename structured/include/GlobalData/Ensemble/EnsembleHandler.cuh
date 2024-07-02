@@ -1,13 +1,10 @@
-
-#ifndef __ENSEMBLE_HANDLER__
-#define __ENSEMBLE_HANDLER__
+#pragma once
 
 #include <string>
 
 #include "System/ExtendedSystem.cuh"
 
 #include "utils/Box.cuh"
-
 
 namespace uammd{
 namespace structured{
@@ -67,4 +64,3 @@ class EnsembleHandler{
 };
 
 }}}
-#endif

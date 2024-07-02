@@ -1,5 +1,4 @@
-#ifndef __AFM_INTERACTOR__
-#define __AFM_INTERACTOR__
+#pragma once
 
 #include"Interactor/Interactor.cuh"
 
@@ -551,5 +550,3 @@ namespace Interactor{
     };
 
 }}}
-
-#endif

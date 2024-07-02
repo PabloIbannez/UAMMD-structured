@@ -1,6 +1,8 @@
-// Header guards to prevent double inclusion of this header file
-#ifndef __EXCLUSION_LIST__
-#define __EXCLUSION_LIST__
+#pragma once
+
+#include "System/ExtendedSystem.cuh"
+#include "ParticleData/ExtendedParticleData.cuh"
+#include "GlobalData/GlobalData.cuh"
 
 namespace uammd{
 namespace structured{
@@ -50,7 +52,7 @@ namespace structured{
             startBuffer = strB;
 
             // Copying the exclusion list to the buffer in shared memory
-            forj(0,current_nExc){
+            for(int j=0;j<current_nExc;j++){
                 startBuffer[j]=start[j];
             }
         }
@@ -59,7 +61,7 @@ namespace structured{
         inline __device__ bool isPartExcluded(int k){
 
             // Search the exclusion list for particle k
-            forj(0,current_nExc){
+            for(int j=0;j<current_nExc;j++){
                 // If particle k is found, return true
                 if(startBuffer[j]==k){return true;}
             }
@@ -89,26 +91,7 @@ namespace structured{
             // Constructor for Exclusions class
             Exclusions(std::shared_ptr<GlobalData>            gd,
                        std::shared_ptr<ExtendedParticleData>  pd,
-                       DataEntry& dataEntry):gd(gd),pd(pd){
-
-                        System::log<System::MESSAGE>("[Exclusions] Initialized");
-
-                        // Get total number of particles
-                        int N = pd->getNumParticles();
-
-                        // Load the groupsList from the dataEntry
-                        groupsList = dataEntry.getDataAsGroupsList("id","id_list",0,N-1,true);
-                        // Note: for a system with N particles, the id go from 0 to N-1
-                        // Note: true flag is for checking that relations are symmetric
-
-                        // Check if the number of groups is the same as the number of particles
-                        if(N!=groupsList->getNGroups()){
-                            System::log<System::CRITICAL>("[Exclusions] The number of entries"
-                                                          " in the exclusions list differs "
-                                                          "from the number of particles");
-                        }
-
-            }
+                       DataEntry& dataEntry);
 
             // Function to get the maximum number of exclusions
             int getMaxExclusions(){return groupsList->getMaxGroupSize();}
@@ -117,18 +100,7 @@ namespace structured{
             size_t getSharedSize(){return this->getMaxExclusions()*sizeof(int);}
 
             // Function to generate a particleExclusionList
-            particleExclusionList getParticleExclusionList(){
-
-                // Get the groupsListInfo from the groupsList
-                auto groupsListInfo = groupsList->getGroupsListInfo(access::location::gpu);
-
-                // Create and return a particleExclusionList with this information
-                return particleExclusionList(groupsListInfo.listStart,
-                                             groupsListInfo.n);
-            }
+            particleExclusionList getParticleExclusionList();
     };
 
 }}
-
-// End of header guards
-#endif

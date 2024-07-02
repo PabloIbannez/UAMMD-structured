@@ -1,5 +1,9 @@
-#ifndef MEASURES_TRANSFORMS_CUH
-#define MEASURES_TRANSFORMS_CUH
+#pragma once
+
+#include "uammd.cuh"
+#include "utils/quaternion.cuh"
+
+#include "thrust/functional.h"
 
 namespace uammd{
 namespace structured{
@@ -378,6 +382,3 @@ namespace MeasuresTransforms{
 
 
 }}}}
-
-
-#endif

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "uammd.cuh"
+
 #include "System/ExtendedSystem.cuh"
 #include "ParticleData/ExtendedParticleData.cuh"
 #include "ParticleData/ParticleGroup.cuh"

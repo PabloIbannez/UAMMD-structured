@@ -1,5 +1,4 @@
-#ifndef __SET_INTERACTOR__
-#define __SET_INTERACTOR__
+#pragma once
 
 #include"Interactor/Interactor.cuh"
 
@@ -8,32 +7,6 @@ namespace structured{
 namespace Interactor{
 
     namespace SetInteractor_ns{
-
-        std::vector<int> setsIntersection(const std::vector<std::vector<std::vector<int>>>& idSets){
-
-            std::vector<int> allIds;
-
-            std::vector<int> intersection;
-
-            for(const std::vector<std::vector<int>>& idSet : idSets){
-                for(const std::vector<int>& idSubSet : idSet){
-                    std::vector<int> setBuffer = idSubSet;
-
-                    std::sort(setBuffer.begin(),setBuffer.end());
-                    std::sort(allIds.begin(),allIds.end());
-
-                    std::set_intersection(setBuffer.begin(),setBuffer.end(),
-                            allIds.begin(),allIds.end(),
-                            std::back_inserter(intersection));
-
-                    allIds.insert(allIds.end(),idSubSet.begin(),idSubSet.end());
-                }
-            }
-
-            return intersection;
-        }
-
-        ////////////////////////////////////////////////////////////////////////
 
         template<class transverser>
         struct reduction{
@@ -576,7 +549,7 @@ namespace Interactor{
                         {
                             sets2check.push_back(set_raw);
 
-                            std::vector<int> intersection = SetInteractor_ns::setsIntersection(sets2check);
+                            std::vector<int> intersection = setsIntersection(sets2check);
 
                             if(intersection.size() != 0){
                                 std::string message;
@@ -673,5 +646,3 @@ namespace Interactor{
     };
 
 }}}
-
-#endif

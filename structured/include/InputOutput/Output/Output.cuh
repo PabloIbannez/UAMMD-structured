@@ -1,6 +1,8 @@
 #ifndef __OUTPUT_STATE__
 #define __OUTPUT_STATE__
 
+#include "UAMMDstructuredBase.cuh"
+
 #include "Formats/psf.cuh"
 #include "Formats/dcd.cuh"
 
@@ -9,6 +11,7 @@ namespace structured{
 namespace InputOutput{
 namespace Output{
 
+inline
 void WriteCoord(std::shared_ptr<ParticleGroup> pg,
                 Box box,
                 std::ofstream& out){
@@ -62,6 +65,7 @@ void WriteCoord(std::shared_ptr<ParticleGroup> pg,
     }
 }
 
+inline
 void WriteSP(std::shared_ptr<ParticleGroup> pg,
              Box box,
              std::ofstream& out){
@@ -139,6 +143,7 @@ void WriteSP(std::shared_ptr<ParticleGroup> pg,
     }
 }
 
+inline
 void WriteSPO(std::shared_ptr<ParticleGroup> pg,
               Box box,
               std::ofstream& out){
@@ -220,6 +225,7 @@ void WriteSPO(std::shared_ptr<ParticleGroup> pg,
     }
 }
 
+inline
 void WriteSPF(std::shared_ptr<ParticleGroup> pg,
               Box box,
               std::ofstream& out){
@@ -273,6 +279,7 @@ void WriteSPF(std::shared_ptr<ParticleGroup> pg,
     }
 }
 
+inline
 void WriteVelocity(std::shared_ptr<ParticleGroup> pg,
                    std::ofstream& out){
 
@@ -314,6 +321,7 @@ void WriteVelocity(std::shared_ptr<ParticleGroup> pg,
     }
 }
 
+inline
 void WriteXYZ(std::shared_ptr<ParticleGroup> pg,
               Box box,
               std::ofstream& out){
@@ -355,6 +363,7 @@ void WriteXYZ(std::shared_ptr<ParticleGroup> pg,
 
 }
 
+inline
 void WriteITPV(std::shared_ptr<ParticleGroup> pg,
                Box box,
                std::ofstream& out){
@@ -401,6 +410,7 @@ void WriteITPV(std::shared_ptr<ParticleGroup> pg,
     }
 }
 
+inline
 void WriteITPD(std::shared_ptr<ParticleGroup> pg,
                Box box,
                std::ofstream& out){
@@ -447,6 +457,7 @@ void WriteITPD(std::shared_ptr<ParticleGroup> pg,
     }
 }
 
+inline
 void WritePDB(std::shared_ptr<ParticleGroup> pg,
               Box box,
               int frame,
@@ -544,6 +555,7 @@ void WritePDB(std::shared_ptr<ParticleGroup> pg,
         std::endl;
 }
 
+inline
 void WritePDB(std::shared_ptr<ParticleGroup> pg,
               Box box,
               std::ofstream& out){
@@ -553,6 +565,7 @@ void WritePDB(std::shared_ptr<ParticleGroup> pg,
 }
 
 
+inline
 void WriteDCDheader(std::shared_ptr<ParticleGroup> pg,
                     int start,
                     int interval,
@@ -564,6 +577,7 @@ void WriteDCDheader(std::shared_ptr<ParticleGroup> pg,
                         out);
 }
 
+inline
 void WriteDCD(std::shared_ptr<ParticleGroup> pg,
               Box box,
               int frame,int step,
@@ -575,6 +589,7 @@ void WriteDCD(std::shared_ptr<ParticleGroup> pg,
                               out);
 }
 
+inline
 void WriteLAMMPS(std::shared_ptr<ParticleGroup> pg,
                  Box box,
                  real t,
@@ -646,6 +661,7 @@ void WriteLAMMPS(std::shared_ptr<ParticleGroup> pg,
     }
 
 }
+    inline
     void WriteMagnetization(std::shared_ptr<ParticleGroup> pg,
 			    std::ofstream& out){
 
@@ -689,6 +705,7 @@ void WriteLAMMPS(std::shared_ptr<ParticleGroup> pg,
       }
     }
 
+      inline
       void WriteXYZMagnetization(std::shared_ptr<ParticleGroup> pg,
 			    std::ofstream& out){
 
@@ -742,6 +759,7 @@ void WriteLAMMPS(std::shared_ptr<ParticleGroup> pg,
       }
       }
 
+  inline
   void WriteSPM(std::shared_ptr<ParticleGroup> pg,
 		Box box,
 		std::ofstream& out){
@@ -808,6 +826,7 @@ void WriteLAMMPS(std::shared_ptr<ParticleGroup> pg,
 
   //Writes the position and the orientation of each particle in order to be visualized
   //with SVV3D (similar to spunto but includes also arrows.)
+  inline
   void WriteSVV(std::shared_ptr<ParticleGroup> pg,
 		Box box,
 		std::ofstream& out){
@@ -885,6 +904,7 @@ void WriteLAMMPS(std::shared_ptr<ParticleGroup> pg,
 
     //Writes the position and the magnetization of each particle in order to be visualized
     //with SVV3D (similar to spunto but includes also arrows.)
+    inline
     void WriteSVVM(std::shared_ptr<ParticleGroup> pg,
 		Box box,
 		std::ofstream& out){
@@ -956,6 +976,7 @@ void WriteLAMMPS(std::shared_ptr<ParticleGroup> pg,
       //Writes the position, the magnetization and the anisotropy axis of each particle
       //in order to be visualized
       //with SVV3D (similar to spunto but includes also arrows.)
+    inline
     void WriteSVVMA(std::shared_ptr<ParticleGroup> pg,
 		Box box,
 		std::ofstream& out){

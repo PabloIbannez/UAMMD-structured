@@ -1,5 +1,3 @@
-#pragma once
-
 #include "Integrator/IntegratorUtils.cuh"
 
 namespace uammd{

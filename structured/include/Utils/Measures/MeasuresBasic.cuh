@@ -1,7 +1,10 @@
 #pragma once
 
+#include "ParticleData/ExtendedParticleData.cuh"
+
 #include "utils/quaternion.cuh"
 #include "MeasuresTransforms.cuh"
+
 #include <memory>
 #include <tuple>
 

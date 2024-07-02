@@ -1,26 +1,21 @@
-#ifndef __GLOBAL_DATA__
-#define __GLOBAL_DATA__
+#pragma once
 
 #include"InputOutput/Input/Input.cuh"
 
 //Units
 #include"GlobalData/Units/UnitsHandler.cuh"
-#include"GlobalData/Units/UnitsIncluders.cuh"
 #include"GlobalData/Units/UnitsLoaders.cuh"
 
 //Fundamental
 #include"GlobalData/Fundamental/FundamentalHandler.cuh"
-#include"GlobalData/Fundamental/FundamentalIncluders.cuh"
 #include"GlobalData/Fundamental/FundamentalLoaders.cuh"
 
 //Ensemble
 #include"GlobalData/Ensemble/EnsembleHandler.cuh"
-#include"GlobalData/Ensemble/EnsembleIncluders.cuh"
 #include"GlobalData/Ensemble/EnsembleLoaders.cuh"
 
 //Types
 #include"GlobalData/Types/TypesHandler.cuh"
-#include"GlobalData/Types/TypesIncluders.cuh"
 #include"GlobalData/Types/TypesLoaders.cuh"
 
 
@@ -46,48 +41,14 @@ namespace structured{
 
 
             GlobalDataBase(std::shared_ptr<ExtendedSystem> sys,
-                           std::vector<std::string> path):sys(sys),path(path){
-
-                std::shared_ptr<InputEntryManager>   globalInfo;
-                globalInfo = std::make_shared<InputEntryManager>(sys,path);
-
-                //Units
-                std::vector<std::string> unitsPath = path;
-                unitsPath.push_back("units");
-                if(globalInfo->isEntryPresent("units")){
-                    unitsHandler = UnitsLoader::loadUnits(sys,unitsPath);
-                }else{
-                    System::log<System::MESSAGE>("[GlobalDataBase] Units not specified, using default units, \"None\"");
-                    auto input = sys->getInput();
-                    input->addEntry(unitsPath,"Units","None");
-
-                    unitsHandler = UnitsLoader::loadUnits(sys,unitsPath);
-                }
-
-                //Ensemble
-                std::vector<std::string> ensemblePath = path;
-                ensemblePath.push_back("ensemble");
-
-                ensembleHandler = EnsembleLoader::loadEnsemble(sys,ensemblePath);
-
-                System::log<System::DEBUG1>("[GlobalDataBase] GlobalDataBase created");
-            }
+                           std::vector<std::string> path);
 
             std::shared_ptr<ExtendedSystem> getSystem(){return sys;}
 
             std::shared_ptr<Units::UnitsHandler>             getUnits(){return unitsHandler;}
             std::shared_ptr<Ensemble::EnsembleHandler>       getEnsemble(){return ensembleHandler;}
 
-            void updateInputGlobalData(){
-
-                //Ensemble
-                std::vector<std::string> ensemblePath = path;
-                ensemblePath.push_back("ensemble");
-
-                ensembleHandler->updateDataEntry(sys->getInput()->getDataEntry(ensemblePath));
-
-            }
-
+            void updateInputGlobalData();
     };
 
     class GlobalData{
@@ -100,51 +61,17 @@ namespace structured{
             std::shared_ptr<Types::TypesHandler>             typesHandler;
             std::shared_ptr<Fundamental::FundamentalHandler> fundamentalHandler;
 
-            void init(){
-
-                std::shared_ptr<ExtendedSystem> sys = globalDataBase->getSystem();
-
-                std::shared_ptr<InputEntryManager>   globalInfo;
-                globalInfo = std::make_shared<InputEntryManager>(sys,path);
-
-                //Fundamental
-                std::vector<std::string> fundamentalPath = path;
-                fundamentalPath.push_back("fundamental");
-                if(globalInfo->isEntryPresent("fundamental")){
-                    fundamentalHandler = FundamentalLoader::loadFundamental(sys,fundamentalPath);
-                }else{
-                    System::log<System::MESSAGE>("[GlobalDataBase] Fundamental not specified, using default fundamental, \"Time\"");
-                    auto input = sys->getInput();
-                    input->addEntry(fundamentalPath,"Fundamental","Time");
-
-                    fundamentalHandler = FundamentalLoader::loadFundamental(sys,fundamentalPath);
-                }
-
-                //Load types
-                std::vector<std::string> typesPath = path;
-                typesPath.push_back("types");
-
-                typesHandler = TypesLoader::loadTypes(sys,typesPath);
-
-            }
+            void init();
 
         public:
 
             GlobalData(std::shared_ptr<GlobalDataBase>  globalDataBase,
-                       std::vector<std::string>         path):globalDataBase(globalDataBase),path(path){
-                this->init();
-            }
+                       std::vector<std::string>         path);
 
             GlobalData(std::shared_ptr<ExtendedSystem>  sys,
-                       std::vector<std::string>         path):path(path){
+                       std::vector<std::string>         path);
 
-                globalDataBase = std::make_shared<GlobalDataBase>(sys,path);
-
-                this->init();
-
-            }
-
-            GlobalData(std::shared_ptr<ExtendedSystem>  sys):GlobalData(sys,{"global"}){}
+            GlobalData(std::shared_ptr<ExtendedSystem>  sys);
 
             std::shared_ptr<GlobalDataBase> getGlobalDataBase(){return globalDataBase;}
 
@@ -155,20 +82,7 @@ namespace structured{
             std::shared_ptr<Types::TypesHandler>             getTypes()      {return typesHandler;}
             std::shared_ptr<Fundamental::FundamentalHandler> getFundamental(){return fundamentalHandler;}
 
-            void updateInputGlobalData(){
-
-                std::shared_ptr<ExtendedSystem> sys = globalDataBase->getSystem();
-
-                //Fundamental
-                std::vector<std::string> fundamentalPath = path;
-                fundamentalPath.push_back("fundamental");
-
-                fundamentalHandler->updateDataEntry(sys->getInput()->getDataEntry(fundamentalPath));
-
-                globalDataBase->updateInputGlobalData();
-            }
-
+            void updateInputGlobalData();
     };
 
 }}
-#endif

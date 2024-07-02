@@ -1,0 +1,230 @@
+{
+    "GlobalData": {
+        "Units": [
+            ["Units", "None", "None.cu"],
+            ["Units", "KcalMol_A", "KcalMol_A.cu"]
+        ],
+        "Types": [
+            ["Types", "Basic", "Basic.cu"],
+            ["Types", "Polarizable", "Polarizable.cu"]
+        ],
+        "Fundamental": [
+            ["Fundamental", "Time", "Time.cu"],
+            ["Fundamental", "DynamicallyBondedPatchyParticles", "DynamicallyBondedPatchyParticles.cu"],
+            ["Fundamental", "None", "None.cu"]
+        ],
+        "Ensemble": [
+            ["Ensemble", "NVT", "NVT.cu"],
+            ["Ensemble", "NVTlambda", "NVTlambda.cu"]
+        ]
+    },
+    "Integrator": {
+        "Minimization": [
+            ["SteepestDescent", "SteepestDescent", "SteepestDescent.cu"]
+        ],
+        "NVT": [
+            ["Brownian", "EulerMaruyama", "EulerMaruyama.cu"],
+            ["Brownian", "EulerMaruyamaRigidBody", "EulerMaruyamaRigidBody.cu"],
+            ["Brownian", "EulerMaruyamaRigidBodyPatchesState", "EulerMaruyamaRigidBody.cu"],
+            ["Langevin", "BBK", "BBK.cu"],
+            ["Langevin", "GJF", "GJF.cu"],
+            ["DPD", "Verlet", "Verlet.cu"],
+            ["SPH", "Verlet", "Verlet.cu"],
+            ["BDHIOpenBoundary", "Cholesky", "Cholesky.cu"],
+            ["BDHIOpenBoundary", "Lanczos", "Lanczos.cu"],
+            ["BDHITriplyPeriodic", "ForceCouplingMethod", "ForceCouplingMethod.cu"],
+            ["BDHITriplyPeriodic", "PositivelySplitEwald", "PositivelySplitEwald.cu"],
+            ["BDHITriplyPeriodic", "FluctuatingImmersedBoundary", "FluctuatingImmersedBoundary.cu"],
+            ["BDHIDoublyPeriodic", "DPStokes", "DPStokes.cu"],
+            ["FluctuatingHydrodynamics", "CompressibleInertialCoupling", "CompressibleInertialCoupling.cu"],
+            ["FluctuatingHydrodynamics", "IncompressibleInertialCoupling", "IncompressibleInertialCoupling.cu"],
+            ["Magnetic", "Brownian", "Brownian.cu"],
+            ["Magnetic", "Fixed", "Fixed.cu"],
+            ["Magnetic", "ForceCouplingMethod", "ForceCouplingMethod.cu"], ["BDHIDoublyPeriodic", "Quasi2D", "Quasi2D.cu"] ],
+        "NVE": [
+            ["Verlet", "VelocityVerlet", "VelocityVerlet.cu"]
+        ],
+        "Special": [
+            ["None", "None", "None.cu"]
+        ]
+    },
+    "SimulationStep": {
+        "SimulationOutput": [
+            ["WriteStep", "WriteStep", "WriteSimulationState.cu"],
+            ["WriteStep", "WritePatchyParticlesStep", "WriteSimulationState.cu"]
+        ],
+        "SimulationUtils": [
+            ["UtilsStep", "InfoStep", "InfoStep.cu"],
+            ["UtilsStep", "SortStep", "SortStep.cu"],
+            ["FlowControl", "AFMMaxForce", "AFMMaxForce.cu"],
+            ["FlowControl", "LambdaCycle", "LambdaCycle.cu"],
+            ["FlowControl", "LambdaActivation", "LambdaActivation.cu"]
+        ],
+        "SimulationMeasures": [
+            ["ParticlesListMeasure", "DistancesMeasure", "DistancesMeasure.cu"],
+            ["ParticlesListMeasure", "AnglesMeasure", "AnglesMeasure.cu"],
+            ["ParticlesListMeasure", "DihedralsMeasure", "DihedralsMeasure.cu"],
+            ["MechanicalMeasure", "StressMeasure", "StressMeasure.cu"],
+            ["ThermodynamicMeasure", "ThermodynamicQuantityMeasure", "ThermodynamicQuantityMeasure.cu"],
+            ["ThermodynamicMeasure", "ThermodynamicIntegration", "ThermodynamicIntegration.cu"],
+            ["GeometricalMeasure", "MeanRadius", "MeanRadius.cu"],
+            ["GeometricalMeasure", "GyrationRadius", "GyrationRadius.cu"],
+            ["GeometricalMeasure", "MeanSquareDisplacement", "MeanSquareDisplacement.cu"],
+            ["GeometricalMeasure", "MeanAngularCorrelation", "MeanAngularCorrelation.cu"],
+            ["GeometricalMeasure", "CenterOfMassPosition", "CenterOfMassPosition.cu"],
+            ["GeometricalMeasure", "EscapeTime", "EscapeTime.cu"],
+            ["GeometricalMeasure", "Height", "Height.cu"],
+            ["TopologicalMeasures", "PatchPolymers", "PatchPolymers.cu"],
+            ["ParticlesListMeasure", "PotentialMeasure", "PotentialMeasure.cu"],
+            ["MagneticMeasure", "MeasureTotalMagnetization", "MeasureTotalMagnetization.cu"],
+            ["MagneticMeasure", "MeasureMeanMagnetization", "MeasureMeanMagnetization.cu"],
+            ["ExperimentMeasures", "AFMMeasure", "AFMMeasure.cu"],
+            ["GeometricalMeasure", "DistanceBetweenCentersOfMass", "DistanceBetweenCentersOfMass.cu"],
+            ["ParticlesListMeasure", "ContactsMeasure", "ContactsMeasure.cu"],
+            ["ThermodynamicMeasure", "InteractorsListEnergyMeasure", "InteractorsListEnergyMeasure.cu"],
+            ["MechanicalMeasure", "HessianMeasure", "HessianMeasure.cu"],
+            ["MechanicalMeasure", "PairwiseForceMeasure", "PairwiseForceMeasure.cu"],
+            ["MechanicalMeasure", "ForceBetweenSetsMeasure", "ForceBetweenSetsMeasure.cu"]
+        ]
+    },
+    "Interactor": {
+        "Bonds": [
+            ["Bond1", "FixedHarmonic", "FixedHarmonic.cu"],
+            ["Bond2", "Fene", "Fene.cu"],
+            ["Bond2", "FeneCommon_K_R0", "Fene.cu"],
+            ["Bond2", "FeneCommon_r0_K_R0", "Fene.cu"],
+            ["Bond2", "DebyeHuckel", "DebyeHuckel.cu"],
+            ["Bond2", "Harmonic", "Harmonic.cu"],
+	    ["Bond2", "HarmonicAnisotropic", "HarmonicAnisotropic.cu"],
+            ["Bond2", "LambdaHarmonic", "LambdaHarmonic.cu"],
+            ["Bond2", "HarmonicCommon_K", "Harmonic.cu"],
+            ["Bond2", "HarmonicCommon_K_r0", "Harmonic.cu"],
+            ["Bond2", "Steric6", "Steric.cu"],
+            ["Bond2", "Steric6Common_epsilon_sigma", "Steric.cu"],
+            ["Bond2", "Steric12", "Steric.cu"],
+            ["Bond2", "Steric12Common_epsilon_sigma", "Steric.cu"],
+            ["Bond2", "Morse", "Morse.cu"],
+            ["Bond2", "MorseCommon_D", "Morse.cu"],
+            ["Bond2", "MorseCommon_r0_E_D", "Morse.cu"],
+            ["Bond2", "MorseWCACommon_eps0", "Morse.cu"],
+            ["Bond2", "LennardJonesType1", "LennardJones.cu"],
+            ["Bond2", "LennardJonesType1Common_epsilon", "LennardJones.cu"],
+            ["Bond2", "LennardJonesType2", "LennardJones.cu"],
+            ["Bond2", "LennardJonesType2Common_epsilon", "LennardJones.cu"],
+            ["Bond2", "LennardJonesType3", "LennardJones.cu"],
+            ["Bond2", "LennardJonesType3Common_epsilon", "LennardJones.cu"],
+            ["Bond2", "LennardJonesKaranicolasBrooks", "LennardJones.cu"],
+            ["Bond2", "LennardJonesKaranicolasBrooksCommon_epsilon", "LennardJones.cu"],
+            ["Bond2", "LennardJonesGaussian", "LennardJones.cu"],
+            ["Bond2", "LennardJonesGaussianCommon_epsilon_D", "LennardJones.cu"],
+            ["Bond2", "LennardJonesSoftCoreType1", "LennardJonesSoftCore.cu"],
+            ["Bond2", "LennardJonesSoftCoreType2", "LennardJonesSoftCore.cu"],
+            ["Bond2", "LennardJonesSoftCoreType1Common_epsilon", "LennardJonesSoftCore.cu"],
+            ["Bond2", "LennardJonesSoftCoreType2Common_epsilon", "LennardJonesSoftCore.cu"],
+            ["Bond2", "Gaussian", "Gaussian.cu"],
+            ["Bond2", "GaussianCommon_E_r0_D", "Gaussian.cu"],
+            ["Bond3", "BestChenHummerAngular", "BestChenHummerAngular.cu"],
+            ["Bond3", "KratkyPorod", "KratkyPorod.cu"],
+            ["Bond3", "KratkyPorodCommon_K", "KratkyPorod.cu"],
+            ["Bond3", "HarmonicAngular", "HarmonicAngular.cu"],
+            ["Bond3", "HarmonicAngularCommon_K", "HarmonicAngular.cu"],
+            ["Bond3", "HarmonicAngularCommon_K_theta0", "HarmonicAngular.cu"],
+            ["Bond4", "Dihedral", "Dihedral.cu"],
+            ["Bond4", "DihedralCommon_n_K_phi0", "Dihedral.cu"],
+            ["Bond4", "Dihedral4", "Dihedral.cu"],
+            ["Bond2", "MaxDistanceRestraint", "MaxDistanceRestraint.cu"],
+            ["Bond1", "ConstantForce", "ConstantForce.cu"],
+            ["Bond1", "LambdaFixedHarmonicAnisotropic", "LambdaFixedHarmonicAnisotropic.cu"],
+            ["Bond4", "IDP_Fourier", "IDP_Fourier.cu"],
+            ["Bond2", "HelixExponential", "Helix.cu"],
+            ["Bond2", "HelixCosine", "Helix.cu"],
+            ["Bond1", "FixedHarmonicAnisotropic", "FixedHarmonicAnisotropic.cu"]
+        ],
+        "Single": [
+            ["External", "PolarizationTabulated", "PolarizationTabulated.cu"],
+            ["External", "ConstantForce", "ConstantForce.cu"],
+            ["Surface", "SurfaceLennardJonesType1", "LennardJonesSurface.cu"],
+            ["Surface", "SurfaceLennardJonesType2", "LennardJonesSurface.cu"],
+            ["Surface", "SurfaceWCAType1", "LennardJonesSurface.cu"],
+            ["Surface", "SurfaceWCAType2", "LennardJonesSurface.cu"],
+            ["Surface", "SurfaceGeneralLennardJonesType1", "LennardJonesSurface.cu"],
+            ["Surface", "SurfaceGeneralLennardJonesType2", "LennardJonesSurface.cu"],
+            ["Surface", "SurfaceAnchorage", "ParabolaSurface.cu"],
+            ["Surface", "ParabolaSurface", "ParabolaSurface.cu"],
+            ["External", "ACMagneticField", "ExternalMagneticField.cu"],
+            ["External", "ConstantMagneticField", "ExternalMagneticField.cu"],
+            ["External", "SphericalShell", "SphericalShell.cu"],
+            ["Surface", "Absorbed", "Absorbed.cu"],
+            ["External", "Plates", "Plates.cu"],
+            ["External", "HelixBoundaries","HelixBoundaries.cu"],
+            ["External", "ExternalTabulated", "ExternalTabulated.cu"],
+            ["External", "ConstantTorque", "ConstantTorque.cu"]
+        ],
+        "Set": [
+            ["Set1", "ConstantTorqueOverCenterOfMass", "Torque.cu"],
+            ["Set1", "ConstantForceOverCenterOfMass", "ConstantForce.cu"],
+            ["Set1", "FixedHarmonicAnisotropicCenterOfMass", "FixedHarmonic.cu"],
+            ["Set1", "FixedHarmonicAnisotropicCommon_K_r0CenterOfMass", "FixedHarmonic.cu"],
+            ["Set2", "ConstantTorqueBetweenCentersOfMass", "Torque2.cu"],
+            ["Set2", "ConstantForceBetweenCentersOfMass", "ConstantForce.cu"],
+            ["Set2", "HarmonicBondBetweenCentersOfMass", "Harmonic.cu"]
+        ],
+        "PatchyParticles": [
+            ["PatchyParticles", "PatchyParticles", "PatchyParticles.cu"],
+            ["PatchyParticles", "DynamicallyBondedPatchyParticles", "DynamicallyBondedPatchyParticles.cu"]
+        ],
+        "Pair": [
+            ["NonBonded", "DebyeHuckel", "DebyeHuckel.cu"],
+            ["NonBonded", "Zhang", "Zhang.cu"],
+            ["NonBonded", "DLVOType1", "DLVO.cu"],
+            ["NonBonded", "DLVOType2", "DLVO.cu"],
+            ["NonBonded", "DLVOType3", "DLVO.cu"],
+            ["NonBonded", "Clashed", "Clashed.cu"],
+            ["NonBonded", "KimHummer", "KimHummer.cu"],
+            ["NonBonded", "LennardJonesType1", "LennardJones.cu"],
+            ["NonBonded", "LennardJonesType2", "LennardJones.cu"],
+            ["NonBonded", "LennardJonesType3", "LennardJones.cu"],
+            ["NonBonded", "WCAType1", "LennardJones.cu"],
+            ["NonBonded", "WCAType2", "LennardJones.cu"],
+            ["NonBonded", "WCAType3", "LennardJones.cu"],
+            ["NonBonded", "GeneralLennardJonesType1", "LennardJones.cu"],
+            ["NonBonded", "GeneralLennardJonesType2", "LennardJones.cu"],
+            ["NonBonded", "GeneralLennardJonesType3", "LennardJones.cu"],
+            ["NonBonded", "Steric6", "LennardJones.cu"],
+            ["NonBonded", "Steric12", "LennardJones.cu"],
+            ["NonBonded", "StericInner12", "StericInner.cu"],
+            ["NonBonded", "StericInner6", "StericInner.cu"],
+            ["NonBonded", "DipolarMagnetic", "DipolarMagnetic.cu"],
+            ["NonBonded", "Steric6SoftCore", "LennardJonesSoftCore.cu"],
+            ["NonBonded", "Steric12SoftCore", "LennardJonesSoftCore.cu"],
+            ["NonBonded", "LennardJonesSoftCoreType1", "LennardJonesSoftCore.cu"],
+            ["NonBonded", "LennardJonesSoftCoreType2", "LennardJonesSoftCore.cu"],
+            ["NonBonded", "SplitLennardJones", "SplitLennardJones.cu"]
+        ],
+        "Patches": [
+            ["SurfacePatches", "Linker", "Linker.cu"],
+            ["NonBondedPatches", "HelixExponential", "Helix.cu"],
+            ["NonBondedPatches", "HelixExponential2States", "Helix.cu"],
+            ["NonBondedPatches", "HelixCosine", "Helix.cu"],
+            ["NonBondedPatches", "HelixCosine2States", "Helix.cu"],
+            ["NonBondedPatches", "DistanceSwitchExponential", "DistanceSwitch.cu"],
+            ["NonBondedPatches", "DistanceSwitchCosine", "DistanceSwitch.cu"]
+        ],
+        "AFM": [
+            ["AFM", "SphericalTip", "SphericalTip.cu"],
+            ["AFM", "SphericallyBluntedConicTip", "SphericallyBluntedConicTip.cu"]
+        ]
+    },
+    "DataStructures": {
+        "VerletConditionalListSet": [
+            ["Condition", "all", "All.cu"],
+            ["Condition", "intra_inter", "Intra_Inter.cu"],
+            ["Condition", "nonExcluded", "NonExcluded.cu"],
+            ["Condition", "nonExclIntra_nonExclInter", "NonExclIntra_NonExclInter.cu"],
+            ["Condition", "nonExclTypeGroup1Intra_nonExclTypeGroup2Intra_nonExclInter_nonExclNoGroup", "NonExclTypeGroup1Intra_NonExclTypeGroup2Intra_NonExclInter_NonExclNoGroup.cu"],
+            ["Condition", "nonExclIntra_nonExclInter_nonExclCharged", "NonExclIntra_NonExclInter_NonExclCharged.cu"],
+            ["Condition", "nonExclIntra_nonExclInter_nonExclInterCharged", "NonExclIntra_NonExclInter_NonExclInterCharged.cu"],
+            ["Condition", "interDifferentType", "InterDifferentType.cu"]
+        ]
+    }
+}

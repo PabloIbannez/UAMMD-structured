@@ -5,6 +5,7 @@ namespace uammd{
 namespace structured{
 namespace psf{
 
+    inline
     void WritePSF(std::shared_ptr<ParticleGroup> pg,
                   std::ofstream& out){
 

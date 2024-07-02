@@ -1,5 +1,4 @@
-#ifndef __VERLET_CONDITIONAL_LIST_SET__
-#define __VERLET_CONDITIONAL_LIST_SET__
+#pragma once
 
 #include"utils/Grid.cuh"
 #include<thrust/device_vector.h>
@@ -445,6 +444,12 @@ namespace structured{
             }
 
             void setCutOff(real newCutOff) override {
+
+                if(cutOff == newCutOff){
+                    System::log<System::DEBUG5>("[VerletConditionalListSet] (%s) Cut-off unchanged: %f",name.c_str(),cutOff);
+                    return;
+                }
+
                 cutOff         = newCutOff;
                 cutOffVerlet   = cutOff*cutOffVerletFactor;
 
@@ -462,6 +467,3 @@ namespace structured{
     };
 
 }}
-
-
-#endif

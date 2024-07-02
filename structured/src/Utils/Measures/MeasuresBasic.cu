@@ -1,5 +1,3 @@
-#include "UAMMDstructuredBase.cuh"
-#include "utils/quaternion.cuh"
 #include "Utils/Measures/MeasuresTransforms.cuh"
 
 namespace uammd{

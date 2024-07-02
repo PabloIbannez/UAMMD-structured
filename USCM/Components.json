@@ -20,20 +20,73 @@
     },
     "Integrator": {
         "Minimization": [
+            ["SteepestDescent", "SteepestDescent", "SteepestDescent.cuh"]
         ],
         "NVT": [
+            ["Brownian", "EulerMaruyama", "EulerMaruyama.cuh"],
+            ["Brownian", "EulerMaruyamaRigidBody", "EulerMaruyamaRigidBody.cuh"],
+            ["Brownian", "EulerMaruyamaRigidBodyPatchesState", "EulerMaruyamaRigidBody.cuh"],
+            ["Langevin", "BBK", "BBK.cuh"],
+            ["Langevin", "GJF", "GJF.cuh"],
+            ["DPD", "Verlet", "Verlet.cuh"],
+            ["SPH", "Verlet", "Verlet.cuh"],
+            ["BDHIOpenBoundary", "Cholesky", "Cholesky.cuh"],
+            ["BDHIOpenBoundary", "Lanczos", "Lanczos.cuh"],
+            ["BDHITriplyPeriodic", "ForceCouplingMethod", "ForceCouplingMethod.cuh"],
+            ["BDHITriplyPeriodic", "PositivelySplitEwald", "PositivelySplitEwald.cuh"],
+            ["BDHITriplyPeriodic", "FluctuatingImmersedBoundary", "FluctuatingImmersedBoundary.cuh"],
+            ["BDHIDoublyPeriodic", "DPStokes", "DPStokes.cuh"],
+            ["FluctuatingHydrodynamics", "CompressibleInertialCoupling", "CompressibleInertialCoupling.cuh"],
+            ["FluctuatingHydrodynamics", "IncompressibleInertialCoupling", "IncompressibleInertialCoupling.cuh"],
+            ["Magnetic", "Brownian", "Brownian.cuh"],
+            ["Magnetic", "Fixed", "Fixed.cuh"],
+            ["Magnetic", "ForceCouplingMethod", "ForceCouplingMethod.cuh"],
+            ["BDHIDoublyPeriodic", "Quasi2D", "Quasi2D.cuh"]
         ],
         "NVE": [
+            ["Verlet", "VelocityVerlet", "VelocityVerlet.cuh"]
         ],
         "Special": [
+            ["None", "None", "None.cuh"]
         ]
     },
     "SimulationStep": {
         "SimulationOutput": [
+            ["WriteStep", "WriteStep", "WriteSimulationState.cuh"],
+            ["WriteStep", "WritePatchyParticlesStep", "WriteSimulationState.cuh"]
         ],
         "SimulationUtils": [
+            ["UtilsStep", "InfoStep", "InfoStep.cuh"],
+            ["UtilsStep", "SortStep", "SortStep.cuh"],
+            ["FlowControl", "AFMMaxForce", "AFMMaxForce.cuh"],
+            ["FlowControl", "LambdaCycle", "LambdaCycle.cuh"],
+            ["FlowControl", "LambdaActivation", "LambdaActivation.cuh"]
         ],
         "SimulationMeasures": [
+            ["ParticlesListMeasure", "DistancesMeasure", "DistancesMeasure.cuh"],
+            ["ParticlesListMeasure", "AnglesMeasure", "AnglesMeasure.cuh"],
+            ["ParticlesListMeasure", "DihedralsMeasure", "DihedralsMeasure.cuh"],
+            ["MechanicalMeasure", "StressMeasure", "StressMeasure.cuh"],
+            ["ThermodynamicMeasure", "ThermodynamicQuantityMeasure", "ThermodynamicQuantityMeasure.cuh"],
+            ["ThermodynamicMeasure", "ThermodynamicIntegration", "ThermodynamicIntegration.cuh"],
+            ["GeometricalMeasure", "MeanRadius", "MeanRadius.cuh"],
+            ["GeometricalMeasure", "GyrationRadius", "GyrationRadius.cuh"],
+            ["GeometricalMeasure", "MeanSquareDisplacement", "MeanSquareDisplacement.cuh"],
+            ["GeometricalMeasure", "MeanAngularCorrelation", "MeanAngularCorrelation.cuh"],
+            ["GeometricalMeasure", "CenterOfMassPosition", "CenterOfMassPosition.cuh"],
+            ["GeometricalMeasure", "EscapeTime", "EscapeTime.cuh"],
+            ["GeometricalMeasure", "Height", "Height.cuh"],
+            ["TopologicalMeasures", "PatchPolymers", "PatchPolymers.cuh"],
+            ["ParticlesListMeasure", "PotentialMeasure", "PotentialMeasure.cuh"],
+            ["MagneticMeasure", "MeasureTotalMagnetization", "MeasureTotalMagnetization.cuh"],
+            ["MagneticMeasure", "MeasureMeanMagnetization", "MeasureMeanMagnetization.cuh"],
+            ["ExperimentMeasures", "AFMMeasure", "AFMMeasure.cuh"],
+            ["GeometricalMeasure", "DistanceBetweenCentersOfMass", "DistanceBetweenCentersOfMass.cuh"],
+            ["ParticlesListMeasure", "ContactsMeasure", "ContactsMeasure.cuh"],
+            ["ThermodynamicMeasure", "InteractorsListEnergyMeasure", "InteractorsListEnergyMeasure.cuh"],
+            ["MechanicalMeasure", "HessianMeasure", "HessianMeasure.cuh"],
+            ["MechanicalMeasure", "PairwiseForceMeasure", "PairwiseForceMeasure.cuh"],
+            ["MechanicalMeasure", "ForceBetweenSetsMeasure", "ForceBetweenSetsMeasure.cuh"]
         ]
     },
     "Interactor": {
@@ -166,6 +219,14 @@
     },
     "DataStructures": {
         "VerletConditionalListSet": [
+            ["Condition", "all", "All.cuh"],
+            ["Condition", "intra_inter", "Intra_Inter.cuh"],
+            ["Condition", "nonExcluded", "NonExcluded.cuh"],
+            ["Condition", "nonExclIntra_nonExclInter", "NonExclIntra_NonExclInter.cuh"],
+            ["Condition", "nonExclTypeGroup1Intra_nonExclTypeGroup2Intra_nonExclInter_nonExclNoGroup", "NonExclTypeGroup1Intra_NonExclTypeGroup2Intra_NonExclInter_NonExclNoGroup.cuh"],
+            ["Condition", "nonExclIntra_nonExclInter_nonExclCharged", "NonExclIntra_NonExclInter_NonExclCharged.cuh"],
+            ["Condition", "nonExclIntra_nonExclInter_nonExclInterCharged", "NonExclIntra_NonExclInter_NonExclInterCharged.cuh"],
+            ["Condition", "interDifferentType", "InterDifferentType.cuh"]
         ]
     }
 }

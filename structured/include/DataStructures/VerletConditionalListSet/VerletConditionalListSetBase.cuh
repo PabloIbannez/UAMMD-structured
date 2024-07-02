@@ -1,8 +1,17 @@
-#ifndef __VERLET_CONDITIONAL_LIST_SET_BASE__
-#define __VERLET_CONDITIONAL_LIST_SET_BASE__
+#pragma once
 
-#include"utils/Grid.cuh"
+#include "System/ExtendedSystem.cuh"
+#include "GlobalData/GlobalData.cuh"
+#include "ParticleData/ExtendedParticleData.cuh"
+#include "ParticleData/ParticleGroup.cuh"
+
+#include "utils/Grid.cuh"
+
 #include<thrust/device_vector.h>
+#include<thrust/host_vector.h>
+
+#include <memory>
+#include <string>
 
 namespace uammd{
 namespace structured{
@@ -44,5 +53,3 @@ namespace structured{
 
 }}
 
-
-#endif

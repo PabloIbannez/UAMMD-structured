@@ -257,21 +257,21 @@ def generate(args,
     logger.info("Generating components ...")
 
     #Global data
-    checkIncludeInFile(generateIncludeFile(COMPONENTS_PATH+"/Components.json",
-                                           "GlobalData",
-                                           UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
-    checkIncludeInFile(generateGenericLoader("types",COMPONENTS_PATH+"/Components.json",
-                                             ["GlobalData","Types"],
-                                             UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
-    checkIncludeInFile(generateGenericLoader("units",COMPONENTS_PATH+"/Components.json",
-                                             ["GlobalData","Units"],
-                                             UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
-    checkIncludeInFile(generateGenericLoader("fundamental",COMPONENTS_PATH+"/Components.json",
-                                             ["GlobalData","Fundamental"],
-                                             UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
-    checkIncludeInFile(generateGenericLoader("ensemble",COMPONENTS_PATH+"/Components.json",
-                                             ["GlobalData","Ensemble"],
-                                             UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
+    #checkIncludeInFile(generateIncludeFile(COMPONENTS_PATH+"/Components.json",
+    #                                       "GlobalData",
+    #                                       UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
+    #checkIncludeInFile(generateGenericLoader("types",COMPONENTS_PATH+"/Components.json",
+    #                                         ["GlobalData","Types"],
+    #                                         UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
+    #checkIncludeInFile(generateGenericLoader("units",COMPONENTS_PATH+"/Components.json",
+    #                                         ["GlobalData","Units"],
+    #                                         UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
+    #checkIncludeInFile(generateGenericLoader("fundamental",COMPONENTS_PATH+"/Components.json",
+    #                                         ["GlobalData","Fundamental"],
+    #                                         UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
+    #checkIncludeInFile(generateGenericLoader("ensemble",COMPONENTS_PATH+"/Components.json",
+    #                                         ["GlobalData","Ensemble"],
+    #                                         UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
 
     #Integrator
 
@@ -300,18 +300,18 @@ def generate(args,
     #                                                       UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
 
     #Interactors
-    checkIncludeInFile(generateIncludeFile(COMPONENTS_PATH+"/Components.json",
-                                           "Interactor",
-                                           UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
+    #checkIncludeInFile(generateIncludeFile(COMPONENTS_PATH+"/Components.json",
+    #                                       "Interactor",
+    #                                       UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
 
 
-    checkIncludeInFile(generateGenericPatchesPotentialLoader(COMPONENTS_PATH+"/Components.json",
-                                                             ["Interactor","Patches"],
-                                                             UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
+    #checkIncludeInFile(generateGenericPatchesPotentialLoader(COMPONENTS_PATH+"/Components.json",
+    #                                                         ["Interactor","Patches"],
+    #                                                         UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
 
-    checkIncludeInFile(generateGenericPotentialLoader(COMPONENTS_PATH+"/Components.json",
-                                                      ["Interactor"],
-                                                      UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
+    #checkIncludeInFile(generateGenericPotentialLoader(COMPONENTS_PATH+"/Components.json",
+    #                                                  ["Interactor"],
+    #                                                  UAMMD_STRUCTURED_PATH),UAMMD_STRUCTURED_INCLUDE)
 
     logger.info(Fore.GREEN + "Generation finished successfully."+ Fore.RESET+"\n")
 

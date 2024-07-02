@@ -1,5 +1,6 @@
-#ifndef __BASIC_TYPE__
-#define __BASIC_TYPE__
+#pragma once
+
+#include "GlobalData/Types/Types/Types.cuh"
 
 namespace uammd{
 namespace structured{
@@ -18,5 +19,3 @@ namespace Types{
     using Basic = Types_<Basic_>;
 
 }}}
-
-#endif

@@ -1,5 +1,10 @@
-#ifndef __INPUT_JSON__
-#define __INPUT_JSON__
+#pragma once
+
+#include "System/System.h"
+
+#include "ThirdParty/json.hpp"
+
+#include "DataStructures/GroupsList/GroupsList.cuh"
 
 #include<string>
 #include<fstream>
@@ -7,10 +12,6 @@
 #include<vector>
 #include<set>
 #include<map>
-
-#include"ThirdParty/json.hpp"
-
-#include"DataStructures/GroupsList/GroupsList.cuh"
 
 #define JSON_TYPE nlohmann::json
 
@@ -822,5 +823,3 @@ namespace InputJSON{
 
 
 }}}
-
-#endif

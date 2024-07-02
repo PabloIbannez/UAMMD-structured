@@ -1,5 +1,4 @@
-#ifndef __TYPES_HANDLER__
-#define __TYPES_HANDLER__
+#pragma once
 
 #include <string>
 #include <map>
@@ -101,5 +100,3 @@ namespace Types{
 
 
 }}}
-
-#endif

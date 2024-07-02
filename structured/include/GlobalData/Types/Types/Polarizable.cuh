@@ -1,5 +1,6 @@
-#ifndef __POLARIZABLE_TYPE__
-#define __POLARIZABLE_TYPE__
+#pragma once
+
+#include "GlobalData/Types/Types/Types.cuh"
 
 namespace uammd{
 namespace structured{
@@ -18,5 +19,3 @@ namespace Types{
     using Polarizable = Types_<Polarizable_>;
 
 }}}
-
-#endif

@@ -7,14 +7,17 @@ namespace dcd{
 
     namespace dcd_ns{
 
+        inline
         void write_int(std::ofstream& out,int i){
             out.write(reinterpret_cast<char*>(&i),sizeof(int));
         }
-        
+
+        inline
         void write_float(std::ofstream& out,float f){
             out.write(reinterpret_cast<char*>(&f),sizeof(float));
         }
-        
+
+        inline
         void pad(char *s,int len){
             int curlen;
             int i;
@@ -28,14 +31,15 @@ namespace dcd{
         }
     }
 
+    inline
     void WriteDCDheader(std::shared_ptr<ParticleGroup> pg,
                         int start,
                         int interval,
                         std::ofstream& out){
 
-        auto pd  = pg->getParticleData(); 
+        auto pd  = pg->getParticleData();
         auto sys = pd->getSystem();
-        
+
         int N = pg->getNumberParticles();
 
         float float_buffer;
@@ -45,12 +49,12 @@ namespace dcd{
 
         sprintf(char_buffer,"CORD");
         out.write(reinterpret_cast<char*>(&char_buffer),sizeof(char)*4);
-  
+
         dcd_ns::write_int(out, 0);        /* NFILE - Number of frames  */
         dcd_ns::write_int(out, start   ); /* NPRIV - Starting timestep of DCD file */
         dcd_ns::write_int(out, interval); /* NSAVC - Timesteps between DCD saves */
         dcd_ns::write_int(out, 0);        /* NSTEP - Number of timesteps */
-        
+
         dcd_ns::write_int(out, 0);
         dcd_ns::write_int(out, 0);
         dcd_ns::write_int(out, 0);
@@ -63,11 +67,11 @@ namespace dcd{
         dcd_ns::write_int(out, 0);
         dcd_ns::write_int(out, 0);
         dcd_ns::write_int(out, 0);
-        
+
         dcd_ns::write_int(out, 0);
         dcd_ns::write_int(out, 0);
         dcd_ns::write_int(out, 0);
-        
+
         dcd_ns::write_int(out, 0);
         dcd_ns::write_int(out, 0);
         dcd_ns::write_int(out, 0);
@@ -76,41 +80,42 @@ namespace dcd{
         dcd_ns::write_int(out, 84);
         dcd_ns::write_int(out, 164);
         dcd_ns::write_int(out, 2);
-  
+
         sprintf(char_buffer,"REMARK");
         dcd_ns::pad(char_buffer,80);
         out.write(reinterpret_cast<char*>(&char_buffer),sizeof(char)*80);
-        
+
 	    sprintf(char_buffer,"REMARKS DATE: %i", -1);
         dcd_ns::pad(char_buffer,80);
         out.write(reinterpret_cast<char*>(&char_buffer),sizeof(char)*80);
-        
+
         dcd_ns::write_int(out, 164);
         dcd_ns::write_int(out, 4);
         dcd_ns::write_int(out, N);
         dcd_ns::write_int(out, 4);
     }
 
+    inline
     void WriteDCDstep(std::shared_ptr<ParticleGroup> pg,
                       Box box,
                       int frame,
                       int step,
                       std::ofstream& out){
-        
-        auto pd  = pg->getParticleData(); 
+
+        auto pd  = pg->getParticleData();
         auto sys = pd->getSystem();
-        
+
         int N = pg->getNumberParticles();
-        
-        auto id    = pd->getId(access::location::cpu, 
+
+        auto id    = pd->getId(access::location::cpu,
                                access::mode::read);
-            
-        auto pos   = pd->getPos(access::location::cpu, 
+
+        auto pos   = pd->getPos(access::location::cpu,
                                 access::mode::read);
-        
+
         auto groupIndex  = pg->getIndexIterator(access::location::cpu);
         auto sortedIndex = pd->getIdOrderedIndices(access::location::cpu);
-        
+
         std::map<int,int> id_index;
         fori(0,pg->getNumberParticles()){
             int id_   = id[groupIndex[i]];
@@ -118,9 +123,9 @@ namespace dcd{
 
             id_index[id_]=index;
         }
-        
+
         dcd_ns::write_int(out, N*4);
-        
+
         for(const auto& ii : id_index){
 
             int index = ii.second;
@@ -131,7 +136,7 @@ namespace dcd{
 
         }
         dcd_ns::write_int(out, N*4);
-	
+
         dcd_ns::write_int(out, N*4);
         for(const auto& ii : id_index){
 

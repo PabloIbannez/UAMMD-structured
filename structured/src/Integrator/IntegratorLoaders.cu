@@ -1,11 +1,3 @@
-#include "System/ExtendedSystem.cuh"
-#include "GlobalData/GlobalData.cuh"
-#include "ParticleData/ExtendedParticleData.cuh"
-#include "ParticleData/ParticleGroup.cuh"
-#include "ParticleGroup/ParticleGroupUtils.cuh"
-
-#include "Integrator/IntegratorBase.cuh"
-#include "Integrator/IntegratorFactory.cuh"
 #include "Integrator/IntegratorLoaders.cuh"
 
 namespace uammd{

@@ -1,4 +1,7 @@
 #pragma once
+
+#include "SimulationStep/SimulationStep.cuh"
+
 #include <functional>
 #include <memory>
 #include <string>
@@ -8,16 +11,6 @@
 namespace uammd {
 namespace structured {
 namespace SimulationStep {
-
-// Custom hash function for std::pair<std::string, std::string>
-struct PairHash {
-    template <class T1, class T2>
-    std::size_t operator()(const std::pair<T1, T2>& p) const {
-        auto h1 = std::hash<T1>{}(p.first);
-        auto h2 = std::hash<T2>{}(p.second);
-        return h1 ^ (h2 << 1);
-    }
-};
 
 class SimulationStepFactory {
 public:
@@ -66,6 +59,13 @@ public:
         throw std::runtime_error("Unknown SimulationStep type");
     }
 
+    bool isSimulationStepRegistered(const std::string& simulationStepType,
+                                    const std::string& simulationStepSubType) {
+        auto& creators = getCreatorsRef();
+        std::pair<std::string, std::string> key(simulationStepType, simulationStepSubType);
+        return creators.find(key) != creators.end();
+    }
+
     const std::unordered_map<std::pair<std::string, std::string>,
                              Creator,
                              PairHash>& getCreators() const {
@@ -87,20 +87,20 @@ private:
 
 }}}
 
-#define REGISTER_SIMULATION_STEP(type, ...) \
+#define REGISTER_SIMULATION_STEP(type, subType, ...) \
     namespace { \
-        struct registerVCLS##type { \
-            registerVCLS##type() { \
+        struct registerSimulationStep##type##subType { \
+            registerSimulationStep##type##subType() { \
                 uammd::structured::SimulationStep::SimulationStepFactory::getInstance().registerSimulationStep( \
-                    #type, [](std::shared_ptr<uammd::structured::ParticleGroup>     pg, \
-                              std::shared_ptr<uammd::structured::IntegratorManager> integrator, \
-                              std::shared_ptr<uammd::structured::ForceField>        ff, \
-                              uammd::structured::DataEntry&  data, \
-                              std::string name \
-                              ) -> std::shared_ptr<uammd::structured::SimulationStep::SimulationStepBase> { \
+                    #type, #subType,\
+                    [](std::shared_ptr<uammd::ParticleGroup>                 pg, \
+                       std::shared_ptr<uammd::structured::IntegratorManager> integrator, \
+                       std::shared_ptr<uammd::structured::ForceField>        ff, \
+                       uammd::structured::DataEntry&  data, \
+                       std::string name ) -> std::shared_ptr<uammd::structured::SimulationStep::SimulationStepBase> { \
                     return std::make_shared<__VA_ARGS__>(pg, integrator, ff, data, name); \
                 }); \
             } \
         }; \
-        registerVCLS##type registerVCLS##type##Instance; \
+        registerSimulationStep##type##subType registerSimulationStep##type##subType##Instance; \
     }

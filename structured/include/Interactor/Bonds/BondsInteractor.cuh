@@ -1,5 +1,4 @@
-#ifndef __BONDS_INTERACTOR__
-#define __BONDS_INTERACTOR__
+#pragma once
 
 #include"Interactor/Interactor.cuh"
 
@@ -83,10 +82,10 @@ namespace Interactor{
             BondsInteractor(std::shared_ptr<GlobalData>           gd,
                             std::shared_ptr<ParticleGroup>        pg,
                             DataEntry& data,
-                            std::shared_ptr<BondType> pot,
                             std::string name):Interactor(pg,"BondsInteractor: \"" +name+"\""),
-                                              gd(gd),
-                                              pot(pot){
+                                              gd(gd){
+
+                this->pot = std::make_shared<BondType>(gd,pg,data);
 
                 // Get the labels for every particle in the bond
                 std::vector<std::string> partLabels = pot->getParticleBondLabels();
@@ -465,5 +464,3 @@ namespace Interactor{
 	    }
     };
 }}}
-
-#endif

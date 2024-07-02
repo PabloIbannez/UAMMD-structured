@@ -36,21 +36,12 @@ set(UAMMD_STRUCTURED_PATH "${CMAKE_BINARY_DIR}/UAMMDstructured")
 file(MAKE_DIRECTORY ${UAMMD_STRUCTURED_PATH})
 file(MAKE_DIRECTORY ${UAMMD_STRUCTURED_PATH}/uammd)
 file(MAKE_DIRECTORY ${UAMMD_STRUCTURED_PATH}/extensions)
+
+set(UAMMD_COMPONENTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/structured/Components.json")
 ###############################################################
 # Copy structured/ folder to UAMMDstructured/
 
 file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/structured ${UAMMD_STRUCTURED_PATH}/extensions/structured SYMBOLIC)
-###############################################################
-# File generation
-
-set(USCM_PATH "${CMAKE_CURRENT_SOURCE_DIR}/USCM/USCM.py")
-
-execute_process(COMMAND sh -c "python ${USCM_PATH} --generate"
-                RESULT_VARIABLE result)
-
-if(NOT result EQUAL 0)
-  message(FATAL_ERROR "USCM --generate failed.")
-endif()
 
 ###############################################################
 # Copy external/src/UAMMD/src/ to UAMMDstructured/src
@@ -69,32 +60,6 @@ add_custom_target(
 )
 
 add_dependencies(CopyUAMMD UAMMD)
-################################################################
-# Create UAMMDlauncher
-
-# Set paths for generated files
-set(LAUNCHER_DIR "${CMAKE_BINARY_DIR}/launcher")
-file(MAKE_DIRECTORY ${LAUNCHER_DIR})
-
-# Generate launcher code
-file(GENERATE OUTPUT ${LAUNCHER_DIR}/UAMMDlauncher.cu CONTENT "
-#include \"UAMMDstructured.cuh\"
-
-using namespace uammd::structured;
-
-int main(int argc, char *argv[]) {
-
-    if (argc < 2) {
-        uammd::System::log<uammd::System::CRITICAL>(\"No input file provided!\");
-        return EXIT_FAILURE;
-    }
-
-    std::string inputFilePath = argv[1];
-    startSelfStartingSimulation(inputFilePath);
-
-    return EXIT_SUCCESS;
-}
-")
 ################################################################
 # Include necessary directories
 
@@ -186,32 +151,128 @@ find_package(LAPACK REQUIRED)
 set(LIBRARIES cufft cublas curand cusolver cusparse stdc++fs ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 
 ################################################################
-# Source files
-set(SOURCE_FILES ${DEST_DIR_MAIN}/launcher/UAMMDlauncher.cu)
-
-# Recursively find all .cpp or .cu files in the structured directory and subdirectories
 set(UAMMD_STRUCTURED_SRC_PATH "${UAMMD_STRUCTURED_PATH}/extensions/structured/src")
-file(GLOB_RECURSE STRUCTURED_CPP_FILES "${UAMMD_STRUCTURED_SRC_PATH}/*.cpp")
-file(GLOB_RECURSE STRUCTURED_CU_FILES "${UAMMD_STRUCTURED_SRC_PATH}/*.cu")
+# Add backbone files to STRUCTURED_BACKBONE_FILES
+# Add System/ExtendedSystem.cu
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/System/ExtendedSystem.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/GlobalData/GlobalData.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/GlobalData/Units/UnitsLoaders.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/GlobalData/Ensemble/EnsembleLoaders.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/GlobalData/Types/TypesLoaders.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/GlobalData/Fundamental/FundamentalLoaders.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/ParticleData/ExtendedParticleData.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/ParticleData/StateLoader.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/ParticleGroup/ParticleGroupUtils.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Interactor/InteractorLoader.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Interactor/PatchyParticles/PatchyParticlesInteractor.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Integrator/IntegratorBase.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Integrator/IntegratorManager.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Integrator/IntegratorLoaders.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Integrator/IntegratorUtils.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/ForceFields/ForceFields.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Topology/Topology.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/SimulationStep/SimulationStep.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/SimulationStep/SimulationStepManager.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/SimulationStep/GenericSimulationStepLoader.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Simulation/Simulation.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/DataStructures/VerletConditionalListSet/VerletConditionalListSetUtils.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/DataStructures/VerletConditionalListSet/VerletConditionalListSetLoaders.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/DataStructures/GroupsList/GroupsList.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/DataStructures/ExclusionsList/ExclusionsList.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/Backup/Backup.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/Backup/BackupStep.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/Measures/MeasuresBasic.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/ParameterHandler/CheckDataConsistency.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/ParameterHandler/SingleParameterHandler.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/ParameterHandler/PairParameterHandler.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/Containers/SetUtils.cu")
 
-# Check if any .cu files were found
-if(NOT STRUCTURED_CPP_FILES AND NOT STRUCTURED_CU_FILES)
-    message(FATAL_ERROR "No .cpp or .cu files found in the structured directory.")
-endif()
+# Define STRUCTURED_COMPONENTS as a global variable
+set(STRUCTURED_COMPONENTS "")
+
+# Add this function to parse the JSON and populate STRUCTURED_COMPONENTS
+function(parse_json_and_add_files json_file base_path)
+  file(READ ${json_file} json_content)
+  string(JSON json_object ERROR_VARIABLE json_error GET ${json_content})
+
+  if(json_error)
+    message(FATAL_ERROR "Error parsing JSON: ${json_error}")
+  endif()
+
+  parse_json_object("" ${json_object})
+
+  set(STRUCTURED_COMPONENTS ${STRUCTURED_COMPONENTS} PARENT_SCOPE)
+endfunction()
+
+function(parse_json_object current_path object)
+  string(JSON num_elements LENGTH ${object})
+  math(EXPR num_elements "${num_elements} - 1")
+
+  foreach(i RANGE ${num_elements})
+    string(JSON key MEMBER ${object} ${i})
+    string(JSON value GET ${object} ${key})
+
+    if("${value}" MATCHES "^\\[")
+      parse_json_array("${current_path}/${key}" ${value})
+    elseif("${value}" MATCHES "^\\{")
+      parse_json_object("${current_path}/${key}" ${value})
+    endif()
+  endforeach()
+
+  set(STRUCTURED_COMPONENTS ${STRUCTURED_COMPONENTS} PARENT_SCOPE)
+endfunction()
+
+function(parse_json_array current_path array)
+  string(JSON num_elements LENGTH ${array})
+  math(EXPR num_elements "${num_elements} - 1")
+
+  foreach(i RANGE ${num_elements})
+    string(JSON value GET ${array} ${i})
+    if("${value}" MATCHES "^\\[")
+      string(JSON inner_array_length LENGTH ${value})
+      if(inner_array_length GREATER 2)
+        string(JSON component_type GET ${value} 0)
+        string(JSON component_name GET ${value} 1)
+        string(JSON component_file GET ${value} 2)
+        if(component_file MATCHES "\\.cu$")
+          set(file_path "${base_path}${current_path}/${component_type}/${component_file}")
+          list(APPEND STRUCTURED_COMPONENTS ${file_path})
+          set(STRUCTURED_COMPONENTS ${STRUCTURED_COMPONENTS} PARENT_SCOPE)
+          message(STATUS "Added component ${component_name} at src${current_path}/${component_type}/${component_file}")
+        else()
+          message(FATAL_ERROR "Error parsing JSON: ${value} is not a valid file")
+        endif()
+      endif()
+    endif()
+  endforeach()
+  set(STRUCTURED_COMPONENTS ${STRUCTURED_COMPONENTS} PARENT_SCOPE)
+endfunction()
+
+# Use the function to populate STRUCTURED_COMPONENTS
+parse_json_and_add_files(${UAMMD_COMPONENTS_PATH} ${UAMMD_STRUCTURED_PATH}/extensions/structured/src/)
+
+# Remove duplicates in STRUCTURED_COMPONENTS
+list(REMOVE_DUPLICATES STRUCTURED_COMPONENTS)
+
+# Print the components
+#message(STATUS "Components files:")
+#foreach(component IN LISTS STRUCTURED_COMPONENTS)
+#  message(STATUS ${component})
+#endforeach()
 
 # Create an object library for the structured .cpp and .cu files
-add_library(structured_objects STATIC ${STRUCTURED_CPP_FILES} ${STRUCTURED_CU_FILES})
+add_library(structured_objects STATIC ${STRUCTURED_BACKBONE_FILES} ${STRUCTURED_COMPONENTS})
 add_dependencies(structured_objects CopyUAMMD)
 
 # Define the executable
-add_executable(UAMMDlauncher ${LAUNCHER_DIR}/UAMMDlauncher.cu)
+add_executable(UAMMDlauncher ${CMAKE_CURRENT_SOURCE_DIR}/main/UAMMDlauncher.cu)
 add_dependencies(UAMMDlauncher CopyUAMMD)
 
 # Link libraries
 target_link_libraries(UAMMDlauncher PRIVATE
-    structured_objects 
-    $<TARGET_OBJECTS:structured_objects>
-    ${LIBRARIES})
+                      structured_objects
+                      $<TARGET_OBJECTS:structured_objects>
+                      ${LIBRARIES})
 
 # Specify that the main build depends on the external project
 add_dependencies(UAMMDlauncher UAMMD)

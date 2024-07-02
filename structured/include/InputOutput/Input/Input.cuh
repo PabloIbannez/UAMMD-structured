@@ -1,5 +1,6 @@
-#ifndef __INPUT__
-#define __INPUT__
+#pragma once
+
+#include "System/ExtendedSystem.cuh"
 
 namespace uammd{
 namespace structured{
@@ -163,5 +164,3 @@ namespace structured{
     };
 
 }}
-
-#endif

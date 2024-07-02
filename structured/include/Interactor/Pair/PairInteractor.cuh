@@ -1,5 +1,6 @@
-#ifndef __PAIR_INTERACTION__
-#define __PAIR_INTERACTION__
+#pragma once
+
+#include "Interactor/Interactor.cuh"
 
 namespace uammd{
 namespace structured{
@@ -404,5 +405,3 @@ namespace Interactor{
     };
 
 }}}
-
-#endif
