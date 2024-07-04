@@ -1,5 +1,4 @@
-#ifndef __CONDITIONS__
-#define __CONDITIONS__
+#pragma once
 
 #include "DataStructures/ExclusionsList/ExclusionsList.cuh"
 
@@ -40,5 +39,3 @@ namespace conditions{
     };
 
 }}}
-
-#endif

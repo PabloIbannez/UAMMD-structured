@@ -1,18 +1,23 @@
 #include "GlobalData/Units/UnitsHandler.cuh"
-#include "GlobalData/Units/Units/None.cuh"
+#include "GlobalData/Units/UnitsFactory.cuh"
 
 namespace uammd{
 namespace structured{
 namespace Units{
 
-    None::None(DataEntry& data): UnitsHandler(data){}
+    class None: public UnitsHandler{
 
-    real None::getBoltzmannConstant(){
-        return 1.0;
-    }
+        public:
 
-    real None::getElectricConversionFactor(){
-        return 1.0;
-    }
+            None(DataEntry& data):UnitsHandler(data){}
+
+            real getBoltzmannConstant()        override {return 1.0;}
+            real getElectricConversionFactor() override {return 1.0;}
+    };
 
 }}}
+
+REGISTER_UNITS(
+    Units,None,
+    uammd::structured::Units::None
+)

@@ -4,7 +4,7 @@
 #include "ParticleData/ParticleGroup.cuh"
 
 #include "Interactor/Pair/PairInteractor.cuh"
-#include "NonBondedPatches.cuh"
+#include "Interactor/Patches/NonBondedPatches/NonBondedPatches.cuh"
 #include "Interactor/Patches/PatchesFactory.cuh"
 
 #include "Interactor/BasicPotentials.cuh"

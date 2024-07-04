@@ -1,7 +1,4 @@
-#ifndef __TYPES_COMMON__
-#define __TYPES_COMMON__
-
-#include "GlobalData/Types/TypesHandler.cuh"
+#pragma once
 
 namespace uammd{
 namespace structured{
@@ -29,5 +26,3 @@ namespace Types{
     };
 
 }}}
-
-#endif

@@ -29,6 +29,11 @@ public:
                                      unitsType.c_str(), unitsSubType.c_str());
 
         std::pair<std::string, std::string> key(unitsType, unitsSubType);
+        if (isUnitsRegistered(unitsType, unitsSubType)) {
+            System::log<System::CRITICAL>("[UnitsFactory] Units type already registered: %s, %s",
+                                         unitsType.c_str(), unitsSubType.c_str());
+            throw std::runtime_error("Units type already registered");
+        }
         getCreatorsRef()[key] = creator;
     }
 
@@ -82,13 +87,14 @@ private:
     namespace { \
         struct registerUnits##type##subType { \
             registerUnits##type##subType() { \
-                uammd::structured::Units::UnitsFactory::getInstance().registerUnits( \
-                    #type,#subType,\
-                        [](uammd::structured::DataEntry&  data, \
-                           std::string name \
-                           ) -> std::shared_ptr<UnitsHandler> { \
-                    return std::make_shared<__VA_ARGS__>(data); \
-                }); \
+                if (__INCLUDE_LEVEL__ == 0) { \
+                    uammd::structured::Units::UnitsFactory::getInstance().registerUnits( \
+                        #type,#subType,\
+                            [](uammd::structured::DataEntry&  data \
+                               ) -> std::shared_ptr<uammd::structured::Units::UnitsHandler> { \
+                        return std::make_shared<__VA_ARGS__>(data); \
+                    }); \
+                } \
             } \
         }; \
         registerUnits##type##subType registerUnits##type##subType##Instance; \

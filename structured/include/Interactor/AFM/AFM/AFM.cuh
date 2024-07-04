@@ -1,5 +1,4 @@
-#ifndef __AFM__
-#define __AFM__
+#pragma once
 
 namespace uammd{
 namespace structured{
@@ -140,5 +139,3 @@ class AFM_{
 };
 
 }}}}
-
-#endif

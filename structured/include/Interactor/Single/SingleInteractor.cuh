@@ -1,6 +1,17 @@
 #pragma once
 
+#include "uammd.cuh"
+
+#include "System/ExtendedSystem.cuh"
+#include "GlobalData/GlobalData.cuh"
+
 #include "Interactor/Interactor.cuh"
+
+#include "Definitions/SFINAE.cuh"
+#include "Utils/Containers/SetUtils.cuh"
+
+#include "Definitions/Computations.cuh"
+#include "Definitions/Types.cuh"
 
 namespace uammd{
 namespace structured{
@@ -50,13 +61,25 @@ namespace Interactor{
 
         public:
 
-            SingleInteractor(std::shared_ptr<GlobalData>           gd,
-                             std::shared_ptr<ParticleGroup>        pg,
+            SingleInteractor(std::shared_ptr<GlobalData>    gd,
+                             std::shared_ptr<ParticleGroup> pg,
                              DataEntry& data,
-                             std::shared_ptr<PotentialType> pot,
                              std::string name):Interactor(pg,"SingleInteractor: \"" +name+"\""),
-                                               gd(gd),
-                                               pot(pot){
+                                               gd(gd){
+
+                pot = std::make_shared<PotentialType>(gd,pg,data);
+            }
+
+            //For patches
+            SingleInteractor(std::shared_ptr<GlobalData>    gd,
+                             std::shared_ptr<ParticleGroup> pg,
+                             std::shared_ptr<GlobalData>    patchesGd,
+                             std::shared_ptr<ParticleGroup> patchesPg,
+                             DataEntry& data,
+                             std::string name):Interactor(patchesPg,"SingleInteractor: \"" +name+"\""),
+                                               gd(patchesGd){
+
+                pot = std::make_shared<PotentialType>(gd,pg,patchesGd,patchesPg,data);
             }
 
             std::shared_ptr<PotentialType> getPotential(){

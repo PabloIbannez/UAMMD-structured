@@ -4,7 +4,7 @@
 #include "ParticleData/ParticleGroup.cuh"
 
 #include "Interactor/Bonds/BondsInteractor.cuh"
-#include "Bond3.cuh"
+#include "Interactor/Bonds/Bond3/Bond3.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
 #include "Interactor/BasicPotentials.cuh"

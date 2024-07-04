@@ -1,5 +1,11 @@
+#pragma once
+
+#include "uammd.cuh"
+
 namespace uammd{
 namespace structured{
+
+    using Computables = uammd::Interactor::Computables;
 
     //GROMACS convention
     //rij = rj - ri

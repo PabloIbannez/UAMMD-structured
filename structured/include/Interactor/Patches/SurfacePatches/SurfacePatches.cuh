@@ -1,7 +1,5 @@
 #pragma once
 
-#include "UAMMDstructuredBase.cuh"
-
 namespace uammd{
 namespace structured{
 namespace Potentials{

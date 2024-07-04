@@ -29,6 +29,11 @@ public:
                                      fundamentalType.c_str(), fundamentalSubType.c_str());
 
         std::pair<std::string, std::string> key(fundamentalType, fundamentalSubType);
+        if (isFundamentalRegistered(fundamentalType, fundamentalSubType)) {
+            System::log<System::CRITICAL>("[FundamentalFactory] Fundamental already registered: %s, %s",
+                                          fundamentalType.c_str(), fundamentalSubType.c_str());
+            throw std::runtime_error("Fundamental already registered");
+        }
         getCreatorsRef()[key] = creator;
     }
 
@@ -82,13 +87,14 @@ private:
     namespace { \
         struct registerFundamental##type##subType { \
             registerFundamental##type##subType() { \
-                uammd::structured::Fundamental::FundamentalFactory::getInstance().registerFundamental( \
-                    #type,#subType,\
-                        [](uammd::structured::DataEntry&  data, \
-                           std::string name \
-                           ) -> std::shared_ptr<FundamentalHandler> { \
-                    return std::make_shared<__VA_ARGS__>(data); \
-                }); \
+                if (__INCLUDE_LEVEL__ == 0) { \
+                    uammd::structured::Fundamental::FundamentalFactory::getInstance().registerFundamental( \
+                        #type,#subType,\
+                            [](uammd::structured::DataEntry&  data \
+                               ) -> std::shared_ptr<uammd::structured::Fundamental::FundamentalHandler> { \
+                        return std::make_shared<__VA_ARGS__>(data); \
+                    }); \
+                } \
             } \
         }; \
         registerFundamental##type##subType registerFundamental##type##subType##Instance; \

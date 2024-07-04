@@ -1,12 +1,23 @@
 #include "GlobalData/Fundamental/FundamentalHandler.cuh"
-#include "GlobalData/Fundamental/Fundamental/None.cuh"
+#include "GlobalData/Fundamental/FundamentalFactory.cuh"
 
 namespace uammd{
 namespace structured{
 namespace Fundamental{
 
-    None::None(DataEntry &data) : FundamentalHandler(data) {}
+    class None: public FundamentalHandler{
 
-    void None::updateDataEntry(DataEntry data) {}
+        public:
+
+            None(DataEntry& data):FundamentalHandler(data){}
+
+            void updateDataEntry(DataEntry data){}
+
+    };
 
 }}}
+
+REGISTER_FUNDAMENTAL(
+    Fundamental,None,
+    uammd::structured::Fundamental::None
+)

@@ -1,5 +1,7 @@
-#ifndef __BASIC_POTENTIALS__
-#define __BASIC_POTENTIALS__
+#pragma once
+
+#include "utils/quaternion.cuh"
+#include "Definitions/Computations.cuh"
 
 namespace uammd{
 namespace structured{
@@ -2870,4 +2872,3 @@ namespace BasicPotentials{
 
 }}}}
 
-#endif

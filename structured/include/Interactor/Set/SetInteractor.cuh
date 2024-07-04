@@ -1,6 +1,17 @@
 #pragma once
 
-#include"Interactor/Interactor.cuh"
+#include "uammd.cuh"
+
+#include "System/ExtendedSystem.cuh"
+#include "GlobalData/GlobalData.cuh"
+
+#include "Interactor/Interactor.cuh"
+
+#include "Definitions/SFINAE.cuh"
+#include "Utils/Containers/SetUtils.cuh"
+
+#include "Definitions/Computations.cuh"
+#include "Definitions/Types.cuh"
 
 namespace uammd{
 namespace structured{
@@ -508,11 +519,10 @@ namespace Interactor{
             SetInteractor(std::shared_ptr<GlobalData>           gd,
                           std::shared_ptr<ParticleGroup>        pg,
                           DataEntry& data,
-                          std::shared_ptr<PotentialType> pot,
                           std::string name):Interactor(pg,"SetInteractor: \"" +name+"\""),
-                                            gd(gd),
-                                            pot(pot){
+                                            gd(gd){
 
+                pot = std::make_shared<PotentialType>(gd,pg,data);
 
                 ////////////////////////////
 
@@ -549,7 +559,7 @@ namespace Interactor{
                         {
                             sets2check.push_back(set_raw);
 
-                            std::vector<int> intersection = setsIntersection(sets2check);
+                            std::vector<int> intersection = Utils::Containers::setsIntersection(sets2check);
 
                             if(intersection.size() != 0){
                                 std::string message;

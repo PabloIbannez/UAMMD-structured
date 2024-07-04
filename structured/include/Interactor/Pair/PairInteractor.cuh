@@ -1,6 +1,19 @@
 #pragma once
 
+#include "uammd.cuh"
+
+#include "System/ExtendedSystem.cuh"
+#include "GlobalData/GlobalData.cuh"
+
+#include "DataStructures/VerletConditionalListSet/VerletConditionalListSetBase.cuh"
+
 #include "Interactor/Interactor.cuh"
+
+#include "Definitions/SFINAE.cuh"
+#include "Utils/Containers/SetUtils.cuh"
+
+#include "Definitions/Computations.cuh"
+#include "Definitions/Types.cuh"
 
 namespace uammd{
 namespace structured{
@@ -46,7 +59,7 @@ namespace Interactor{
 
     }
 
-    template<class PotentialType, class NeighbourList, int THREADS_PER_BLOCK = 256>
+    template<class PotentialType, class NeighbourList = VerletConditionalListSetBase, int THREADS_PER_BLOCK = 256>
     class PairInteractor: public Interactor{
 
         protected:
@@ -74,13 +87,28 @@ namespace Interactor{
 
             PairInteractor(std::shared_ptr<GlobalData>           gd,
                            std::shared_ptr<ParticleGroup>        pg,
-                           DataEntry& data,
-                           std::shared_ptr<PotentialType> pot,
                            std::shared_ptr<NeighbourList> nl,
+                           DataEntry& data,
                            std::string name):Interactor(pg,"PairInteractor: \"" +name+"\""),
                                              gd(gd),
-                                             pot(pot),
                                              nl(nl){
+
+                pot = std::make_shared<PotentialType>(gd,pg,data);
+
+                conditionInteractionName = data.getParameter<std::string>("condition");
+            }
+
+            PairInteractor(std::shared_ptr<GlobalData>    gd,
+                           std::shared_ptr<ParticleGroup> pg,
+                           std::shared_ptr<GlobalData>    patchesGd,
+                           std::shared_ptr<ParticleGroup> patchesPg,
+                           std::shared_ptr<NeighbourList> nl,
+                           DataEntry& data,
+                           std::string name):Interactor(patchesPg,"PairInteractor: \"" +name+"\""),
+                                             gd(patchesGd),
+                                             nl(nl){
+
+                pot = std::make_shared<PotentialType>(gd,pg,patchesGd,patchesPg,data);
 
                 conditionInteractionName = data.getParameter<std::string>("condition");
             }

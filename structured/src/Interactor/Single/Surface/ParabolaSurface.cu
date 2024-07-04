@@ -4,7 +4,7 @@
 #include "ParticleData/ParticleGroup.cuh"
 
 #include "Interactor/Single/SingleInteractor.cuh"
-#include "Surface.cuh"
+#include "Interactor/Single/Surface/Surface.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
 #include "Interactor/BasicPotentials.cuh"

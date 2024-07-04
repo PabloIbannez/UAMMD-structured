@@ -1,3 +1,5 @@
+#pragma once
+
 // 2D Matrices
 // Row-major order
 #define UAMMD_SET_2D_ROW_MAJOR(matrix, rows, cols, row, col, value) (matrix)[(row) * (cols) + (col)] = (value)

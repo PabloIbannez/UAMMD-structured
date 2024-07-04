@@ -29,6 +29,11 @@ public:
                                      ensembleType.c_str(), ensembleSubType.c_str());
 
         std::pair<std::string, std::string> key(ensembleType, ensembleSubType);
+        if (isEnsembleRegistered(ensembleType, ensembleSubType)) {
+            System::log<System::CRITICAL>("[EnsembleFactory] Ensemble already registered: %s, %s",
+                                         ensembleType.c_str(), ensembleSubType.c_str());
+            throw std::runtime_error("Ensemble already registered");
+        }
         getCreatorsRef()[key] = creator;
     }
 
@@ -82,13 +87,14 @@ private:
     namespace { \
         struct registerEnsemble##type##subType { \
             registerEnsemble##type##subType() { \
-                uammd::structured::Ensemble::EnsembleFactory::getInstance().registerEnsemble( \
-                    #type,#subType,\
-                        [](uammd::structured::DataEntry&  data, \
-                           std::string name \
-                           ) -> std::shared_ptr<EnsembleHandler> { \
-                    return std::make_shared<__VA_ARGS__>(data); \
-                }); \
+                if (__INCLUDE_LEVEL__ == 0) { \
+                    uammd::structured::Ensemble::EnsembleFactory::getInstance().registerEnsemble( \
+                        #type,#subType,\
+                            [](uammd::structured::DataEntry&  data \
+                               ) -> std::shared_ptr<uammd::structured::Ensemble::EnsembleHandler> { \
+                        return std::make_shared<__VA_ARGS__>(data); \
+                    }); \
+                } \
             } \
         }; \
         registerEnsemble##type##subType registerEnsemble##type##subType##Instance; \

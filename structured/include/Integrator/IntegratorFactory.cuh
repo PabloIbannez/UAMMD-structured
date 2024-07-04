@@ -31,6 +31,11 @@ public:
                                      integratorType.c_str(), integratorSubType.c_str());
 
         std::pair<std::string, std::string> key(integratorType, integratorSubType);
+        if (isIntegratorRegistered(integratorType, integratorSubType)) {
+            System::log<System::CRITICAL>("[IntegratorFactory] Integrator already registered: %s, %s",
+                                          integratorType.c_str(), integratorSubType.c_str());
+            throw std::runtime_error("Integrator already registered");
+        }
         getCreatorsRef()[key] = creator;
     }
 
@@ -86,15 +91,17 @@ private:
     namespace { \
         struct registerIntegrator##type##subType { \
             registerIntegrator##type##subType() { \
-                uammd::structured::Integrator::IntegratorFactory::getInstance().registerIntegrator( \
-                    #type,#subType,\
-                        [](std::shared_ptr<uammd::structured::GlobalData>    gd, \
-                           std::shared_ptr<uammd::ParticleGroup> pg, \
-                           uammd::structured::DataEntry&  data, \
-                           std::string name \
-                           ) -> std::shared_ptr<uammd::Integrator> { \
-                    return std::make_shared<__VA_ARGS__>(gd,pg,data,name); \
-                }); \
+                if (__INCLUDE_LEVEL__ == 0) { \
+                    uammd::structured::Integrator::IntegratorFactory::getInstance().registerIntegrator( \
+                        #type,#subType,\
+                            [](std::shared_ptr<uammd::structured::GlobalData>    gd, \
+                               std::shared_ptr<uammd::ParticleGroup> pg, \
+                               uammd::structured::DataEntry&  data, \
+                               std::string name \
+                               ) -> std::shared_ptr<uammd::Integrator> { \
+                        return std::make_shared<__VA_ARGS__>(gd,pg,data,name); \
+                    }); \
+                } \
             } \
         }; \
         registerIntegrator##type##subType registerIntegrator##type##subType##Instance; \

@@ -1,6 +1,17 @@
 #pragma once
 
-#include"Interactor/Interactor.cuh"
+#include "uammd.cuh"
+
+#include "System/ExtendedSystem.cuh"
+#include "GlobalData/GlobalData.cuh"
+
+#include "Interactor/Interactor.cuh"
+
+#include "Definitions/SFINAE.cuh"
+#include "Utils/Containers/SetUtils.cuh"
+
+#include "Definitions/Computations.cuh"
+#include "Definitions/Types.cuh"
 
 namespace uammd{
 namespace structured{

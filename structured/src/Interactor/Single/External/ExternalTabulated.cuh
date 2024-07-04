@@ -3,6 +3,8 @@
 #include "misc/IBM.cuh"
 #include "misc/IBM_kernels.cuh"
 
+#include "Definitions/Matrices.cuh"
+
 namespace uammd{
 namespace structured{
 namespace Potentials{

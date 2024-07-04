@@ -14,6 +14,12 @@
 
 #include "Interactor/Patches/GenericPatchesPotentialLoader.cuh"
 
+#include "Definitions/SFINAE.cuh"
+#include "Utils/Containers/SetUtils.cuh"
+
+#include "Definitions/Computations.cuh"
+#include "Definitions/Types.cuh"
+
 #include "utils/quaternion.cuh"
 
 namespace uammd {

@@ -69,6 +69,7 @@ include_directories(${UAMMD_STRUCTURED_PATH}/uammd/)
 include_directories(${UAMMD_STRUCTURED_PATH}/uammd/third_party/)
 # Include UAMMD structured
 include_directories(${UAMMD_STRUCTURED_PATH}/extensions/structured/include/)
+include_directories(${UAMMD_STRUCTURED_PATH}/extensions/structured/src/)
 # Include CUDA
 include_directories(${CUDA_INCLUDE_DIRS})
 
@@ -183,8 +184,6 @@ list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/Backup
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/Backup/BackupStep.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/Measures/MeasuresBasic.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/ParameterHandler/CheckDataConsistency.cu")
-list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/ParameterHandler/SingleParameterHandler.cu")
-list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/ParameterHandler/PairParameterHandler.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/Containers/SetUtils.cu")
 
 # Define STRUCTURED_COMPONENTS as a global variable

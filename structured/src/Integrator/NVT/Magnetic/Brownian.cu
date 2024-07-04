@@ -1,4 +1,4 @@
-#include "../Brownian/EulerMaruyamaRigidBody.cuh"
+#include "Integrator/NVT/Brownian/EulerMaruyamaRigidBody.cu"
 #include "MagneticBase.cuh"
 
 namespace uammd{

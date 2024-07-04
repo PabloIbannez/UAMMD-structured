@@ -1,18 +1,23 @@
 #include "GlobalData/Units/UnitsHandler.cuh"
-#include "GlobalData/Units/Units/KcalMol_A.cuh"
+#include "GlobalData/Units/UnitsFactory.cuh"
 
 namespace uammd{
 namespace structured{
 namespace Units{
 
-    KcalMol_A::KcalMol_A(DataEntry& data): UnitsHandler(data){}
+    class KcalMol_A: public UnitsHandler{
 
-    real KcalMol_A::getBoltzmannConstant(){
-        return 1.987191E-03; // kcal/(mol*K)
-    }
+        public:
 
-    real KcalMol_A::getElectricConversionFactor(){
-        return 332.0716; // kcal/(mol*A)
-    }
+            KcalMol_A(DataEntry& data):UnitsHandler(data){}
+
+            real getBoltzmannConstant()        override {return 1.987191E-03;}
+            real getElectricConversionFactor() override {return 332.0716;}
+    };
 
 }}}
+
+REGISTER_UNITS(
+    Units,KcalMol_A,
+    uammd::structured::Units::KcalMol_A
+)

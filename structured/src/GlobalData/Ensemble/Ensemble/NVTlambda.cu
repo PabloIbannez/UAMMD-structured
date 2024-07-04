@@ -1,47 +1,64 @@
 #include "GlobalData/Ensemble/EnsembleHandler.cuh"
-#include "GlobalData/Ensemble/Ensemble/NVTlambda.cuh"
+#include "GlobalData/Ensemble/EnsembleFactory.cuh"
 
 namespace uammd{
 namespace structured{
 namespace Ensemble{
 
-    NVTlambda::NVTlambda(DataEntry& data):EnsembleHandler(data){
+    class NVTlambda: public EnsembleHandler{
 
-        auto ensembleData = data.getDataMap();
+        private:
 
-        temperature   = ensembleData[0]["temperature"];
+            Box box;
+            real temperature;
+            real lambda;
 
-        real3 boxSize = real3(ensembleData[0]["box"]);
-        box           = Box(boxSize);
+        public:
 
-        lambda        = ensembleData[0]["lambda"];
-    }
+            NVTlambda(DataEntry& data):EnsembleHandler(data){
 
-    Box NVTlambda::getBox()          { return box; }
-    real NVTlambda::getTemperature() { return temperature; }
-    real NVTlambda::getLambda()      { return lambda; }
+                auto ensembleData = data.getDataMap();
 
-    void NVTlambda::setBox(Box newBox)                  { box = newBox; }
-    void NVTlambda::setTemperature(real newTemperature) { temperature = newTemperature; }
-    void NVTlambda::setLambda(real newLambda)           { lambda = newLambda; }
+                temperature   = ensembleData[0]["temperature"];
 
-    void NVTlambda::updateDataEntry(DataEntry data) {
-        std::vector<std::string> labels = data.getLabels();
-        for(int i = 0; i < labels.size(); i++){
-            std::string lbl = labels[i];
+                real3 boxSize = real3(ensembleData[0]["box"]);
+                box           = Box(boxSize);
 
-            if(lbl == "temperature"){
-                data.setData(0,i,this->temperature);
+                lambda        = ensembleData[0]["lambda"];
             }
 
-            if(lbl == "box"){
-                data.setData(0,i,box.boxSize);
+            Box  getBox()         override{return box;}
+            real getTemperature() override{return temperature;}
+            real getLambda()      override{return lambda;}
+
+            void setBox(Box newBox)                  override{box = newBox;}
+            void setTemperature(real newTemperature) override{temperature = newTemperature;}
+            void setLambda(real newLambda)           override{lambda = newLambda;}
+
+            void updateDataEntry(DataEntry data) override{
+                std::vector<std::string> labels = data.getLabels();
+                for(int i = 0; i < labels.size(); i++){
+                    std::string lbl = labels[i];
+
+                    if(lbl == "temperature"){
+                        data.setData(0,i,this->temperature);
+                    }
+
+                    if(lbl == "box"){
+                        data.setData(0,i,box.boxSize);
+                    }
+
+                    if(lbl == "lambda"){
+                        data.setData(0,i,this->lambda);
+                    }
+                }
             }
 
-            if(lbl == "lambda"){
-                data.setData(0,i,this->lambda);
-            }
-        }
-    }
+    };
 
 }}}
+
+REGISTER_ENSEMBLE(
+    Ensemble,NVTlambda,
+    uammd::structured::Ensemble::NVTlambda
+)

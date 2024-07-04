@@ -1,6 +1,16 @@
 #pragma once
 
-#include"Interactor/Interactor.cuh"
+#include "uammd.cuh"
+
+#include "System/ExtendedSystem.cuh"
+#include "GlobalData/GlobalData.cuh"
+
+#include "Interactor/Interactor.cuh"
+
+#include "Definitions/SFINAE.cuh"
+#include "Utils/Containers/SetUtils.cuh"
+
+#include "Definitions/Computations.cuh"
 
 namespace uammd{
 namespace structured{
@@ -223,10 +233,10 @@ namespace Interactor{
             AFMInteractor(std::shared_ptr<GlobalData>    gd,
                           std::shared_ptr<ParticleGroup> pg,
                           DataEntry& data,
-                          std::shared_ptr<AFMType> afm,
                           std::string name):Interactor(pg,"AFMInteractor: \"" +name+"\""),
-                                            gd(gd),
-                                            afm(afm){
+                                            gd(gd){
+
+                afm = std::make_shared<AFMType>(gd,pg,data);
 
                 ////////////////////////////
 
@@ -262,7 +272,7 @@ namespace Interactor{
 
                     //Check set not intersects
                     {
-                        std::vector<int> intersection = SetInteractor_ns::setsIntersection(sets2check);
+                        std::vector<int> intersection = Utils::Containers::setsIntersection(sets2check);
 
                         if(intersection.size() != 0){
                             std::string message;

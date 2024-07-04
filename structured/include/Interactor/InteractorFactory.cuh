@@ -47,6 +47,11 @@ namespace Interactor {
                                              interactorType.c_str(), interactorSubType.c_str());
 
                 std::pair<std::string, std::string> key(interactorType, interactorSubType);
+                if (getCreatorsRef<CreatorType>().find(key) != getCreatorsRef<CreatorType>().end()) {
+                    System::log<System::CRITICAL>("[InteractorFactory] Interactor already registered: %s, %s",
+                                                  interactorType.c_str(), interactorSubType.c_str());
+                    throw std::runtime_error("Interactor already registered");
+                }
                 getCreatorsRef<CreatorType>()[key] = creator;
             }
 
@@ -110,14 +115,16 @@ namespace Interactor {
     namespace { \
         struct registerInteractor##type##subType { \
             registerInteractor##type##subType() { \
-                uammd::structured::Interactor::InteractorFactory::getInstance().registerInteractor<uammd::structured::Interactor::InteractorFactory::Creator>( \
-                    #type, #subType, \
-                    [](std::shared_ptr<uammd::structured::GlobalData> gd, \
-                       std::shared_ptr<uammd::ParticleGroup> pg, \
-                       uammd::structured::DataEntry&  data, \
-                       std::string name) -> std::shared_ptr<uammd::Interactor> { \
-                    return std::make_shared<__VA_ARGS__>(gd, pg, data, name); \
-                }); \
+                if (__INCLUDE_LEVEL__ == 0) { \
+                    uammd::structured::Interactor::InteractorFactory::getInstance().registerInteractor<uammd::structured::Interactor::InteractorFactory::Creator>( \
+                        #type, #subType, \
+                        [](std::shared_ptr<uammd::structured::GlobalData> gd, \
+                           std::shared_ptr<uammd::ParticleGroup> pg, \
+                           uammd::structured::DataEntry&  data, \
+                           std::string name) -> std::shared_ptr<uammd::Interactor> { \
+                        return std::make_shared<__VA_ARGS__>(gd, pg, data, name); \
+                    }); \
+                } \
             } \
         }; \
         registerInteractor##type##subType registerInteractor##type##subType##Instance; \
@@ -140,15 +147,17 @@ namespace Interactor {
     namespace { \
         struct registerInteractor##type##subType { \
             registerInteractor##type##subType() { \
-                uammd::structured::Interactor::InteractorFactory::getInstance().registerInteractor<uammd::structured::Interactor::InteractorFactory::NonBondedCreator>( \
-                    #type, #subType, \
-                    [](std::shared_ptr<uammd::structured::GlobalData> gd, \
-                       std::shared_ptr<uammd::ParticleGroup> pg, \
-                       std::shared_ptr<uammd::structured::VerletConditionalListSetBase> vcls, \
-                       uammd::structured::DataEntry&  data, \
-                       std::string name) -> std::shared_ptr<uammd::Interactor> { \
-                    return std::make_shared<__VA_ARGS__>(gd, pg, vcls, data, name); \
-                }); \
+                if (__INCLUDE_LEVEL__ == 0) { \
+                    uammd::structured::Interactor::InteractorFactory::getInstance().registerInteractor<uammd::structured::Interactor::InteractorFactory::NonBondedCreator>( \
+                        #type, #subType, \
+                        [](std::shared_ptr<uammd::structured::GlobalData> gd, \
+                           std::shared_ptr<uammd::ParticleGroup> pg, \
+                           std::shared_ptr<uammd::structured::VerletConditionalListSetBase> vcls, \
+                           uammd::structured::DataEntry&  data, \
+                           std::string name) -> std::shared_ptr<uammd::Interactor> { \
+                        return std::make_shared<__VA_ARGS__>(gd, pg, vcls, data, name); \
+                    }); \
+                } \
             } \
         }; \
         registerInteractor##type##subType registerInteractor##type##subType##Instance; \
@@ -159,14 +168,16 @@ namespace Interactor {
     namespace { \
         struct registerInteractor##type##subType { \
             registerInteractor##type##subType() { \
-                uammd::structured::Interactor::InteractorFactory::getInstance().registerInteractor<uammd::structured::Interactor::InteractorFactory::PatchyParticleCreator>( \
-                    #type, #subType, \
-                    [](std::shared_ptr<uammd::structured::GlobalData> gd, \
-                       std::shared_ptr<uammd::ParticleGroup> pg, \
-                       std::vector<std::string> path, \
-                       std::string name) -> std::shared_ptr<uammd::Interactor> { \
-                    return std::make_shared<__VA_ARGS__>(gd, pg, path, name); \
-                }); \
+                if (__INCLUDE_LEVEL__ == 0) { \
+                    uammd::structured::Interactor::InteractorFactory::getInstance().registerInteractor<uammd::structured::Interactor::InteractorFactory::PatchyParticleCreator>( \
+                        #type, #subType, \
+                        [](std::shared_ptr<uammd::structured::GlobalData> gd, \
+                           std::shared_ptr<uammd::ParticleGroup> pg, \
+                           std::vector<std::string> path, \
+                           std::string name) -> std::shared_ptr<uammd::Interactor> { \
+                        return std::make_shared<__VA_ARGS__>(gd, pg, path, name); \
+                    }); \
+                } \
             } \
         }; \
         registerInteractor##type##subType registerInteractor##type##subType##Instance; \
