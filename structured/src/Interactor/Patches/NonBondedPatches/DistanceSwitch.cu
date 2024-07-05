@@ -251,3 +251,8 @@ REGISTER_NONBONDED_PATCHES_INTERACTOR(
     NonBondedPatches,DistanceSwitchExponential,
     uammd::structured::Interactor::PairInteractor<uammd::structured::Potentials::NonBondedPatches::DistanceSwitchExponential>
 )
+
+REGISTER_NONBONDED_PATCHES_INTERACTOR(
+    NonBondedPatches,DistanceSwitchCosine,
+    uammd::structured::Interactor::PairInteractor<uammd::structured::Potentials::NonBondedPatches::DistanceSwitchCosine>
+)

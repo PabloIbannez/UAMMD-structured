@@ -92,11 +92,15 @@ namespace AFM{
             param.startChipPosition    = afmParametersMap.at("startChipPosition");
 
             param.indentationStartStep    = afmParametersMap.at("indentationStartStep");
-            param.indentationBackwardStep = afmParametersMap.at("indentationBackwardStep");
-
-            if(param.indentationBackwardStep == 0){
+            if (afmParametersMap.count("indentationBackwardStep") == 0){
                 //Set to maximum value
                 param.indentationBackwardStep = std::numeric_limits<ullint>::max();
+            } else {
+                param.indentationBackwardStep = afmParametersMap.at("indentationBackwardStep");
+
+                if(param.indentationBackwardStep == 0){
+                    param.indentationBackwardStep = std::numeric_limits<ullint>::max();
+                }
             }
 
             System::log<System::MESSAGE>("[SphericalTip] AFM epsilon: %f", param.epsilon);

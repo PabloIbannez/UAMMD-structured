@@ -119,6 +119,7 @@ namespace Interactor{
 
             void sum(Computables comp,cudaStream_t st) override {
 
+                nl->setCutOff(std::max(pot->getCutOff(),nl->getCutOff()));
                 nl->update(st);
 
                 if(comp.energy == true){
@@ -134,14 +135,14 @@ namespace Interactor{
                         int Nblocks=numberParticles/Nthreads + ((numberParticles%Nthreads)?1:0);
 
                         PairInteractor_ns::transverseNeighboursThreadPerParticle<
-                                             typename PotentialType::ComputationalData,
-                                             typename NeighbourList::NeighbourListData,
-                                             typename PotentialType::EnergyTransverser>
-                        <<<Nblocks,Nthreads,0, st>>>(numberParticles,
-                                                     groupMask,
-                                                     pot->getComputationalData(comp,st),
-                                                     nlData,
-                                                     pot->getEnergyTransverser());
+                            typename PotentialType::ComputationalData,
+                                     typename NeighbourList::NeighbourListData,
+                                     typename PotentialType::EnergyTransverser>
+                                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                 groupMask,
+                                                 pot->getComputationalData(comp,st),
+                                                 nlData,
+                                                 pot->getEnergyTransverser());
 
                         CudaCheckError();
 
@@ -149,7 +150,7 @@ namespace Interactor{
                     } else {
                         if(!warningEnergy){
                             System::log<System::WARNING>("[PairInteractor] (%s) Requested non-implemented transverser (energy)",
-                                                         name.c_str());
+                                    name.c_str());
                             warningEnergy = true;
                         }
                     }
@@ -158,27 +159,27 @@ namespace Interactor{
 
                 if(comp.force == true){
 
-		  if(comp.magneticField == false){
+                    if(comp.magneticField == false){
 
-		    if constexpr (has_getForceTransverser<PotentialType>::value){
+                        if constexpr (has_getForceTransverser<PotentialType>::value){
 
-		      auto nlData   = nl->getNeighbourList(conditionInteractionName);
+                            auto nlData   = nl->getNeighbourList(conditionInteractionName);
 
-		      int  numberParticles    = nlData.N; //numberParticles in the neig list
+                            int  numberParticles    = nlData.N; //numberParticles in the neig list
                             auto groupMask = pg->getGroupIndexMask(access::location::gpu);
 
                             int Nthreads=THREADS_PER_BLOCK;
                             int Nblocks=numberParticles/Nthreads + ((numberParticles%Nthreads)?1:0);
 
                             PairInteractor_ns::transverseNeighboursThreadPerParticle<
-                                                 typename PotentialType::ComputationalData,
-                                                 typename NeighbourList::NeighbourListData,
-                                                 typename PotentialType::ForceTransverser>
-                            <<<Nblocks,Nthreads,0, st>>>(numberParticles,
-                                                         groupMask,
-                                                         pot->getComputationalData(comp,st),
-                                                         nlData,
-                                                         pot->getForceTransverser());
+                                typename PotentialType::ComputationalData,
+                                         typename NeighbourList::NeighbourListData,
+                                         typename PotentialType::ForceTransverser>
+                                             <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                     groupMask,
+                                                     pot->getComputationalData(comp,st),
+                                                     nlData,
+                                                     pot->getForceTransverser());
 
                             CudaCheckError();
 
@@ -186,78 +187,78 @@ namespace Interactor{
                         } else {
                             if(!warningForce){
                                 System::log<System::WARNING>("[PairInteractor] (%s) Requested non-implemented transverser (force)",
-                                                             name.c_str());
+                                        name.c_str());
                                 warningForce = true;
                             }
                         }
 
                     } else {
 
-		      if constexpr (has_getForceTorqueMagneticFieldTransverser<PotentialType>::value){
+                        if constexpr (has_getForceTorqueMagneticFieldTransverser<PotentialType>::value){
 
-			auto nlData   = nl->getNeighbourList(conditionInteractionName);
+                            auto nlData   = nl->getNeighbourList(conditionInteractionName);
 
-			int  numberParticles    = nlData.N; //numberParticles in the neig list
+                            int  numberParticles    = nlData.N; //numberParticles in the neig list
                             auto groupMask = pg->getGroupIndexMask(access::location::gpu);
 
                             int Nthreads=THREADS_PER_BLOCK;
                             int Nblocks=numberParticles/Nthreads + ((numberParticles%Nthreads)?1:0);
 
                             PairInteractor_ns::transverseNeighboursThreadPerParticle<
-                                                 typename PotentialType::ComputationalData,
-                                                 typename NeighbourList::NeighbourListData,
-                                                 typename PotentialType::ForceTorqueMagneticFieldTransverser>
-                            <<<Nblocks,Nthreads,0, st>>>(numberParticles,
-                                                         groupMask,
-                                                         pot->getComputationalData(comp,st),
-                                                         nlData,
-                                                         pot->getForceTorqueMagneticFieldTransverser());
+                                typename PotentialType::ComputationalData,
+                                         typename NeighbourList::NeighbourListData,
+                                         typename PotentialType::ForceTorqueMagneticFieldTransverser>
+                                             <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                     groupMask,
+                                                     pot->getComputationalData(comp,st),
+                                                     nlData,
+                                                     pot->getForceTorqueMagneticFieldTransverser());
 
                             CudaCheckError();
 
 
-		      } else {
-			if(!warningForceMagnetic){
-			  System::log<System::WARNING>("[PairInteractor] (%s) Requested non-implemented transverser (forceTorqueMagneticField)",
-						       name.c_str());
-			  warningForceMagnetic = true;
-			}
-		      }
+                        } else {
+                            if(!warningForceMagnetic){
+                                System::log<System::WARNING>("[PairInteractor] (%s) Requested non-implemented transverser (forceTorqueMagneticField)",
+                                        name.c_str());
+                                warningForceMagnetic = true;
+                            }
+                        }
                     }
                 }
 
-		if(comp.magneticField == true and comp.force == false){
-		  if constexpr (has_getMagneticFieldTransverser<PotentialType>::value){
+                if(comp.magneticField == true and comp.force == false){
+                    if constexpr (has_getMagneticFieldTransverser<PotentialType>::value){
 
-			auto nlData   = nl->getNeighbourList(conditionInteractionName);
+                        auto nlData   = nl->getNeighbourList(conditionInteractionName);
 
-			int  numberParticles    = nlData.N; //numberParticles in the neig list
-			auto groupMask = pg->getGroupIndexMask(access::location::gpu);
+                        int  numberParticles    = nlData.N; //numberParticles in the neig list
+                        auto groupMask = pg->getGroupIndexMask(access::location::gpu);
 
-			int Nthreads=THREADS_PER_BLOCK;
-			int Nblocks=numberParticles/Nthreads + ((numberParticles%Nthreads)?1:0);
+                        int Nthreads=THREADS_PER_BLOCK;
+                        int Nblocks=numberParticles/Nthreads + ((numberParticles%Nthreads)?1:0);
 
-			PairInteractor_ns::transverseNeighboursThreadPerParticle<
-			  typename PotentialType::ComputationalData,
-			  typename NeighbourList::NeighbourListData,
-			  typename PotentialType::MagneticFieldTransverser>
-			  <<<Nblocks,Nthreads,0, st>>>(numberParticles,
-						       groupMask,
-						       pot->getComputationalData(comp,st),
-						       nlData,
-						       pot->getMagneticFieldTransverser());
+                        PairInteractor_ns::transverseNeighboursThreadPerParticle<
+                            typename PotentialType::ComputationalData,
+                                     typename NeighbourList::NeighbourListData,
+                                     typename PotentialType::MagneticFieldTransverser>
+                                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                 groupMask,
+                                                 pot->getComputationalData(comp,st),
+                                                 nlData,
+                                                 pot->getMagneticFieldTransverser());
 
-			CudaCheckError();
+                        CudaCheckError();
 
 
-		  } else {
-		    if(!warningMagneticField){
-		      System::log<System::WARNING>("[PairInteractor] (%s) Requested non-implemented transverser (MagneticField)",
-						   name.c_str());
-		      warningForceMagnetic = true;
-		    }
-		  }
-		}
+                    } else {
+                        if(!warningMagneticField){
+                            System::log<System::WARNING>("[PairInteractor] (%s) Requested non-implemented transverser (MagneticField)",
+                                    name.c_str());
+                            warningForceMagnetic = true;
+                        }
+                    }
+                }
 
                 if(comp.lambdaDerivative == true){
 
@@ -272,21 +273,21 @@ namespace Interactor{
                         int Nblocks=numberParticles/Nthreads + ((numberParticles%Nthreads)?1:0);
 
                         PairInteractor_ns::transverseNeighboursThreadPerParticle<
-                                             typename PotentialType::ComputationalData,
-                                             typename NeighbourList::NeighbourListData,
-                                             typename PotentialType::LambdaTransverser>
-                        <<<Nblocks,Nthreads,0, st>>>(numberParticles,
-                                                     groupMask,
-                                                     pot->getComputationalData(comp,st),
-                                                     nlData,
-                                                     pot->getLambdaTransverser());
+                            typename PotentialType::ComputationalData,
+                                     typename NeighbourList::NeighbourListData,
+                                     typename PotentialType::LambdaTransverser>
+                                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                 groupMask,
+                                                 pot->getComputationalData(comp,st),
+                                                 nlData,
+                                                 pot->getLambdaTransverser());
 
                         CudaCheckError();
 
                     } else {
                         if(!warningLambdaDerivative){
                             System::log<System::WARNING>("[PairInteractor] (%s) Requested non-implemented transverser (lambdaDerivative)",
-                                                         name.c_str());
+                                    name.c_str());
                             warningLambdaDerivative = true;
                         }
                     }
@@ -306,14 +307,14 @@ namespace Interactor{
                         int Nblocks=numberParticles/Nthreads + ((numberParticles%Nthreads)?1:0);
 
                         PairInteractor_ns::transverseNeighboursThreadPerParticle<
-                                             typename PotentialType::ComputationalData,
-                                             typename NeighbourList::NeighbourListData,
-                                             typename PotentialType::StressTransverser>
-                        <<<Nblocks,Nthreads,0, st>>>(numberParticles,
-                                                     groupMask,
-                                                     pot->getComputationalData(comp,st),
-                                                     nlData,
-                                                     pot->getStressTransverser());
+                            typename PotentialType::ComputationalData,
+                                     typename NeighbourList::NeighbourListData,
+                                     typename PotentialType::StressTransverser>
+                                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                 groupMask,
+                                                 pot->getComputationalData(comp,st),
+                                                 nlData,
+                                                 pot->getStressTransverser());
 
                         CudaCheckError();
 
@@ -321,13 +322,13 @@ namespace Interactor{
                     } else {
                         if(!warningStress){
                             System::log<System::WARNING>("[PairInteractor] (%s) Requested non-implemented transverser (stress)",
-                                                         name.c_str());
+                                    name.c_str());
                             warningStress = true;
                         }
                     }
                 }
 
-		if(comp.hessian == true){
+                if(comp.hessian == true){
 
                     if constexpr (has_getHessianTransverser<PotentialType>::value){
 
@@ -340,14 +341,14 @@ namespace Interactor{
                         int Nblocks=numberParticles/Nthreads + ((numberParticles%Nthreads)?1:0);
 
                         PairInteractor_ns::transverseNeighboursThreadPerParticle<
-                                             typename PotentialType::ComputationalData,
-                                             typename NeighbourList::NeighbourListData,
-                                             typename PotentialType::HessianTransverser>
-                        <<<Nblocks,Nthreads,0, st>>>(numberParticles,
-                                                     groupMask,
-                                                     pot->getComputationalData(comp,st),
-                                                     nlData,
-                                                     pot->getHessianTransverser());
+                            typename PotentialType::ComputationalData,
+                                     typename NeighbourList::NeighbourListData,
+                                     typename PotentialType::HessianTransverser>
+                                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                 groupMask,
+                                                 pot->getComputationalData(comp,st),
+                                                 nlData,
+                                                 pot->getHessianTransverser());
 
                         CudaCheckError();
 
@@ -355,13 +356,13 @@ namespace Interactor{
                     } else {
                         if(!warningHessian){
                             System::log<System::WARNING>("[PairInteractor] (%s) Requested non-implemented transverser (Hessian)",
-                                                         name.c_str());
+                                    name.c_str());
                             warningHessian = true;
                         }
                     }
                 }
 
-		if(comp.pairwiseForce == true){
+                if(comp.pairwiseForce == true){
 
                     if constexpr (has_getPairwiseForceTransverser<PotentialType>::value){
 
@@ -374,14 +375,14 @@ namespace Interactor{
                         int Nblocks=numberParticles/Nthreads + ((numberParticles%Nthreads)?1:0);
 
                         PairInteractor_ns::transverseNeighboursThreadPerParticle<
-                                             typename PotentialType::ComputationalData,
-                                             typename NeighbourList::NeighbourListData,
-                                             typename PotentialType::PairwiseForceTransverser>
-                        <<<Nblocks,Nthreads,0, st>>>(numberParticles,
-                                                     groupMask,
-                                                     pot->getComputationalData(comp,st),
-                                                     nlData,
-                                                     pot->getPairwiseForceTransverser());
+                            typename PotentialType::ComputationalData,
+                                     typename NeighbourList::NeighbourListData,
+                                     typename PotentialType::PairwiseForceTransverser>
+                                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                 groupMask,
+                                                 pot->getComputationalData(comp,st),
+                                                 nlData,
+                                                 pot->getPairwiseForceTransverser());
 
                         CudaCheckError();
 
@@ -389,7 +390,7 @@ namespace Interactor{
                     } else {
                         if(!warningPairwiseForces){
                             System::log<System::WARNING>("[PairInteractor] (%s) Requested non-implemented transverser (PairwiseForce)",
-                                                         name.c_str());
+                                    name.c_str());
                             warningPairwiseForces = true;
                         }
                     }
@@ -408,14 +409,14 @@ namespace Interactor{
                         int Nblocks=numberParticles/Nthreads + ((numberParticles%Nthreads)?1:0);
 
                         PairInteractor_ns::transverseNeighboursThreadPerParticle<
-                                             typename PotentialType::ComputationalData,
-                                             typename NeighbourList::NeighbourListData,
-                                             typename PotentialType::MagneticFieldTransverser>
-                        <<<Nblocks,Nthreads,0, st>>>(numberParticles,
-                                                     groupMask,
-                                                     pot->getComputationalData(comp,st),
-                                                     nlData,
-                                                     pot->getMagneticFieldTransverser());
+                            typename PotentialType::ComputationalData,
+                                     typename NeighbourList::NeighbourListData,
+                                     typename PotentialType::MagneticFieldTransverser>
+                                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                 groupMask,
+                                                 pot->getComputationalData(comp,st),
+                                                 nlData,
+                                                 pot->getMagneticFieldTransverser());
 
                         CudaCheckError();
 
@@ -423,7 +424,7 @@ namespace Interactor{
                     } else {
                         if(!warningMagneticField){
                             System::log<System::WARNING>("[PairInteractor] (%s) Requested non-implemented transverser (magneticField)",
-                                                         name.c_str());
+                                    name.c_str());
                             warningMagneticField = true;
                         }
                     }

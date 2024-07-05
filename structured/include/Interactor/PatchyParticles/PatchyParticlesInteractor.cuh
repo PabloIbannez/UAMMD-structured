@@ -12,7 +12,7 @@
 #include "DataStructures/VerletConditionalListSet/VerletConditionalListSetBase.cuh"
 #include "DataStructures/VerletConditionalListSet/VerletConditionalListSetUtils.cuh"
 
-#include "Interactor/Patches/GenericPatchesPotentialLoader.cuh"
+#include "Interactor/Patches/PatchInteractorLoader.cuh"
 
 #include "Definitions/SFINAE.cuh"
 #include "Utils/Containers/SetUtils.cuh"

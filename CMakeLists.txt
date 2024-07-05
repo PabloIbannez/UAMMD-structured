@@ -38,6 +38,7 @@ file(MAKE_DIRECTORY ${UAMMD_STRUCTURED_PATH}/uammd)
 file(MAKE_DIRECTORY ${UAMMD_STRUCTURED_PATH}/extensions)
 
 set(UAMMD_COMPONENTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/structured/Components.json")
+set(UAMMD_DATA_PATH "${CMAKE_CURRENT_SOURCE_DIR}/structured/Data.json")
 ###############################################################
 # Copy structured/ folder to UAMMDstructured/
 
@@ -152,6 +153,57 @@ find_package(LAPACK REQUIRED)
 set(LIBRARIES cufft cublas curand cusolver cusparse stdc++fs ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 
 ################################################################
+# Files generation
+
+set(UAMMD_STRUCTURED_INCLUDE_PATH "${UAMMD_STRUCTURED_PATH}/extensions/structured/include")
+
+# Function to parse JSON and generate property definitions
+function(generate_property_definitions json_file section output_var)
+  file(READ ${json_file} json_content)
+  string(JSON section_data GET ${json_content} ${section})
+
+  set(properties "")
+  string(JSON array_length LENGTH ${section_data})
+  math(EXPR array_length "${array_length} - 1")
+
+  foreach(index RANGE ${array_length})
+    string(JSON item GET ${section_data} ${index})
+    string(JSON name GET ${item} 0)
+    string(JSON cpp_type GET ${item} 1)
+    string(JSON c_type GET ${item} 2)
+    string(APPEND properties "((${cpp_type},${name},${c_type}))\\\n")
+  endforeach()
+
+  # Remove the last newline and backslash
+  string(REGEX REPLACE "\\\\n$" "" properties "${properties}")
+
+  set(${output_var} "${properties}" PARENT_SCOPE)
+endfunction()
+
+# List of sections to process
+set(SECTIONS ParticleData State Units Fundamental Ensemble)
+
+# Generate header files for each section
+foreach(SECTION ${SECTIONS})
+  string(TOUPPER ${SECTION} SECTION_UPPER)
+  set(HEADER_FILE "${UAMMD_STRUCTURED_INCLUDE_PATH}/Definitions/${SECTION}.cuh")
+
+  generate_property_definitions(${UAMMD_DATA_PATH} ${SECTION} PROPERTIES)
+
+  file(WRITE ${HEADER_FILE}
+"#pragma once
+
+#define ${SECTION_UPPER}_PROPERTIES ${PROPERTIES}
+")
+
+  # Add a custom target for generating the header file
+  add_custom_target(
+    Generate${SECTION}Data ALL
+    DEPENDS ${HEADER_FILE}
+  )
+endforeach()
+
+################################################################
 set(UAMMD_STRUCTURED_SRC_PATH "${UAMMD_STRUCTURED_PATH}/extensions/structured/src")
 # Add backbone files to STRUCTURED_BACKBONE_FILES
 # Add System/ExtendedSystem.cu
@@ -165,6 +217,7 @@ list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/ParticleData
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/ParticleData/StateLoader.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/ParticleGroup/ParticleGroupUtils.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Interactor/InteractorLoader.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Interactor/Patches/PatchInteractorLoader.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Interactor/PatchyParticles/PatchyParticlesInteractor.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Integrator/IntegratorBase.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Integrator/IntegratorManager.cu")
@@ -262,6 +315,9 @@ list(REMOVE_DUPLICATES STRUCTURED_COMPONENTS)
 # Create an object library for the structured .cpp and .cu files
 add_library(structured_objects STATIC ${STRUCTURED_BACKBONE_FILES} ${STRUCTURED_COMPONENTS})
 add_dependencies(structured_objects CopyUAMMD)
+foreach(SECTION ${SECTIONS})
+  add_dependencies(structured_objects Generate${SECTION}Data)
+endforeach()
 
 # Define the executable
 add_executable(UAMMDlauncher ${CMAKE_CURRENT_SOURCE_DIR}/main/UAMMDlauncher.cu)
@@ -273,10 +329,8 @@ target_link_libraries(UAMMDlauncher PRIVATE
                       $<TARGET_OBJECTS:structured_objects>
                       ${LIBRARIES})
 
-# Specify that the main build depends on the external project
-add_dependencies(UAMMDlauncher UAMMD)
-
-################################################################
-## Installation rules
-install(TARGETS UAMMDlauncher
-        RUNTIME DESTINATION ${INSTALL_DIR})
+# Specify that the main build depends on the external project and generated files
+add_dependencies(UAMMDlauncher CopyUAMMD)
+foreach(SECTION ${SECTIONS})
+  add_dependencies(UAMMDlauncher Generate${SECTION}Data)
+endforeach()

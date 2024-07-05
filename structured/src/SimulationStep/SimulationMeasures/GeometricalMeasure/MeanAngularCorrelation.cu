@@ -6,6 +6,8 @@
 #include "SimulationStep/SimulationStep.cuh"
 #include "SimulationStep/SimulationStepFactory.cuh"
 
+#include "utils/quaternion.cuh"
+
 namespace uammd{
 namespace structured{
 namespace SimulationStep{

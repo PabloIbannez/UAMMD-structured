@@ -6,6 +6,8 @@
 #include "SimulationStep/SimulationStep.cuh"
 #include "SimulationStep/SimulationStepFactory.cuh"
 
+#include "Utils/Measures/MeasuresBasic.cuh"
+
 namespace uammd{
 namespace structured{
 namespace SimulationStep{

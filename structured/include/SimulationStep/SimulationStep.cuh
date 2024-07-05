@@ -15,6 +15,8 @@
 
 #include "utils/container.h"
 
+#include "Utils/Backup/Backup.cuh"
+
 namespace uammd{
 namespace structured{
 namespace SimulationStep{

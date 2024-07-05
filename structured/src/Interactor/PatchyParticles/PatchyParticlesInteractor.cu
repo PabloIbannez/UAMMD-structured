@@ -294,11 +294,11 @@ namespace Interactor{
 
         for(auto& entry : patchForceFieldInfo->getEntriesInfo()){
 
-            if(Potentials::GenericPatchyParticlesLoader::isPatchyParticlesInteractorAvailable(getExtendedSystem(this->sys),entry.second.path)){
-              std::shared_ptr<typename uammd::Interactor> inter = Potentials::GenericPatchyParticlesLoader::loadGenericPatchyParticles(getExtendedSystem(this->sys),
-                                                                                                                                       gd,pg,
-                                                                                                                                       patchesGd,patchesGroups,
-                                                                                                                                       patchesVConListSet,entry.second.path);
+            if(isPatchInteractorAvailable(getExtendedSystem(this->sys),entry.second.path)){
+              std::shared_ptr<typename uammd::Interactor> inter = loadPatchInteractor(getExtendedSystem(this->sys),
+                                                                                      gd,pg,
+                                                                                      patchesGd,patchesGroups,
+                                                                                      patchesVConListSet,entry.second.path);
 
               if(patchInteractors.count(entry.second.name) == 0){
                     patchInteractors[entry.second.name] = inter;

@@ -8,7 +8,7 @@
 
 #include "InputOutput/Output/Output.cuh"
 
-//TODO: fix it
+#include "Interactor/PatchyParticles/PatchyParticlesInteractor.cuh"
 
 namespace uammd{
 namespace structured{
@@ -201,134 +201,134 @@ class WriteStep: public SimulationStepBase{
         }
 };
 
-//class WritePatchyParticlesStep: public WriteStep{
-//
-//        std::shared_ptr<GlobalData>   gd;
-//
-//        std::shared_ptr<ParticleData>  pdParent;
-//        std::shared_ptr<ParticleGroup> pgParent;
-//
-//        std::map<std::string,std::shared_ptr<Interactor::PatchyParticles_<>>> patches;
-//        std::map<std::string,std::shared_ptr<ParticleGroup>> patchesGroups;
-//
-//        std::shared_ptr<ParticleData> pdBuffer;
-//
-//        void updateParticleDataBuffer(cudaStream_t st){
-//
-//            for(auto& p : patches){
-//                p.second->updatePatchyParticles(st);
-//            }
-//
-//            //Update the particle data buffer
-//            auto posBuffer    = pdBuffer->getPos(access::location::cpu,access::mode::write);
-//            auto radiusBuffer = pdBuffer->getRadius(access::location::cpu,access::mode::write);
-//
-//            //Load parent particle data
-//            int offset = 0;
-//            {
-//                auto pos    = pdParent->getPos(access::location::cpu,access::mode::read);
-//                auto radius = pdParent->getRadius(access::location::cpu,access::mode::read);
-//
-//                auto groupIndex = this->pgParent->getIndexIterator(access::location::cpu);
-//
-//                for(int i=0;i<this->pgParent->getNumberParticles();i++){
-//                    int index = groupIndex[i];
-//                    posBuffer[offset]    = pos[index];
-//                    radiusBuffer[offset] = radius[index];
-//                    offset++;
-//                }
-//            }
-//            int typesOffset = gd->getTypes()->getNumberOfTypes()+1;
-//
-//            //Load patch particle data
-//            for(auto& p : patches){
-//
-//                auto pos    = p.second->getPatchesParticleData()->getPos(access::location::cpu,access::mode::read);
-//                auto radius = p.second->getPatchesParticleData()->getRadius(access::location::cpu,access::mode::read);
-//
-//                auto groupIndex = patchesGroups[p.first]->getIndexIterator(access::location::cpu);
-//
-//                for(int i=0;i<patchesGroups[p.first]->getNumberParticles();i++){
-//                    int index = groupIndex[i];
-//                    posBuffer[offset]    = pos[index];
-//                    posBuffer[offset].w  = int(posBuffer[offset].w) + typesOffset;
-//                    radiusBuffer[offset] = radius[index];
-//                    offset++;
-//                }
-//
-//                typesOffset += p.second->getPatchesGlobalData()->getTypes()->getNumberOfTypes()+1;
-//            }
-//        };
-//
-//    public:
-//
-//        WritePatchyParticlesStep(std::shared_ptr<ParticleGroup>     pg,
-//                                 std::shared_ptr<IntegratorManager> integrator,
-//                                 std::shared_ptr<ForceField>        ff,
-//                                 DataEntry& data,
-//                                 std::string name):WriteStep(pg,integrator,ff,data,name){
-//
-//            //Store the global data
-//            gd = topology->getGlobalData();
-//            //Store the original particle data
-//            pdParent = pg->getParticleData();
-//            pgParent = pg;
-//
-//            std::map<std::string,std::shared_ptr<typename uammd::Interactor>> patchesTmp = topology->getInteractorsByClass("PatchyParticles");
-//
-//            for(auto& p : patchesTmp){
-//                patches[p.first]=std::static_pointer_cast<Interactor::PatchyParticles_<>>(p.second);
-//                System::log<System::MESSAGE>("[WritePatchyParticlesStep] (%s) Found PatchyParticles interactor \"%s\"",name.c_str(),p.first.c_str());
-//            }
-//
-//            if(patches.size()==0){
-//                System::log<System::WARNING>("[WritePatchyParticlesStep] (%s) No PatchyParticles interactor found",name.c_str());
-//            }
-//        }
-//
-//        void init(cudaStream_t st) {
-//
-//            //Get the ids of the particles in the group
-//            auto pgIds = pgParent->getPropertyIterator(pdParent->getId(access::location::cpu, access::mode::read).begin(),
-//                                                       access::location::cpu);
-//
-//            //Iterate over all PatchyParticles interactors and compute the number of particles
-//            int Np = pgParent->getNumberParticles();
-//            for(auto p : patches){
-//                auto patchesId = p.second->getPatchesParticleData()->getId(access::location::cpu,access::mode::read);
-//                auto parentId  = p.second->getPatchesParticleData()->getModelId(access::location::cpu,access::mode::read);
-//
-//                //Find the id of the patches whose parent is in pgIds
-//                std::vector<int> ids;
-//                for(int i=0;i<pgParent->getNumberParticles();i++){
-//                    for(int j=0;j<p.second->getPatchesParticleData()->getNumParticles();j++){
-//                        if(pgIds[i]==parentId[j]){
-//                            ids.push_back(patchesId[j]);
-//                        }
-//                    }
-//                }
-//
-//                //Create a new group with the patches
-//                GroupUtils::selectors::ids selector(ids);
-//                patchesGroups[p.first] = std::make_shared<ParticleGroup>(selector,
-//                                                                         p.second->getPatchesParticleData(),
-//                                                                         "WritePatchyParticlesStep_"+p.first+pgParent->getName());
-//
-//                Np += ids.size();
-//            }
-//
-//            pdBuffer = std::make_shared<ParticleData>(Np,pgParent->getParticleData()->getSystem());
-//            //Overriding the particle group
-//            this->pg = std::make_shared<ParticleGroup>(pdBuffer,"ParentPatches_"+pgParent->getName());
-//
-//            WriteStep::init(st);
-//        }
-//
-//        void applyStep(ullint step, cudaStream_t st){
-//            this->updateParticleDataBuffer(st);
-//            WriteStep::applyStep(step,st);
-//        }
-//};
+class WritePatchyParticlesStep: public WriteStep{
+
+        std::shared_ptr<GlobalData>   gd;
+
+        std::shared_ptr<ParticleData>  pdParent;
+        std::shared_ptr<ParticleGroup> pgParent;
+
+        std::map<std::string,std::shared_ptr<Interactor::PatchyParticles_<>>> patches;
+        std::map<std::string,std::shared_ptr<ParticleGroup>> patchesGroups;
+
+        std::shared_ptr<ParticleData> pdBuffer;
+
+        void updateParticleDataBuffer(cudaStream_t st){
+
+            for(auto& p : patches){
+                p.second->updatePatchyParticles(st);
+            }
+
+            //Update the particle data buffer
+            auto posBuffer    = pdBuffer->getPos(access::location::cpu,access::mode::write);
+            auto radiusBuffer = pdBuffer->getRadius(access::location::cpu,access::mode::write);
+
+            //Load parent particle data
+            int offset = 0;
+            {
+                auto pos    = pdParent->getPos(access::location::cpu,access::mode::read);
+                auto radius = pdParent->getRadius(access::location::cpu,access::mode::read);
+
+                auto groupIndex = this->pgParent->getIndexIterator(access::location::cpu);
+
+                for(int i=0;i<this->pgParent->getNumberParticles();i++){
+                    int index = groupIndex[i];
+                    posBuffer[offset]    = pos[index];
+                    radiusBuffer[offset] = radius[index];
+                    offset++;
+                }
+            }
+            int typesOffset = gd->getTypes()->getNumberOfTypes()+1;
+
+            //Load patch particle data
+            for(auto& p : patches){
+
+                auto pos    = p.second->getPatchesParticleData()->getPos(access::location::cpu,access::mode::read);
+                auto radius = p.second->getPatchesParticleData()->getRadius(access::location::cpu,access::mode::read);
+
+                auto groupIndex = patchesGroups[p.first]->getIndexIterator(access::location::cpu);
+
+                for(int i=0;i<patchesGroups[p.first]->getNumberParticles();i++){
+                    int index = groupIndex[i];
+                    posBuffer[offset]    = pos[index];
+                    posBuffer[offset].w  = int(posBuffer[offset].w) + typesOffset;
+                    radiusBuffer[offset] = radius[index];
+                    offset++;
+                }
+
+                typesOffset += p.second->getPatchesGlobalData()->getTypes()->getNumberOfTypes()+1;
+            }
+        };
+
+    public:
+
+        WritePatchyParticlesStep(std::shared_ptr<ParticleGroup>     pg,
+                                 std::shared_ptr<IntegratorManager> integrator,
+                                 std::shared_ptr<ForceField>        ff,
+                                 DataEntry& data,
+                                 std::string name):WriteStep(pg,integrator,ff,data,name){
+
+            //Store the global data
+            gd = topology->getGlobalData();
+            //Store the original particle data
+            pdParent = pg->getParticleData();
+            pgParent = pg;
+
+            std::map<std::string,std::shared_ptr<typename uammd::Interactor>> patchesTmp = topology->getInteractorsByClass("PatchyParticles");
+
+            for(auto& p : patchesTmp){
+                patches[p.first]=std::static_pointer_cast<Interactor::PatchyParticles_<>>(p.second);
+                System::log<System::MESSAGE>("[WritePatchyParticlesStep] (%s) Found PatchyParticles interactor \"%s\"",name.c_str(),p.first.c_str());
+            }
+
+            if(patches.size()==0){
+                System::log<System::WARNING>("[WritePatchyParticlesStep] (%s) No PatchyParticles interactor found",name.c_str());
+            }
+        }
+
+        void init(cudaStream_t st) {
+
+            //Get the ids of the particles in the group
+            auto pgIds = pgParent->getPropertyIterator(pdParent->getId(access::location::cpu, access::mode::read).begin(),
+                                                       access::location::cpu);
+
+            //Iterate over all PatchyParticles interactors and compute the number of particles
+            int Np = pgParent->getNumberParticles();
+            for(auto p : patches){
+                auto patchesId = p.second->getPatchesParticleData()->getId(access::location::cpu,access::mode::read);
+                auto parentId  = p.second->getPatchesParticleData()->getModelId(access::location::cpu,access::mode::read);
+
+                //Find the id of the patches whose parent is in pgIds
+                std::vector<int> ids;
+                for(int i=0;i<pgParent->getNumberParticles();i++){
+                    for(int j=0;j<p.second->getPatchesParticleData()->getNumParticles();j++){
+                        if(pgIds[i]==parentId[j]){
+                            ids.push_back(patchesId[j]);
+                        }
+                    }
+                }
+
+                //Create a new group with the patches
+                GroupUtils::selectors::ids selector(ids);
+                patchesGroups[p.first] = std::make_shared<ParticleGroup>(selector,
+                                                                         p.second->getPatchesParticleData(),
+                                                                         "WritePatchyParticlesStep_"+p.first+pgParent->getName());
+
+                Np += ids.size();
+            }
+
+            pdBuffer = std::make_shared<ParticleData>(Np,pgParent->getParticleData()->getSystem());
+            //Overriding the particle group
+            this->pg = std::make_shared<ParticleGroup>(pdBuffer,"ParentPatches_"+pgParent->getName());
+
+            WriteStep::init(st);
+        }
+
+        void applyStep(ullint step, cudaStream_t st){
+            this->updateParticleDataBuffer(st);
+            WriteStep::applyStep(step,st);
+        }
+};
 
 }}}}
 
@@ -337,7 +337,7 @@ REGISTER_SIMULATION_STEP(
         uammd::structured::SimulationStep::SimulationOutput::WriteStep
 )
 
-//REGISTER_SIMULATION_STEP(
-//        WritePatchyParticlesStep,
-//        uammd::structured::SimulationStep::SimulationOutput::WritePatchyParticlesStep
-//)
+REGISTER_SIMULATION_STEP(
+        WriteStep,WritePatchyParticlesStep,
+        uammd::structured::SimulationStep::SimulationOutput::WritePatchyParticlesStep
+)

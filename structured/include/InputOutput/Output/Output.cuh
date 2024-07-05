@@ -1,10 +1,9 @@
-#ifndef __OUTPUT_STATE__
-#define __OUTPUT_STATE__
-
-#include "UAMMDstructuredBase.cuh"
+#pragma once
 
 #include "Formats/psf.cuh"
 #include "Formats/dcd.cuh"
+
+#include "utils/quaternion.cuh"
 
 namespace uammd{
 namespace structured{
@@ -1054,5 +1053,3 @@ void WriteLAMMPS(std::shared_ptr<ParticleGroup> pg,
 
 
 }}}}
-
-#endif

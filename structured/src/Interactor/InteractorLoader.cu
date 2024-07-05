@@ -1,6 +1,4 @@
-#pragma oonce
-
-#include"Interactor/InteractorLoader.cuh"
+#include "Interactor/InteractorLoader.cuh"
 
 namespace uammd{
 namespace structured{

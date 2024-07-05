@@ -73,6 +73,11 @@ namespace Interactor {
                 return isRegistered<PatchesCreator>(key) || isRegistered<NonBondedPatchesCreator>(key);
             }
 
+            bool isInteractorNonBonded(const std::string& integratorType, const std::string& integratorSubType) const {
+                std::pair<std::string, std::string> key(integratorType, integratorSubType);
+                return isRegistered<NonBondedPatchesCreator>(key);
+            }
+
             template<typename CreatorType>
             const std::unordered_map<std::pair<std::string, std::string>, CreatorType, PairHash>& getCreators() const {
                 return getCreatorsRef<CreatorType>();
