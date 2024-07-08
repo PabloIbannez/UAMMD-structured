@@ -4,7 +4,7 @@
 
 #include"System/System.h"
 
-#include"InputOutput/Input/InputFormats/InputJSON.cuh"
+#include"Input/InputFormats/InputJSON.cuh"
 
 namespace uammd{
 namespace structured{

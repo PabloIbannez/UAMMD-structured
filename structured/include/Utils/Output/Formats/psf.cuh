@@ -1,5 +1,4 @@
-#ifndef __PSF__
-#define __PSF__
+#pragma once
 
 namespace uammd{
 namespace structured{
@@ -173,4 +172,3 @@ namespace psf{
 
 }}}
 
-#endif

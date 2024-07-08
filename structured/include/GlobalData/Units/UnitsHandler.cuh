@@ -2,6 +2,8 @@
 
 #include "System/ExtendedSystem.cuh"
 
+#include "Utils/Preprocessor/DataAccess.cuh"
+
 #include <string>
 
 namespace uammd{
@@ -24,24 +26,24 @@ class UnitsHandler{
             return subType;
         }
 
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wreturn-type"
-
-        virtual real getBoltzmannConstant(){
-            System::log<System::CRITICAL>("[Units] BoltzmannConstant not defined for units \"%s\".",
-                                          subType.c_str());
-        }
-        virtual real getElectricConversionFactor(){
-            System::log<System::CRITICAL>("[Units] ElectricConversionFactor not defined for units \"%s\".",
-                                          subType.c_str());
+        #define CONSTANT_IMPL(NAME, name, type) \
+        virtual type get##NAME(){ \
+            System::log<System::CRITICAL>("[Units] %s not defined for units \"%s\".", \
+                                          std::string(#name).c_str(), \
+                                          subType.c_str()); \
+            throw std::runtime_error("Constant not defined for units."); \
         }
 
+        #define CONSTANT_AUX(NAME, name, type) CONSTANT_IMPL(NAME, name, type)
 
+        #define CONSTANT(r, data, tuple) \
+            CONSTANT_AUX(__DATA_CAPS__(tuple), __DATA_NAME__(tuple), __DATA_TYPE__(tuple))
 
-        #pragma GCC diagnostic pop
+        __MACRO_OVER_UNITS__(CONSTANT)
 
-
-
+        #undef CONSTANT
+        #undef CONSTANT_AUX
+        #undef CONSTANT_IMPL
 };
 
 }}}

@@ -233,6 +233,7 @@ list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/DataStructur
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/DataStructures/VerletConditionalListSet/VerletConditionalListSetLoaders.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/DataStructures/GroupsList/GroupsList.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/DataStructures/ExclusionsList/ExclusionsList.cu")
+list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/Output/Output.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/Backup/Backup.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/Backup/BackupStep.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Utils/Measures/MeasuresBasic.cu")
@@ -334,3 +335,8 @@ add_dependencies(UAMMDlauncher CopyUAMMD)
 foreach(SECTION ${SECTIONS})
   add_dependencies(UAMMDlauncher Generate${SECTION}Data)
 endforeach()
+
+################################################################
+## Installation rules
+install(TARGETS UAMMDlauncher
+        RUNTIME DESTINATION ${INSTALL_DIR})

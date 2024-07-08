@@ -1,12 +1,10 @@
-
-#ifndef __FUNDAMENTAL_HANDLER__
-#define __FUNDAMENTAL_HANDLER__
+#pragma once
 
 #include <string>
 
 #include "System/ExtendedSystem.cuh"
 
-
+#include "Utils/Preprocessor/DataAccess.cuh"
 
 namespace uammd{
 namespace structured{
@@ -28,45 +26,27 @@ class FundamentalHandler{
             return subType;
         }
 
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wreturn-type"
-
-        virtual double getTimeStep(){
-            System::log<System::CRITICAL>("[Fundamental] TimeStep not defined for fundamental \"%s\".",
-                                          subType.c_str());
-        }
-        virtual ullint getCurrentStep(){
-            System::log<System::CRITICAL>("[Fundamental] CurrentStep not defined for fundamental \"%s\".",
-                                          subType.c_str());
-        }
-        virtual double getSimulationTime(){
-            System::log<System::CRITICAL>("[Fundamental] SimulationTime not defined for fundamental \"%s\".",
-                                          subType.c_str());
-        }
-        virtual real getEnergyThreshold(){
-            System::log<System::CRITICAL>("[Fundamental] EnergyThreshold not defined for fundamental \"%s\".",
-                                          subType.c_str());
+        #define VARIABLE_IMPL(NAME, name, type) \
+        virtual type get##NAME(){ \
+            System::log<System::CRITICAL>("[Fundamental] %s not defined for fundamental \"%s\".", \
+                                          std::string(#NAME).c_str(), subType.c_str()); \
+            throw std::runtime_error("Variable not defined for fundamental."); \
+        } \
+        virtual void set##NAME(type value){ \
+            System::log<System::CRITICAL>("[Fundamental] %s not defined for fundamental \"%s\".", \
+                                          std::string(#NAME).c_str(), subType.c_str()); \
         }
 
-        virtual void setTimeStep(double value){
-            System::log<System::CRITICAL>("[Fundamental] TimeStep not defined for fundamental \"%s\".",
-                                          subType.c_str());
-        }
-        virtual void setCurrentStep(ullint value){
-            System::log<System::CRITICAL>("[Fundamental] CurrentStep not defined for fundamental \"%s\".",
-                                          subType.c_str());
-        }
-        virtual void setSimulationTime(double value){
-            System::log<System::CRITICAL>("[Fundamental] SimulationTime not defined for fundamental \"%s\".",
-                                          subType.c_str());
-        }
-        virtual void setEnergyThreshold(real value){
-            System::log<System::CRITICAL>("[Fundamental] EnergyThreshold not defined for fundamental \"%s\".",
-                                          subType.c_str());
-        }
+        #define VARIABLE_AUX(NAME, name, type) VARIABLE_IMPL(NAME, name, type)
 
+        #define VARIABLE(r, data, tuple) \
+            VARIABLE_AUX(__DATA_CAPS__(tuple), __DATA_NAME__(tuple), __DATA_TYPE__(tuple))
 
-        #pragma GCC diagnostic pop
+        __MACRO_OVER_FUNDAMENTAL__(VARIABLE)
+
+        #undef VARIABLE
+        #undef VARIABLE_AUX
+        #undef VARIABLE_IMPL
 
         virtual void updateDataEntry(DataEntry data) = 0;
 
@@ -74,4 +54,3 @@ class FundamentalHandler{
 };
 
 }}}
-#endif

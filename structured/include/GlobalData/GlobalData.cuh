@@ -1,14 +1,10 @@
 #pragma once
 
-#include"InputOutput/Input/Input.cuh"
+#include"Input/Input.cuh"
 
 //Units
 #include"GlobalData/Units/UnitsHandler.cuh"
 #include"GlobalData/Units/UnitsLoaders.cuh"
-
-//Fundamental
-#include"GlobalData/Fundamental/FundamentalHandler.cuh"
-#include"GlobalData/Fundamental/FundamentalLoaders.cuh"
 
 //Ensemble
 #include"GlobalData/Ensemble/EnsembleHandler.cuh"
@@ -17,6 +13,10 @@
 //Types
 #include"GlobalData/Types/TypesHandler.cuh"
 #include"GlobalData/Types/TypesLoaders.cuh"
+
+//Fundamental
+#include"GlobalData/Fundamental/FundamentalHandler.cuh"
+#include"GlobalData/Fundamental/FundamentalLoaders.cuh"
 
 
 namespace uammd{

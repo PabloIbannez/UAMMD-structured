@@ -4,6 +4,8 @@
 
 #include "System/ExtendedSystem.cuh"
 
+#include "Utils/Preprocessor/DataAccess.cuh"
+
 #include "utils/Box.cuh"
 
 namespace uammd{
@@ -26,37 +28,27 @@ class EnsembleHandler{
             return subType;
         }
 
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wreturn-type"
-
-        virtual real getLambda(){
-            System::log<System::CRITICAL>("[Ensemble] Lambda not defined for ensemble \"%s\".",
-                                          subType.c_str());
-        }
-        virtual real getTemperature(){
-            System::log<System::CRITICAL>("[Ensemble] Temperature not defined for ensemble \"%s\".",
-                                          subType.c_str());
-        }
-        virtual Box getBox(){
-            System::log<System::CRITICAL>("[Ensemble] Box not defined for ensemble \"%s\".",
-                                          subType.c_str());
+        #define VARIABLE_IMPL(NAME, name, type) \
+        virtual type get##NAME(){ \
+            System::log<System::CRITICAL>("[Ensemble] %s not defined for ensemble \"%s\".", \
+                                          std::string(#NAME).c_str(), subType.c_str()); \
+            throw std::runtime_error("Variable not defined for ensemble."); \
+        } \
+        virtual void set##NAME(type value){ \
+            System::log<System::CRITICAL>("[Ensemble] %s not defined for ensemble \"%s\".", \
+                                          std::string(#NAME).c_str(), subType.c_str()); \
         }
 
-        virtual void setLambda(real value){
-            System::log<System::CRITICAL>("[Ensemble] Lambda not defined for ensemble \"%s\".",
-                                          subType.c_str());
-        }
-        virtual void setTemperature(real value){
-            System::log<System::CRITICAL>("[Ensemble] Temperature not defined for ensemble \"%s\".",
-                                          subType.c_str());
-        }
-        virtual void setBox(Box value){
-            System::log<System::CRITICAL>("[Ensemble] Box not defined for ensemble \"%s\".",
-                                          subType.c_str());
-        }
+        #define VARIABLE_AUX(NAME, name, type) VARIABLE_IMPL(NAME, name, type)
 
+        #define VARIABLE(r, data, tuple) \
+            VARIABLE_AUX(__DATA_CAPS__(tuple), __DATA_NAME__(tuple), __DATA_TYPE__(tuple))
 
-        #pragma GCC diagnostic pop
+        __MACRO_OVER_ENSEMBLE__(VARIABLE)
+
+        #undef VARIABLE
+        #undef VARIABLE_AUX
+        #undef VARIABLE_IMPL
 
         virtual void updateDataEntry(DataEntry data) = 0;
 

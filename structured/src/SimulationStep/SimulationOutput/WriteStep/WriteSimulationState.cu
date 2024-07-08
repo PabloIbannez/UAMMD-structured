@@ -6,7 +6,7 @@
 #include "SimulationStep/SimulationStep.cuh"
 #include "SimulationStep/SimulationStepFactory.cuh"
 
-#include "InputOutput/Output/Output.cuh"
+#include "Utils/Output/Output.cuh"
 
 #include "Interactor/PatchyParticles/PatchyParticlesInteractor.cuh"
 
@@ -29,7 +29,7 @@ class WriteStep: public SimulationStepBase{
                                               "lammpstrj",
                                               "vel",
                                               "magnet", "xyzm", "spm",
-					      "svv", "svvm", "svvma"};
+                                              "svv", "svvm", "svvma"};
 
     private:
 
@@ -108,10 +108,10 @@ class WriteStep: public SimulationStepBase{
                                 outputFilePath = outputFilePath + "." + outputFormat;
                                 outputFile.open(outputFilePath,std::ios::binary);
 
-                                InputOutput::Output::WriteDCDheader(pg,
-                                                                    frame,
-                                                                    this->intervalStep,
-                                                                    outputFile);
+                                Output::WriteDCDheader(pg,
+                                                       frame,
+                                                       this->intervalStep,
+                                                       outputFile);
                             } else {
                                 outputFilePath = outputFilePath + "." + outputFormat;
                                 outputFile.open(outputFilePath,std::ios::binary | std::ios_base::app);
@@ -141,59 +141,59 @@ class WriteStep: public SimulationStepBase{
 
             if(outputFormat ==
                std::string("coord")){
-                InputOutput::Output::WriteCoord(pg,this->getBox(),outputFile);
+                Output::WriteCoord(pg,this->getBox(),outputFile);
             } else if(outputFormat ==
                       std::string("sp")){
-                InputOutput::Output::WriteSP(pg,this->getBox(),outputFile);
+                Output::WriteSP(pg,this->getBox(),outputFile);
             } else if(outputFormat ==
                       std::string("spo")){
-                InputOutput::Output::WriteSPO(pg,this->getBox(),outputFile);
+                Output::WriteSPO(pg,this->getBox(),outputFile);
             } else if(outputFormat ==
                       std::string("spf")){
-                InputOutput::Output::WriteSPF(pg,this->getBox(),outputFile);
+                Output::WriteSPF(pg,this->getBox(),outputFile);
             } else if (outputFormat ==
                        std::string("xyz")){
-                InputOutput::Output::WriteXYZ(pg,this->getBox(),outputFile);
+                Output::WriteXYZ(pg,this->getBox(),outputFile);
             } else if (outputFormat ==
                        std::string("pdb")){
-                InputOutput::Output::WritePDB(pg,this->getBox(),frame,outputFile);
+                Output::WritePDB(pg,this->getBox(),frame,outputFile);
             } else if (outputFormat ==
                        std::string("itpv")){
-                InputOutput::Output::WriteITPV(pg,this->getBox(),outputFile);
+                Output::WriteITPV(pg,this->getBox(),outputFile);
             } else if (outputFormat ==
                        std::string("itpd")){
-                InputOutput::Output::WriteITPD(pg,this->getBox(),outputFile);
+                Output::WriteITPD(pg,this->getBox(),outputFile);
             } else if (outputFormat ==
                        std::string("dcd")){
-                InputOutput::Output::WriteDCD(pg,
-                                              this->getBox(),
-                                              frame,step,
-                                              outputFile);
+                Output::WriteDCD(pg,
+                                 this->getBox(),
+                                 frame,step,
+                                 outputFile);
             } else if (outputFormat ==
                        std::string("lammpstrj")){
                 real time = step*gd->getFundamental()->getTimeStep();
-                InputOutput::Output::WriteLAMMPS(pg,this->getBox(),time,outputFile);
+                Output::WriteLAMMPS(pg,this->getBox(),time,outputFile);
             } else if (outputFormat ==
                        std::string("vel")){
-                InputOutput::Output::WriteVelocity(pg,outputFile);
+                Output::WriteVelocity(pg,outputFile);
 	    } else if (outputFormat ==
                        std::string("magnet")){
-	      InputOutput::Output::WriteMagnetization(pg,outputFile);
+	      Output::WriteMagnetization(pg,outputFile);
             } else if (outputFormat ==
                        std::string("xyzm")){
-	      InputOutput::Output::WriteXYZMagnetization(pg,outputFile);
+	      Output::WriteXYZMagnetization(pg,outputFile);
             } else if (outputFormat ==
                        std::string("spm")){
-	      InputOutput::Output::WriteSPM(pg,this->getBox(),outputFile);
+	      Output::WriteSPM(pg,this->getBox(),outputFile);
 	    } else if (outputFormat ==
                        std::string("svv")){
-	      InputOutput::Output::WriteSVV(pg,this->getBox(),outputFile);
+	      Output::WriteSVV(pg,this->getBox(),outputFile);
 	    } else if (outputFormat ==
                        std::string("svvm")){
-	      InputOutput::Output::WriteSVVM(pg,this->getBox(),outputFile);
+	      Output::WriteSVVM(pg,this->getBox(),outputFile);
 	    } else if (outputFormat ==
                        std::string("svvma")){
-	      InputOutput::Output::WriteSVVMA(pg,this->getBox(),outputFile);
+	      Output::WriteSVVMA(pg,this->getBox(),outputFile);
             } else {
 	      System::log<System::CRITICAL>("[WriteStep] (%s) It should not have happen,"
 					    "have the output format changed ?",name.c_str());

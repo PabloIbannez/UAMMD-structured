@@ -1,5 +1,4 @@
-#ifndef __DCD__
-#define __DCD__
+#pragma once
 
 namespace uammd{
 namespace structured{
@@ -173,5 +172,3 @@ namespace dcd{
     }
 
 }}}
-
-#endif
