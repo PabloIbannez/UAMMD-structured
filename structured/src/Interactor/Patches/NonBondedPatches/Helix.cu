@@ -8,7 +8,8 @@
 #include "Interactor/Patches/PatchesFactory.cuh"
 
 #include "Interactor/BasicPotentials.cuh"
-#include "Interactor/BasicParameters.cuh"
+#include "Interactor/BasicParameters/Pair/Helix.cuh"
+#include "Interactor/BasicParameters/Pair/Helix2States.cuh"
 #include "Utils/ParameterHandler/PairParameterHandler.cuh"
 
 namespace uammd{

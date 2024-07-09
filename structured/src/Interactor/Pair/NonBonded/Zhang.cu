@@ -8,7 +8,7 @@
 #include "Interactor/InteractorFactory.cuh"
 
 #include "Interactor/BasicPotentials.cuh"
-#include "Interactor/BasicParameters.cuh"
+#include "Interactor/BasicParameters/Pair/Zhang.cuh"
 #include "Utils/ParameterHandler/PairParameterHandler.cuh"
 
 namespace uammd{

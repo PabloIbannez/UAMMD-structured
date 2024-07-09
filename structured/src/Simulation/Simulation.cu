@@ -187,7 +187,7 @@ void startSelfStartingSimulation(const inTyp& in){
     std::string backupFilePath = "";
     {
         bool saveBackup = false;
-        auto input = std::make_shared<typename ExtendedSystem::InputType>(in);
+        auto input = std::make_shared<typename Input::Input>(in);
 
         for (std::string entryName : input->getEntriesList({"system"})) {
             std::vector<std::string> entryPath = {"system"};
@@ -288,7 +288,7 @@ void startSelfStartingSimulationFromFile(std::string inputFilePath) {
     startSelfStartingSimulation(inputFilePath);
 }
 
-void startSelfStartingSimulationFromInput(const typename ExtendedSystem::InputType::DataType& in) {
+void startSelfStartingSimulationFromInput(const typename Input::Input::DataType& in) {
     startSelfStartingSimulation(in);
 }
 

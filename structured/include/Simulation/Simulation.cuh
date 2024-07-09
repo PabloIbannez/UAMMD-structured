@@ -64,6 +64,6 @@ void startSelfStartingSimulation(const inTyp& in);
 
 void startSelfStartingSimulationFromFile(std::string inputFilePath);
 
-void startSelfStartingSimulationFromInput(const typename ExtendedSystem::InputType::DataType& in);
+void startSelfStartingSimulationFromInput(const typename Input::Input::DataType& in);
 
 }}

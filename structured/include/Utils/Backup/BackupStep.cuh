@@ -21,7 +21,7 @@ class BackupStep: public SimulationStep::SimulationStepBase {
 
     private:
 
-        std::shared_ptr<ExtendedSystem::InputType> input;
+        std::shared_ptr<Input::Input> input;
 
         bool isSimulationStateCorrect();
 

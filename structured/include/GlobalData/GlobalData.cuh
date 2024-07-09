@@ -1,6 +1,6 @@
 #pragma once
 
-#include"Input/Input.cuh"
+#include"Input/InputEntryManager.cuh"
 
 //Units
 #include"GlobalData/Units/UnitsHandler.cuh"

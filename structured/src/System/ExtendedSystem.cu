@@ -3,8 +3,7 @@
 namespace uammd{
 namespace structured{
 
-    template<class InputType_>
-    void ExtendedSystem_<InputType_>::loadSimulationInformation(std::string entryName){
+    void ExtendedSystem::loadSimulationInformation(std::string entryName){
 
         std::vector<std::string> infoPath = path;
         infoPath.push_back(entryName);
@@ -25,8 +24,7 @@ namespace structured{
 
     }
 
-    template<class InputType_>
-    void ExtendedSystem_<InputType_>::loadSimulationBackup(std::string entryName){
+    void ExtendedSystem::loadSimulationBackup(std::string entryName){
 
         backupPath = path;
         backupPath.push_back(entryName);
@@ -49,8 +47,7 @@ namespace structured{
         }
     }
 
-    template<class InputType_>
-    void ExtendedSystem_<InputType_>::init(){
+    void ExtendedSystem::init(){
 
         this->saveBackup = false;
         this->restartedFromBackup = false;
@@ -92,13 +89,11 @@ namespace structured{
 
     }
 
-    template<class InputType_>
-    ExtendedSystem_<InputType_>::ExtendedSystem_(std::string inputFilePath):
-    ExtendedSystem_<InputType_>(0,nullptr,inputFilePath,{"system"}){}
+    ExtendedSystem::ExtendedSystem(std::string inputFilePath):
+    ExtendedSystem(0,nullptr,inputFilePath,{"system"}){}
 
-    template<class InputType_>
-    ExtendedSystem_<InputType_>::ExtendedSystem_(int argc, char *argv[],
-                                                 std::string inputFilePath,std::vector<std::string> path):
+    ExtendedSystem::ExtendedSystem(int argc, char *argv[],
+                                   std::string inputFilePath,std::vector<std::string> path):
     uammd::System(argc,argv),
     path(path){
         //Check if the input file exists
@@ -111,7 +106,7 @@ namespace structured{
         }
 
         try{
-            input=std::make_shared<InputType>(inputFilePath);
+            input=std::make_shared<Input::Input>(inputFilePath);
         }catch(std::exception &e){
             System::log<System::CRITICAL>("[ExtendedSystem] (%s) Error reading input file: %s",
                                           path.back().c_str(),e.what());
@@ -125,8 +120,7 @@ namespace structured{
 
     ///////////////////////////////////////////
 
-    template<class InputType_>
-    void ExtendedSystem_<InputType_>::updateInputSystem(){
+    void ExtendedSystem::updateInputSystem(){
 
         System::log<System::DEBUG1>("[ExtendedSystem] (%s) Updating input backup",this->path.back().c_str());
 
@@ -141,8 +135,7 @@ namespace structured{
 
     }
 
-    template<class InputType_>
-    void ExtendedSystem_<InputType_>::finish(){
+    void ExtendedSystem::finish(){
 
         std::string line;
         fori(0,29) line += "━ ";
@@ -158,6 +151,4 @@ namespace structured{
     std::shared_ptr<ExtendedSystem> getExtendedSystem(std::shared_ptr<uammd::System> sys){
         return std::static_pointer_cast<ExtendedSystem>(sys);
     }
-
-    template class ExtendedSystem_<InputJSON::InputJSON>;
 }}

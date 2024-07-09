@@ -8,7 +8,7 @@
 #include "Interactor/Patches/PatchesFactory.cuh"
 
 #include "Interactor/BasicPotentials.cuh"
-#include "Interactor/BasicParameters.cuh"
+#include "Interactor/BasicParameters/Pair/DistanceSwitch.cuh"
 #include "Utils/ParameterHandler/PairParameterHandler.cuh"
 
 namespace uammd{

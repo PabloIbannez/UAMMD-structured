@@ -3,18 +3,14 @@
 #include <fstream>
 
 #include"System/System.h"
-
-#include"Input/InputFormats/InputJSON.cuh"
+#include"Input/Input.cuh"
 
 namespace uammd{
 namespace structured{
 
-    template<class InputType_>
-    class ExtendedSystem_ : public uammd::System {
+    class ExtendedSystem : public uammd::System {
 
         public:
-
-            using InputType = InputType_;
 
             //Enum available states, running and stopped
             enum SIMULATION_STATE {RUNNING, STOPPED};
@@ -27,7 +23,7 @@ namespace structured{
             bool cudaStreamCreated = false;
             cudaStream_t stream;
 
-            std::shared_ptr<InputType> input;
+            std::shared_ptr<Input::Input> input;
 
             ///////////////////////////
             std::vector<std::string> path;
@@ -58,8 +54,8 @@ namespace structured{
 
         public:
 
-            ExtendedSystem_(std::string inputFilePath);
-            ExtendedSystem_(int argc, char *argv[],std::string inputFilePath,std::vector<std::string> path);
+            ExtendedSystem(std::string inputFilePath);
+            ExtendedSystem(int argc, char *argv[],std::string inputFilePath,std::vector<std::string> path);
 
             cudaStream_t getCudaStream(){
                 if(!cudaStreamCreated){
@@ -91,7 +87,7 @@ namespace structured{
                 this->state = state;
             }
 
-            std::shared_ptr<InputType> getInput(){
+            std::shared_ptr<Input::Input> getInput(){
                 return input;
             }
 
@@ -187,12 +183,6 @@ namespace structured{
 
             void finish();
     };
-
-    using ExtendedSystem = ExtendedSystem_<InputJSON::InputJSON>;
-
-    using ParametersEntry = ExtendedSystem::InputType::parametersEntry;
-    using TypeEntry       = ExtendedSystem::InputType::typeEntry;
-    using DataEntry       = ExtendedSystem::InputType::dataEntry;
 
     std::shared_ptr<ExtendedSystem> getExtendedSystem(std::shared_ptr<uammd::System> sys);
 }}

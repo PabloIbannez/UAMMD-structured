@@ -8,7 +8,7 @@
 #include "Interactor/InteractorFactory.cuh"
 
 #include "Interactor/BasicPotentials.cuh"
-#include "Interactor/BasicParameters.cuh"
+#include "Interactor/BasicParameters/Pair/Helix.cuh"
 
 namespace uammd{
 namespace structured{
