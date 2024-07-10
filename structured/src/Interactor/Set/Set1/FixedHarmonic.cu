@@ -7,7 +7,7 @@
 #include "Interactor/Set/Set1/Set1.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
+#include "Interactor/BasicPotentials/Harmonic.cuh"
 
 namespace uammd{
 namespace structured{

@@ -6,8 +6,6 @@
 #include "Interactor/PatchyParticles/PatchyParticlesInteractor.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
-
 namespace uammd{
 namespace structured{
 namespace Interactor{

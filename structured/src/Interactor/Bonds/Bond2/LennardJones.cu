@@ -7,7 +7,8 @@
 #include "Interactor/Bonds/Bond2/Bond2.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
+#include "Interactor/BasicPotentials/LennardJones.cuh"
+#include "Interactor/BasicPotentials/ModifiedLennardJones.cuh"
 
 namespace uammd{
 namespace structured{

@@ -7,7 +7,8 @@
 #include "Interactor/Bonds/Bond2/Bond2.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
+#include "Interactor/BasicPotentials/Morse.cuh"
+#include "Interactor/BasicPotentials/WCA.cuh"
 
 namespace uammd{
 namespace structured{

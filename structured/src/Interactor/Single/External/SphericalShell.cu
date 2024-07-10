@@ -7,7 +7,7 @@
 #include "Interactor/Single/External/External.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
+#include "Interactor/BasicPotentials/Steric.cuh"
 
 namespace uammd{
 namespace structured{

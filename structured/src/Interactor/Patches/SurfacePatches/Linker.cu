@@ -7,8 +7,9 @@
 #include "Interactor/Patches/SurfacePatches/SurfacePatches.cuh"
 #include "Interactor/Patches/PatchesFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
+#include "Interactor/BasicPotentials/Surface.cuh"
 #include "Interactor/BasicParameters/Single/LennardJones.cuh"
+
 #include "Utils/ParameterHandler/SingleParameterHandler.cuh"
 
 namespace uammd{

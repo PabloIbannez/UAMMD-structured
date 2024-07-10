@@ -7,7 +7,8 @@
 #include "Interactor/AFM/AFM/AFM.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
+#include "Interactor/BasicPotentials/Tip.cuh"
+#include "Interactor/BasicPotentials/Harmonic.cuh"
 
 namespace uammd{
 namespace structured{

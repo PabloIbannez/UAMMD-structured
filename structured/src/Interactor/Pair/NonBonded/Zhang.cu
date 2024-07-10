@@ -1,3 +1,6 @@
+#include "uammd.cuh"
+#include "utils/quaternion.cuh"
+
 #include "System/ExtendedSystem.cuh"
 #include "GlobalData/GlobalData.cuh"
 #include "ParticleData/ExtendedParticleData.cuh"
@@ -7,7 +10,6 @@
 #include "Interactor/Pair/NonBonded/NonBonded.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
 #include "Interactor/BasicParameters/Pair/Zhang.cuh"
 #include "Utils/ParameterHandler/PairParameterHandler.cuh"
 

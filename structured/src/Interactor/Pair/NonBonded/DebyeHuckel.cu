@@ -7,7 +7,7 @@
 #include "Interactor/Pair/NonBonded/NonBonded.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
+#include "Interactor/BasicPotentials/DebyeHuckel.cuh"
 
 namespace uammd{
 namespace structured{

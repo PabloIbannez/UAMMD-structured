@@ -7,7 +7,7 @@
 #include "Interactor/Set/Set2/Set2.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
+#include "Interactor/BasicPotentials/ConstantForce.cuh"
 
 namespace uammd{
 namespace structured{

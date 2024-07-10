@@ -7,8 +7,6 @@
 #include "Interactor/Bonds/Bond4/Bond4.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
-
 namespace uammd{
 namespace structured{
 namespace Potentials{

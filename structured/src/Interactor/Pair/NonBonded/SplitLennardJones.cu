@@ -7,7 +7,7 @@
 #include "Interactor/Pair/NonBonded/NonBonded.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
+#include "Interactor/BasicPotentials/LennardJones.cuh"
 #include "Interactor/BasicParameters/Pair/LennardJones.cuh"
 #include "Utils/ParameterHandler/PairParameterHandler.cuh"
 

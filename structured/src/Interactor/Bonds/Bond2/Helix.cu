@@ -7,7 +7,7 @@
 #include "Interactor/Bonds/Bond2/Bond2.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
+#include "Interactor/BasicPotentials/Helix.cuh"
 #include "Interactor/BasicParameters/Pair/Helix.cuh"
 
 namespace uammd{

@@ -7,7 +7,7 @@
 #include "Interactor/Patches/NonBondedPatches/NonBondedPatches.cuh"
 #include "Interactor/Patches/PatchesFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
+#include "Interactor/BasicPotentials/DistanceSwitch.cuh"
 #include "Interactor/BasicParameters/Pair/DistanceSwitch.cuh"
 #include "Utils/ParameterHandler/PairParameterHandler.cuh"
 

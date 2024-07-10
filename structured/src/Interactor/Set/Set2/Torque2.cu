@@ -7,8 +7,6 @@
 #include "Interactor/Set/Set2/Set2.cuh"
 #include "Interactor/InteractorFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
-
 namespace uammd{
 namespace structured{
 namespace Potentials{

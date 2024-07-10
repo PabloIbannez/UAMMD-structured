@@ -1,3 +1,6 @@
+#include "uammd.cuh"
+#include "utils/quaternion.cuh"
+
 #include "System/ExtendedSystem.cuh"
 #include "GlobalData/GlobalData.cuh"
 #include "ParticleData/ExtendedParticleData.cuh"
@@ -6,8 +9,6 @@
 #include "Interactor/Single/SingleInteractor.cuh"
 #include "Interactor/Single/External/External.cuh"
 #include "Interactor/InteractorFactory.cuh"
-
-#include "Interactor/BasicPotentials.cuh"
 
 namespace uammd{
 namespace structured{

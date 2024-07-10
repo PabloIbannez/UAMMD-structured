@@ -7,7 +7,7 @@
 #include "Interactor/Patches/NonBondedPatches/NonBondedPatches.cuh"
 #include "Interactor/Patches/PatchesFactory.cuh"
 
-#include "Interactor/BasicPotentials.cuh"
+#include "Interactor/BasicPotentials/Helix.cuh"
 #include "Interactor/BasicParameters/Pair/Helix.cuh"
 #include "Interactor/BasicParameters/Pair/Helix2States.cuh"
 #include "Utils/ParameterHandler/PairParameterHandler.cuh"
