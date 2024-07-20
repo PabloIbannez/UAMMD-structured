@@ -9,7 +9,10 @@ import jsbeautifier
 
 #######################
 
-COMPONENTS_PATH = os.path.join(os.getenv('UAMMD_PATH'),
+#COMPONENTS_PATH = os.path.join(os.getenv('UAMMD_PATH'),
+#                               'USCM/Components.json')
+
+COMPONENTS_PATH = os.path.join("../../",
                                'USCM/Components.json')
 
 with open(COMPONENTS_PATH) as f:

@@ -2,6 +2,8 @@ import os
 import json
 import numpy as np
 
+tol = 1e-3
+
 with open("parameters.json", "r") as f:
     parameters = json.load(f)
 
@@ -77,7 +79,10 @@ for i in range(nAFM):
 
     forceTotal = forceAFM + forceParticles
 
-    print(f"Expected force for AFM {i}: {forceAFM:.2f} (AFM), {forceParticles:.2f} (Particles), {forceTotal} (Total). Simulation: {resultsDict[tipId]:.2f}")
+    diff = abs(forceTotal - resultsDict[tipId])
+    diff = np.allclose(forceTotal, resultsDict[tipId], atol=tol)
+
+    print(f"Expected force for AFM {i}: {forceAFM:.2f} (AFM), {forceParticles:.2f} (Particles), {forceTotal} (Total). Simulation: {resultsDict[tipId]:.2f}. OK: {diff}")
 
 
 
