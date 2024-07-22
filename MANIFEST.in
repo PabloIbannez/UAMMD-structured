@@ -1,0 +1,4 @@
+include pyUAMMD/utils/launcher/UAMMDlauncher.cu
+include pyUAMMD/ThirdParty/pybind11_json.hpp
+include pyUAMMD/ThirdParty/json.hpp
+
