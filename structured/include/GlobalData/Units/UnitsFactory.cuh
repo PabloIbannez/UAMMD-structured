@@ -25,7 +25,7 @@ public:
     void registerUnits(const std::string& unitsType,
                        const std::string& unitsSubType,
                        Creator creator) {
-        System::log<System::MESSAGE>("[UnitsFactory] Registering Units in factory: %s, %s",
+        System::log<System::DEBUG>("[UnitsFactory] Registering Units in factory: %s, %s",
                                      unitsType.c_str(), unitsSubType.c_str());
 
         std::pair<std::string, std::string> key(unitsType, unitsSubType);
@@ -41,7 +41,7 @@ public:
                                               const std::string& unitsSubType,
                                               DataEntry&  data){
 
-        System::log<System::MESSAGE>("[UnitsFactory] Creating Units. Type: %s, SubType: %s)",
+        System::log<System::DEBUG>("[UnitsFactory] Creating Units. Type: %s, SubType: %s)",
                                       unitsType.c_str(), unitsSubType.c_str());
 
         auto& creators = getCreatorsRef();

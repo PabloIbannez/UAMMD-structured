@@ -27,7 +27,7 @@ public:
     void registerIntegrator(const std::string& integratorType,
                             const std::string& integratorSubType,
                             Creator creator) {
-        System::log<System::MESSAGE>("[IntegratorFactory] Registering Integrator in factory: %s, %s",
+        System::log<System::DEBUG>("[IntegratorFactory] Registering Integrator in factory: %s, %s",
                                      integratorType.c_str(), integratorSubType.c_str());
 
         std::pair<std::string, std::string> key(integratorType, integratorSubType);
@@ -45,7 +45,7 @@ public:
                                                         std::shared_ptr<ParticleGroup> pg,
                                                         DataEntry&  data,
                                                         std::string name) {
-        System::log<System::MESSAGE>("[IntegratorFactory] Creating Integrator: %s (type: %s, subType: %s)",
+        System::log<System::DEBUG>("[IntegratorFactory] Creating Integrator: %s (type: %s, subType: %s)",
                                      name.c_str(), integratorType.c_str(), integratorSubType.c_str());
 
         auto& creators = getCreatorsRef();

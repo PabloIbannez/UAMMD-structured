@@ -37,7 +37,7 @@ namespace Interactor {
 
             template<typename CreatorType>
             void registerInteractor(const std::string& integratorType, const std::string& integratorSubType, CreatorType creator) {
-                System::log<System::MESSAGE>("[PatchesFactory] Registering Interactor in factory: %s, %s",
+                System::log<System::DEBUG>("[PatchesFactory] Registering Interactor in factory: %s, %s",
                                              integratorType.c_str(), integratorSubType.c_str());
 
                 std::pair<std::string, std::string> key(integratorType, integratorSubType);
@@ -51,7 +51,7 @@ namespace Interactor {
 
             template<typename CreatorType, typename... Args>
             InteractorPtr createInteractor(const std::string& integratorType, const std::string& integratorSubType, Args&&... args) {
-                System::log<System::MESSAGE>("[PatchesFactory] Creating Interactor: %s (type: %s, subType: %s)",
+                System::log<System::DEBUG>("[PatchesFactory] Creating Interactor: %s (type: %s, subType: %s)",
                                              std::get<sizeof...(Args) - 1>(std::forward_as_tuple(args...)).c_str(), // name is always the last argument
                                              integratorType.c_str(), integratorSubType.c_str());
 

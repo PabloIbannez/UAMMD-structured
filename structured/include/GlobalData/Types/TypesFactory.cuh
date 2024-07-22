@@ -25,7 +25,7 @@ public:
     void registerTypes(const std::string& typesType,
                        const std::string& typesSubType,
                        Creator creator) {
-        System::log<System::MESSAGE>("[TypesFactory] Registering Types in factory: %s, %s",
+        System::log<System::DEBUG>("[TypesFactory] Registering Types in factory: %s, %s",
                                      typesType.c_str(), typesSubType.c_str());
 
         std::pair<std::string, std::string> key(typesType, typesSubType);
@@ -41,7 +41,7 @@ public:
                                               const std::string& typesSubType,
                                               DataEntry&  data){
 
-        System::log<System::MESSAGE>("[TypesFactory] Creating Types. Type: %s, SubType: %s)",
+        System::log<System::DEBUG>("[TypesFactory] Creating Types. Type: %s, SubType: %s)",
                                       typesType.c_str(), typesSubType.c_str());
 
         auto& creators = getCreatorsRef();

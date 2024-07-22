@@ -25,7 +25,7 @@ public:
     void registerFundamental(const std::string& fundamentalType,
                              const std::string& fundamentalSubType,
                              Creator creator) {
-        System::log<System::MESSAGE>("[FundamentalFactory] Registering Fundamental in factory: %s, %s",
+        System::log<System::DEBUG>("[FundamentalFactory] Registering Fundamental in factory: %s, %s",
                                      fundamentalType.c_str(), fundamentalSubType.c_str());
 
         std::pair<std::string, std::string> key(fundamentalType, fundamentalSubType);
@@ -41,7 +41,7 @@ public:
                                                           const std::string& fundamentalSubType,
                                                           DataEntry&  data){
 
-        System::log<System::MESSAGE>("[FundamentalFactory] Creating Fundamental. Type: %s, SubType: %s)",
+        System::log<System::DEBUG>("[FundamentalFactory] Creating Fundamental. Type: %s, SubType: %s)",
                                       fundamentalType.c_str(), fundamentalSubType.c_str());
 
         auto& creators = getCreatorsRef();

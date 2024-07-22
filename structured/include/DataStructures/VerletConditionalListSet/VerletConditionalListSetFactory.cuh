@@ -20,7 +20,7 @@ class VerletConditionalListSetFactory{
         }
 
         void registerVerletConditionalListSet(const std::string& conditionType, Creator creator) {
-            System::log<System::MESSAGE>("[VerletConditionalListSetFactory] Registering VerletConditionalListSet in factory: %s",
+            System::log<System::DEBUG>("[VerletConditionalListSetFactory] Registering VerletConditionalListSet in factory: %s",
                                          conditionType.c_str());
             if (getCreatorsRef().find(conditionType) != getCreatorsRef().end()) {
                 System::log<System::CRITICAL>("[VerletConditionalListSetFactory] VerletConditionalListSet type already registered: %s",
@@ -35,7 +35,7 @@ class VerletConditionalListSetFactory{
                                                                                      std::shared_ptr<ParticleGroup> pg,
                                                                                      DataEntry& data,
                                                                                      std::string name) {
-            System::log<System::MESSAGE>("[VerletConditionalListSetFactory] Creating VerletConditionalListSet: %s (type: %s)",
+            System::log<System::DEBUG>("[VerletConditionalListSetFactory] Creating VerletConditionalListSet: %s (type: %s)",
                                          name.c_str(), conditionType.c_str());
 
             auto& creators = getCreatorsRef();

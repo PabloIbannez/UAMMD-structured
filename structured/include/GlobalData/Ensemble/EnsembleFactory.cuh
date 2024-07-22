@@ -25,7 +25,7 @@ public:
     void registerEnsemble(const std::string& ensembleType,
                           const std::string& ensembleSubType,
                           Creator creator) {
-        System::log<System::MESSAGE>("[EnsembleFactory] Registering Ensemble in factory: %s, %s",
+        System::log<System::DEBUG>("[EnsembleFactory] Registering Ensemble in factory: %s, %s",
                                      ensembleType.c_str(), ensembleSubType.c_str());
 
         std::pair<std::string, std::string> key(ensembleType, ensembleSubType);
@@ -41,7 +41,7 @@ public:
                                                     const std::string& ensembleSubType,
                                                     DataEntry&  data){
 
-        System::log<System::MESSAGE>("[EnsembleFactory] Creating Ensemble. Type: %s, SubType: %s)",
+        System::log<System::DEBUG>("[EnsembleFactory] Creating Ensemble. Type: %s, SubType: %s)",
                                       ensembleType.c_str(), ensembleSubType.c_str());
 
         auto& creators = getCreatorsRef();

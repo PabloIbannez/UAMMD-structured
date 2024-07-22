@@ -30,7 +30,7 @@ public:
     void registerSimulationStep(const std::string& simulationStepType,
                                 const std::string& simulationStepSubType,
                                 Creator creator) {
-        System::log<System::MESSAGE>("[SimulationStepFactory] Registering SimulationStep in factory: %s, %s",
+        System::log<System::DEBUG>("[SimulationStepFactory] Registering SimulationStep in factory: %s, %s",
                                      simulationStepType.c_str(), simulationStepSubType.c_str());
 
         std::pair<std::string, std::string> key(simulationStepType, simulationStepSubType);
@@ -49,7 +49,7 @@ public:
                                                              std::shared_ptr<ForceField>        ff,
                                                              DataEntry&  data,
                                                              std::string name) {
-        System::log<System::MESSAGE>("[SimulationStepFactory] Creating SimulationStep: %s (type: %s, subType: %s)",
+        System::log<System::DEBUG>("[SimulationStepFactory] Creating SimulationStep: %s (type: %s, subType: %s)",
                                      name.c_str(), simulationStepType.c_str(), simulationStepSubType.c_str());
 
         auto& creators = getCreatorsRef();
