@@ -10,6 +10,6 @@
 
 	"timeStep":0.01,
 
-	"nSteps":100000,
-	"nStepsOutput":100
+	"nSteps":1000000,
+	"nStepsOutput":1000
 }

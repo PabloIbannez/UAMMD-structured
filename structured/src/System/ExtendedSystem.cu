@@ -118,6 +118,16 @@ namespace structured{
 
     }
 
+    ExtendedSystem::ExtendedSystem(std::shared_ptr<Input::Input> input):
+    uammd::System(0,nullptr),
+    path({"system"}){
+        this->input = input;
+        this->init();
+    }
+
+    ExtendedSystem::ExtendedSystem(const Input::Input::DataType &data):
+    ExtendedSystem(std::make_shared<Input::Input>(data)){}
+
     ///////////////////////////////////////////
 
     void ExtendedSystem::updateInputSystem(){

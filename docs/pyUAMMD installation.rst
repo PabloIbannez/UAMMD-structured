@@ -1,2 +1,0 @@
-pyUAMMD installation
-====================

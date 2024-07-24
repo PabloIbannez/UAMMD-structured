@@ -6,6 +6,17 @@ set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
 # By default, install is done at ~/bin
 set(INSTALL_DIR "$ENV{HOME}/bin" CACHE PATH "Installation directory")
 
+# Add option for Python package installation
+option(INSTALL_PYTHON_PACKAGE "Install Python package during make install" OFF)
+
+# Add option for Python wrapper (only available if INSTALL_PYTHON_PACKAGE is ON)
+option(BUILD_PYTHON_WRAPPER "Build Python wrapper for UAMMDlauncher" OFF)
+
+# Ensure BUILD_PYTHON_WRAPPER is OFF if INSTALL_PYTHON_PACKAGE is OFF
+if(NOT INSTALL_PYTHON_PACKAGE)
+    set(BUILD_PYTHON_WRAPPER OFF)
+endif()
+
 set(UAMMD_REPO_URL "https://github.com/PabloIbannez/UAMMD.git")
 set(UAMMD_TAG "v2.x")
 
@@ -343,3 +354,53 @@ endforeach()
 ## Installation rules
 install(TARGETS UAMMDlauncher
         RUNTIME DESTINATION ${INSTALL_DIR})
+
+################################################################
+# Add this near the end of your file, after the UAMMDlauncher target is defined
+if(BUILD_PYTHON_WRAPPER)
+    # Find Python
+    find_package(Python COMPONENTS Interpreter Development REQUIRED)
+
+    # Find pybind11
+    find_package(pybind11 REQUIRED)
+
+    # Add the Python module target
+    pybind11_add_module(pyUAMMDlauncher ${CMAKE_CURRENT_SOURCE_DIR}/pyUAMMD/utils/launcher/UAMMDlauncher.cu)
+
+    # Link libraries
+    target_link_libraries(pyUAMMDlauncher PRIVATE
+                          structured_objects
+                          $<TARGET_OBJECTS:structured_objects>
+                          ${LIBRARIES})
+
+    # Add dependencies
+    add_dependencies(pyUAMMDlauncher CopyUAMMD)
+    foreach(SECTION ${SECTIONS})
+        add_dependencies(pyUAMMDlauncher Generate${SECTION}Data)
+    endforeach()
+
+    # Installation rules for Python module
+    install(TARGETS pyUAMMDlauncher
+            LIBRARY DESTINATION ${Python_SITELIB}/pyUAMMD/utils/launcher)
+endif()
+
+# Modify the Python package installation section
+if(INSTALL_PYTHON_PACKAGE)
+    find_package(Python COMPONENTS Interpreter REQUIRED)
+
+    add_custom_target(
+        install_python_package
+        COMMAND ${CMAKE_COMMAND} -E echo "Installing Python package..."
+        COMMAND ${Python_EXECUTABLE} -m pip install ${CMAKE_SOURCE_DIR}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+
+    # Make sure the Python package is installed after the main target and Python wrapper (if built)
+    add_dependencies(install_python_package UAMMDlauncher)
+    if(BUILD_PYTHON_WRAPPER)
+        add_dependencies(install_python_package pyUAMMDlauncher)
+    endif()
+
+    # Add the Python package installation to the default install target
+    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install_python_package)")
+endif()

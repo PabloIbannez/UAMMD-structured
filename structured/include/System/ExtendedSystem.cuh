@@ -55,7 +55,9 @@ namespace structured{
         public:
 
             ExtendedSystem(std::string inputFilePath);
-            ExtendedSystem(int argc, char *argv[],std::string inputFilePath,std::vector<std::string> path);
+            ExtendedSystem(std::shared_ptr<Input::Input> input);
+            ExtendedSystem(const Input::Input::DataType& input);
+            ExtendedSystem(int argc, char *argv[], std::string inputFilePath, std::vector<std::string> path);
 
             cudaStream_t getCudaStream(){
                 if(!cudaStreamCreated){

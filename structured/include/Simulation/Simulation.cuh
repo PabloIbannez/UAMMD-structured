@@ -62,8 +62,4 @@ class Simulation{
 template<class inTyp>
 void startSelfStartingSimulation(const inTyp& in);
 
-void startSelfStartingSimulationFromFile(std::string inputFilePath);
-
-void startSelfStartingSimulationFromInput(const typename Input::Input::DataType& in);
-
 }}

@@ -263,7 +263,7 @@ class simulation:
         self.logger.debug("Runing simulation...")
 
         try:
-            from .utils.launcher.UAMMDlauncher import UAMMDlauncher
-            UAMMDlauncher.UAMMDlauncher(self.sim)
+            from .utils.launcher.pyUAMMDlauncher import UAMMDlauncher
+            UAMMDlauncher(self.sim)
         except:
             self.logger.error("Something went wrong with UAMMDlauncher")

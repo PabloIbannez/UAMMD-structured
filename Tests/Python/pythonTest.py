@@ -97,5 +97,5 @@ sim["simulationStep"]["write"]["parameters"]["intervalStep"] = nStepsOutput
 sim["simulationStep"]["write"]["parameters"]["outputFilePath"] = "output"
 sim["simulationStep"]["write"]["parameters"]["outputFormat"] = "sp"
 
-sim.write("simulation.json",legacy=True)
-#sim.run()
+#sim.write("simulation.json",legacy=True)
+sim.run()

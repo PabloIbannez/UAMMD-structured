@@ -78,7 +78,7 @@ namespace NonBonded{
             ///////////////////////////////////////////////////////////
 
             storage.ljParam = std::make_shared<ParameterPairsHandler>(gd,pg,
-                                                                    data);
+                                                                      data);
 
             ///////////////////////////////////////////////////////////
 

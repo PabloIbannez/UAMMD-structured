@@ -118,12 +118,6 @@ int Simulation::run(){
             }
 
             for(ullint i = startStep; i < steps; i++){
-                #ifdef PYBIND11_MODULE
-                if (PyErr_CheckSignals() != 0) {
-                    System::log<System::WARNING>("[Simulation] Python signal received. Exiting ...");
-                    return 2;
-                }
-                #endif
                 for(auto sStep : simSteps){
                     sStep.second->tryApplyStep();
                 }
@@ -284,12 +278,10 @@ void startSelfStartingSimulation(const inTyp& in){
     }
 }
 
-void startSelfStartingSimulationFromFile(std::string inputFilePath) {
-    startSelfStartingSimulation(inputFilePath);
-}
-
-void startSelfStartingSimulationFromInput(const typename Input::Input::DataType& in) {
-    startSelfStartingSimulation(in);
-}
+//Explicit instantiation
+//std::string
+template void startSelfStartingSimulation<std::string>(const std::string& in);
+//Input::Input::DataType
+template void startSelfStartingSimulation<Input::Input::DataType>(const Input::Input::DataType& in);
 
 }}
