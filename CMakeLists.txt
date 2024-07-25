@@ -12,9 +12,13 @@ option(INSTALL_PYTHON_PACKAGE "Install Python package during make install" OFF)
 # Add option for Python wrapper (only available if INSTALL_PYTHON_PACKAGE is ON)
 option(BUILD_PYTHON_WRAPPER "Build Python wrapper for UAMMDlauncher" OFF)
 
+# Add option for building .deb package
+option(BUILD_DEB_PACKAGE "Build .deb package" OFF)
+
 # Ensure BUILD_PYTHON_WRAPPER is OFF if INSTALL_PYTHON_PACKAGE is OFF
-if(NOT INSTALL_PYTHON_PACKAGE)
-    set(BUILD_PYTHON_WRAPPER OFF)
+if(BUILD_PYTHON_WRAPPER AND NOT INSTALL_PYTHON_PACKAGE)
+    message(FATAL_ERROR "BUILD_PYTHON_WRAPPER is ON but INSTALL_PYTHON_PACKAGE is OFF. "
+                        "Please enable INSTALL_PYTHON_PACKAGE to build the Python wrapper.")
 endif()
 
 set(UAMMD_REPO_URL "https://github.com/PabloIbannez/UAMMD.git")
@@ -162,6 +166,17 @@ find_package(LAPACK REQUIRED)
 
 # Link libraries
 set(LIBRARIES cufft cublas curand cusolver cusparse stdc++fs ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+
+if(INSTALL_PYTHON_PACKAGE)
+    find_package(Python COMPONENTS Interpreter REQUIRED)
+endif()
+
+if(BUILD_PYTHON_WRAPPER)
+    # Find Python
+    find_package(Python COMPONENTS Interpreter Development REQUIRED)
+    # Find pybind11
+    find_package(pybind11 REQUIRED)
+endif()
 
 ################################################################
 # Files generation
@@ -350,20 +365,7 @@ foreach(SECTION ${SECTIONS})
   add_dependencies(UAMMDlauncher Generate${SECTION}Data)
 endforeach()
 
-################################################################
-## Installation rules
-install(TARGETS UAMMDlauncher
-        RUNTIME DESTINATION ${INSTALL_DIR})
-
-################################################################
-# Add this near the end of your file, after the UAMMDlauncher target is defined
 if(BUILD_PYTHON_WRAPPER)
-    # Find Python
-    find_package(Python COMPONENTS Interpreter Development REQUIRED)
-
-    # Find pybind11
-    find_package(pybind11 REQUIRED)
-
     # Add the Python module target
     pybind11_add_module(pyUAMMDlauncher ${CMAKE_CURRENT_SOURCE_DIR}/pyUAMMD/utils/launcher/UAMMDlauncher.cu)
 
@@ -378,29 +380,68 @@ if(BUILD_PYTHON_WRAPPER)
     foreach(SECTION ${SECTIONS})
         add_dependencies(pyUAMMDlauncher Generate${SECTION}Data)
     endforeach()
-
-    # Installation rules for Python module
-    install(TARGETS pyUAMMDlauncher
-            LIBRARY DESTINATION ${Python_SITELIB}/pyUAMMD/utils/launcher)
 endif()
 
-# Modify the Python package installation section
-if(INSTALL_PYTHON_PACKAGE)
-    find_package(Python COMPONENTS Interpreter REQUIRED)
+################################################################
+# Build .deb package
+if(BUILD_DEB_PACKAGE)
+    include(InstallRequiredSystemLibraries)
 
-    add_custom_target(
-        install_python_package
-        COMMAND ${CMAKE_COMMAND} -E echo "Installing Python package..."
-        COMMAND ${Python_EXECUTABLE} -m pip install ${CMAKE_SOURCE_DIR}
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    )
+    set(CPACK_PACKAGE_NAME "uammdstructured")
+    set(CPACK_PACKAGE_VERSION "1.0.0")
+    set(CPACK_PACKAGE_CONTACT "Pablo Ibanez Freire <p.ibanez.fre@gmail.com>")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "UAMMDstructured")
+    set(CPACK_PACKAGE_VENDOR "Universidad Autonoma de Madrid")
 
-    # Make sure the Python package is installed after the main target and Python wrapper (if built)
-    add_dependencies(install_python_package UAMMDlauncher)
-    if(BUILD_PYTHON_WRAPPER)
-        add_dependencies(install_python_package pyUAMMDlauncher)
+    ## Set dependencies
+    ## libcufft
+    #set(CPACK_DEBIAN_PACKAGE_DEPENDS "libcufft")
+    ## libcublas
+    #set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libcublas")
+    ## libcurand
+    #set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libcurand")
+    ## libcusolver
+    #set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libcusolver")
+    ## libcusparse
+    #set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libcusparse")
+
+    set(CPACK_GENERATOR "DEB")
+    set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+
+    include(CPack)
+endif()
+
+## Installation rules
+if(BUILD_DEB_PACKAGE)
+    install(TARGETS UAMMDlauncher
+            RUNTIME DESTINATION bin)
+else()
+    install(TARGETS UAMMDlauncher
+            RUNTIME DESTINATION ${INSTALL_DIR})
+endif()
+
+if(NOT BUILD_DEB_PACKAGE)
+    if(INSTALL_PYTHON_PACKAGE)
+        add_custom_target(
+            install_python_package
+            COMMAND ${CMAKE_COMMAND} -E echo "Installing Python package..."
+            COMMAND ${Python_EXECUTABLE} -m pip install ${CMAKE_SOURCE_DIR}
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        )
+
+        # Make sure the Python package is installed after the main target and Python wrapper (if built)
+        add_dependencies(install_python_package UAMMDlauncher)
+        if(BUILD_PYTHON_WRAPPER)
+            add_dependencies(install_python_package pyUAMMDlauncher)
+        endif()
+
+        # Add the Python package installation to the default install target
+        install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install_python_package)")
+        if(BUILD_PYTHON_WRAPPER)
+            # Installation rules for Python module
+            install(TARGETS pyUAMMDlauncher
+                    LIBRARY DESTINATION ${Python_SITELIB}/pyUAMMD/utils/launcher)
+        endif()
     endif()
-
-    # Add the Python package installation to the default install target
-    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install_python_package)")
 endif()
+

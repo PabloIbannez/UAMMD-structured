@@ -30,6 +30,13 @@ from .appending import appendSimulationStep
 from .appending import appendForceField
 from .appending import appendPatchyParticles
 
+launcherLoaded = False
+try:
+    from .utils.launcher.pyUAMMDlauncher import UAMMDlauncher
+    launcherLoaded = True
+except:
+    pass
+
 class simulation:
 
     availModes      = ["batchId","modelId"]
@@ -261,9 +268,8 @@ class simulation:
 
     def run(self):
         self.logger.debug("Runing simulation...")
-
-        try:
-            from .utils.launcher.pyUAMMDlauncher import UAMMDlauncher
+        if not launcherLoaded:
+            self.logger.error("UAMMDlauncher is not available")
+            raise Exception("UAMMDlauncher is not available")
+        else:
             UAMMDlauncher(self.sim)
-        except:
-            self.logger.error("Something went wrong with UAMMDlauncher")
