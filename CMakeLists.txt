@@ -15,6 +15,9 @@ option(BUILD_PYTHON_WRAPPER "Build Python wrapper for UAMMDlauncher" OFF)
 # Add option for building .deb package
 option(BUILD_DEB_PACKAGE "Build .deb package" OFF)
 
+# Add option for setting ccbin for nvcc
+set(CUDA_HOST_COMPILER "DEFAULT" CACHE STRING "Path to the host compiler for CUDA (DEFAULT to use default compiler)")
+
 # Ensure BUILD_PYTHON_WRAPPER is OFF if INSTALL_PYTHON_PACKAGE is OFF
 if(BUILD_PYTHON_WRAPPER AND NOT INSTALL_PYTHON_PACKAGE)
     message(FATAL_ERROR "BUILD_PYTHON_WRAPPER is ON but INSTALL_PYTHON_PACKAGE is OFF. "
@@ -118,6 +121,11 @@ set(CMAKE_CXX_STANDARD 14)
 # Add definitions: UAMMD_EXTENSIONS, UAMMD_EXTENSIONS_PREAMBLE=${UAMMD_STRUCTURED_PATH}/extensions/structured/preamble.h, MAXLOGLEVEL=5
 add_definitions(-DUAMMD_EXTENSIONS -DUAMMD_EXTENSIONS_PREAMBLE=${UAMMD_STRUCTURED_PATH}/extensions/structured/preamble.h -DMAXLOGLEVEL=5)
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr --expt-extended-lambda -O3 -Xcompiler=\"-O3 -fPIC\" -w")
+
+# Set ccbin if CUDA_HOST_COMPILER is provided and not DEFAULT
+if(NOT "${CUDA_HOST_COMPILER}" STREQUAL "DEFAULT")
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -ccbin=${CUDA_HOST_COMPILER}")
+endif()
 
 # Specify the CUDA architecture(s)
 set(CUDA_ARCHITECTURES 60 61 62 70 72 75 80 86 87 89 CACHE STRING "CUDA architectures to compile for")
