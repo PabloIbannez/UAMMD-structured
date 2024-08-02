@@ -164,13 +164,19 @@ set(CMAKE_CUDA_ARCHITECTURES ${FILTERED_CUDA_ARCHITECTURES})
 
 # Check if MKLROOT is defined
 if(DEFINED ENV{MKLROOT})
+  message(STATUS "Detected MKLROOT: $ENV{MKLROOT}")
   set(BLA_VENDOR Intel10_64lp_seq)
   add_definitions(-DUSE_MKL)
+else()
+  message(STATUS "MKLROOT not found. Using OpenBLAS.")
 endif()
 
 # Find BLAS and LAPACK
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
+
+message(STATUS "BLAS libraries: ${BLAS_LIBRARIES}")
+message(STATUS "LAPACK libraries: ${LAPACK_LIBRARIES}")
 
 # Link libraries
 set(LIBRARIES cufft cublas curand cusolver cusparse stdc++fs ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
