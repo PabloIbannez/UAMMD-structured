@@ -130,6 +130,9 @@ namespace Interactor {
         registerInteractor##type##subType registerInteractor##type##subType##Instance; \
     }
 
+#define REGISTER_INTERACTOR(type, subType, ...) \
+    __REGISTER_INTERACTOR__(type, subType, __VA_ARGS__)
+
 #define REGISTER_BOND_INTERACTOR(type, subType, ...) \
     __REGISTER_INTERACTOR__(type, subType, __VA_ARGS__)
 

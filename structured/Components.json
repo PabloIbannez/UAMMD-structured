@@ -176,6 +176,7 @@
             ["PatchyParticles", "DynamicallyBondedPatchyParticles", "DynamicallyBondedPatchyParticles.cu"]
         ],
         "Pair": [
+            ["LongRange", "Electrostatics", "Electrostatics.cu"],
             ["NonBonded", "DebyeHuckel", "DebyeHuckel.cu"],
             ["NonBonded", "Zhang", "Zhang.cu"],
             ["NonBonded", "DLVOType1", "DLVO.cu"],
