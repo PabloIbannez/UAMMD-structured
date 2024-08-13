@@ -84,7 +84,7 @@ namespace Bond1{
             const real3 posi = make_real3(computational.pos[index_i]);
             const real3 posj = bondParam.pos;
             const real3 rij  = computational.box.apply_pbc(posj-posi);
-	    const real r2    = dot(rij, rij);
+	        const real r2    = dot(rij, rij);
 
             const real K   = bondParam.K;
             const real r0  = bondParam.r0;
