@@ -1,78 +1,29 @@
 Simulation
 ==========
 
-In UAMMD-structured, a simulation is defined through a structured input that specifies various components of the system and the simulation process. While we've seen a concrete example in the "First Example" section, let's break down the general structure and components of a UAMMD-structured simulation.
+UAMMD-structured is designed with the primary goal of simulating **generic physical systems**. This process is accomplished through the use of several entities, each responsible for managing and storing some of the information needed to run a simulation. Each of these entities is responsible for different aspects of the simulation, such as managing particle states, handling interactions and performing the integration process.
 
-Key Components
---------------
+A key aspect of UAMMD-structured is its strong reliance on input. As highlighted earlier, there are two primary ways to operate UAMMD-structured. It can be compiled into a single, general-purpose binary that processes inputs in a specific format. Alternatively, it can be executed through a Python interface, where input is provided in the form of a dictionary. In both cases the format of the input is similar. The customization of the simulation is achieved by modifying the options available in the input file or dictionary. Through this input, the properties of the following basic entities are specified, determining the type of simulation being conducted:
 
-A typical UAMMD-structured simulation input consists of the following main sections:
+- **System:** Specifies technical aspects of the simulation, like the name of the simulation, backup and restarting systems, or the seed for random number generation.
 
-1. **System**:
+- **Integrator:** This section defines the integrators employed in the simulation. Integrators are algorithms responsible for updating the state of the simulation. UAMMD-structured provides a range of integrators, from the classical Verlet algorithm, to more complex ones used for simulating systems with fluid interactions. Commonly, only one integrator is used; however, UAMMD-structured also offers the option to sequentially apply multiple integrators.
 
-   Specifies basic simulation parameters such as the name of the simulation.
+- **Global:** Adds elements to the simulation not related to individual particles, such as the units used, the type of particles, or the ensemble (temperature, volume ...) for the simulation.
 
-2. **Global**:
+- **State:** Specifies the properties of particles that may vary throughout the simulation or that are unique to each particle, like position or orientation.
 
-   Sets up fundamental aspects of the simulation environment, including:
-   - Unit system
-   - Particle types and their properties
-   - Ensemble parameters (e.g., box size, temperature)
+- **Topology:** Encapsulates information typically found in topology files in other software (e.g., GROMACS). This facilitates entry for new users by using a common language in the field. Topology specifies:
 
-3. **Integrator**:
+  - **Structure:** Associates each particle with a type and specific structures, like the residue or the chain it belongs to.
 
-   Defines the algorithm(s) used to evolve the system over time. This section includes:
-   - Type of integrator (e.g., Langevin, Brownian dynamics)
-   - Integration parameters (e.g., time step, friction constant)
-   - Schedule for applying different integrators if more than one is used
+  - **Force Field:** Defines the interactions to which the particles are subjected, such as bonds, short-range interactions, external fields ...
 
-4. **State**:
+- **Simulation Steps:** Selects the type of information obtained from the simulation. These are operations performed at user-defined intervals, involving different measurements or writing information to a file, such as dumping the state of the simulation or measuring temperature and pressure.
 
-   Specifies the initial configuration of the system, including:
-   - Particle positions
-   - Velocities (optional)
-   - Other particle-specific properties
+.. figure:: /img/simulation.png
+   :alt: UAMMD-structured architecture
 
-5. **Topology**:
+   This figure illustrates the architecture of the UAMMD-structured simulation framework. It highlights the key components involved in simulating physical systems. The architecture is broken down into several main entities: *System*, *Integrator*, *Global*, *State*, *Topology*, and *Simulation Steps*.
 
-   Defines the structure of the system and the interactions between particles. It's divided into two main subsections:
-   - **Structure**: Associates particles with types and higher-level structures (e.g., residues, chains)
-
-   - **Force Field**: Specifies the interactions present in the system, such as:
-
-     - Bonded interactions (e.g., harmonic bonds, angle potentials)
-     - Non-bonded interactions (e.g., Lennard-Jones potential)
-     - External fields or constraints
-
-6. **Simulation Steps**:
-
-   Defines periodic operations to be performed during the simulation, such as:
-   - Outputting system information
-   - Saving system state
-   - Calculating and recording specific measurements
-
-Structure and Formatting
-------------------------
-
-The simulation input is structured hierarchically, with each main section containing various subsections and entries. As explained in the Input System section, this structure is typically represented in YAML or JSON format, with each component defined by its type, parameters, and (where applicable) data.
-
-It's important to note that the order of sections in the input file is not significant, thanks to the YAML/JSON format. Each entity resides in its unique section, and within these sections, there might be one or several data entries.
-
-Every data entry (excluding State) possesses a "type" field, which is compulsory and must always be present. However, in some entries, we have both parameters and data, while in others, we might only have parameters or just data.
-
-Flexibility and Customization
------------------------------
-
-This structure allows for great flexibility in defining simulations. Users can easily:
-
-- Modify system parameters
-- Change interaction potentials
-- Adjust integration schemes
-- Add or remove measurement and output operations
-
-By adjusting these components, users can tailor the simulation to a wide variety of physical systems and research questions, from simple particle systems to complex biomolecular simulations.
-
-Conclusion
-----------
-
-Understanding this structure is key to effectively using UAMMD-structured. By mastering the organization and options available in each section, users can construct sophisticated simulations tailored to their specific research needs. The example provided in the "First Example" section serves as a practical illustration of how these components come together to define a complete simulation.
+Upon specifying these entities, UAMMD-structured processes, connects them, and initiates the simulation. **Therefore, understanding UAMMD-structured is equivalent to knowing the different options available for these entities**.

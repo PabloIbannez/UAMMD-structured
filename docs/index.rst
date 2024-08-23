@@ -7,16 +7,15 @@ Welcome to UAMMD-structured's documentation!
 
    What is UAMMD-structured and what is not?
    UAMMD-structured installation
-   Overview
    First Example
 
 .. toctree::
    :maxdepth: 2
    :caption: UAMMD-structured Guide
 
+   Simulation
    Execution
    Input
-   Simulation
    System
    Global
    State
