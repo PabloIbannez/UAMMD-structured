@@ -1,15 +1,29 @@
 VelocityVerlet
----------------
+--------------
 
-Category: Integrator
-Type: Verlet
-Subtype: VelocityVerlet
-File: VelocityVerlet.cu
+The VelocityVerlet integrator implements the velocity Verlet algorithm for simulating particles in the NVE ensemble. This integrator is a wrapper around the UAMMD VerletNVE integrator.
 
-[Describe the component]
+For more details on the underlying method, please refer to the `UAMMD VerletNVE documentation <https://uammd.readthedocs.io/en/latest/Integrators.html#verletnve>`_.
 
-[Describe the parameters]
+----
 
-[Provide examples]
+* **type**: ``Verlet``, ``VelocityVerlet``
+* **parameters**:
 
-[Provide links to related components]
+  * ``timeStep``: ``real``: Time step :math:`[time]`
+  * ``temperature``: ``real``: Initial temperature for velocity initialization :math:`[temperature]`
+
+Example:
+
+.. code-block::
+
+   "velocityVerlet":{
+     "type":["Verlet","VelocityVerlet"],
+     "parameters":{
+       "timeStep": 0.01,
+       "temperature": 1.0
+     }
+   }
+
+.. note::
+   The temperature parameter is only used for initializing velocities at the start of the simulation if they are not already set.

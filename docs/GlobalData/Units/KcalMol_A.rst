@@ -1,15 +1,16 @@
 KcalMol_A
 ----------
 
-Category: GlobalData
-Type: Units
-Subtype: KcalMol_A
-File: KcalMol_A.cu
+Data entry description:
 
-[Describe the component]
+* **type**: ``Units``, ``KcalMol_A``.
+* **parameters**: ``None``.
+* **data**: ``None``.
 
-[Describe the parameters]
+Example:
 
-[Provide examples]
+.. code-block:: json
 
-[Provide links to related components]
+   "entryName": {
+      "type": ["Units", "KcalMol_A"],
+   }

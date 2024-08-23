@@ -1,15 +1,28 @@
 MeanAngularCorrelation
------------------------
+----------------------
 
-Category: SimulationStep
-Type: GeometricalMeasure
-Subtype: MeanAngularCorrelation
-File: MeanAngularCorrelation.cu
+The MeanAngularCorrelation step calculates and records the mean angular correlation of particles' orientations relative to their initial orientations.
 
-[Describe the component]
+----
 
-[Describe the parameters]
+* **type**: ``GeometricalMeasure``, ``MeanAngularCorrelation``
+* **parameters**:
 
-[Provide examples]
+  * ``outputFilePath``: ``string``: Path to the output file
 
-[Provide links to related components]
+Example:
+
+.. code-block::
+
+   "angularCorrelation":{
+     "type":["GeometricalMeasure","MeanAngularCorrelation"],
+     "parameters":{
+       "outputFilePath": "angular_correlation.dat"
+     }
+   }
+
+.. note::
+   The output file will contain the step number and the mean angular correlation value.
+
+.. tip::
+   This measure is particularly useful for studying the rotational dynamics of particles in the system.

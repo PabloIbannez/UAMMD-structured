@@ -1,15 +1,30 @@
 InteractorsListEnergyMeasure
------------------------------
+----------------------------
 
-Category: SimulationStep
-Type: ThermodynamicMeasure
-Subtype: InteractorsListEnergyMeasure
-File: InteractorsListEnergyMeasure.cu
+The InteractorsListEnergyMeasure step calculates and records the energy contributions from specified interactors over time.
 
-[Describe the component]
+----
 
-[Describe the parameters]
+* **type**: ``ThermodynamicMeasure``, ``InteractorsListEnergyMeasure``
+* **parameters**:
 
-[Provide examples]
+  * ``outputFilePath``: ``string``: Path to the output file
+  * ``interactorsList``: ``string[]``: List of interactor names to measure (optional, if not provided, all interactors will be measured)
 
-[Provide links to related components]
+Example:
+
+.. code-block::
+
+   "interactorsEnergy":{
+     "type":["ThermodynamicMeasure","InteractorsListEnergyMeasure"],
+     "parameters":{
+       "outputFilePath": "interactors_energy.dat",
+       "interactorsList": ["LennardJones", "Coulomb", "Bonds"]
+     }
+   }
+
+.. note::
+   The output file will contain columns for the step number and the energy contribution from each specified interactor.
+
+.. tip::
+   This measure is useful for analyzing the relative contributions of different interaction types to the total system energy.

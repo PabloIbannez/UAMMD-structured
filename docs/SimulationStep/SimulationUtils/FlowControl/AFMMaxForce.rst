@@ -1,15 +1,30 @@
 AFMMaxForce
-------------
+-----------
 
-Category: SimulationStep
-Type: FlowControl
-Subtype: AFMMaxForce
-File: AFMMaxForce.cu
+The AFMMaxForce is a flow control simulation step designed for Atomic Force Microscopy (AFM) simulations. It stops the simulation when all AFM tips have reached a specified maximum force.
 
-[Describe the component]
+----
 
-[Describe the parameters]
+* **type**: ``FlowControl``, ``AFMMaxForce``
+* **parameters**:
 
-[Provide examples]
+  * ``maxForce``: ``real``: Maximum force threshold for AFM tips :math:`[force]`
+  * ``tipType``: ``string``: Type name for AFM tip particles (default: "TIP")
 
-[Provide links to related components]
+Example:
+
+.. code-block::
+
+   "afmMaxForce":{
+     "type":["FlowControl","AFMMaxForce"],
+     "parameters":{
+       "maxForce": 100.0,
+       "tipType": "TIP"
+     }
+   }
+
+.. note::
+   This step automatically detects and processes AFM interactors in the system.
+
+.. warning::
+   Ensure that AFM interactors are properly set up in your simulation before using this step.

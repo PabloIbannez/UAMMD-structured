@@ -25,19 +25,13 @@ Welcome to UAMMD-structured's documentation!
    Simulation Steps
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Data Structures
-
-   DataStructures/VerletConditionalListSet/index
-
-.. toctree::
    :maxdepth: 2
    :caption: Global Data
 
-   GlobalData/Ensemble/index
    GlobalData/Fundamental/index
-   GlobalData/Types/index
    GlobalData/Units/index
+   GlobalData/Types/index
+   GlobalData/Ensemble/index
 
 .. toctree::
    :maxdepth: 2
@@ -52,13 +46,18 @@ Welcome to UAMMD-structured's documentation!
    :maxdepth: 2
    :caption: Interactors
 
-   Interactor/AFM/index
    Interactor/Bonds/index
-   Interactor/Pair/index
-   Interactor/Patches/index
+   Interactor/Single/index
+   Interactor/NonBonded/index
    Interactor/PatchyParticles/index
    Interactor/Set/index
-   Interactor/Single/index
+   Interactor/AFM/index
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Data Structures
+
+   DataStructures/VerletConditionalListSet/index
 
 .. toctree::
    :maxdepth: 2
@@ -67,3 +66,19 @@ Welcome to UAMMD-structured's documentation!
    SimulationStep/SimulationMeasures/index
    SimulationStep/SimulationOutput/index
    SimulationStep/SimulationUtils/index
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Utilities
+
+   Utilities/Groups
+   Utilities/Batching
+
+.. toctree::
+   :maxdepth: 2
+   :caption: pyUAMMD
+
+   pyUAMMD/Introduction
+   pyUAMMD/Installation
+
+

@@ -1,15 +1,24 @@
 InfoStep
----------
+--------
 
-Category: SimulationStep
-Type: UtilsStep
-Subtype: InfoStep
-File: InfoStep.cu
+The InfoStep is a utility simulation step that prints information about the simulation progress, including estimated time remaining and performance metrics.
 
-[Describe the component]
+----
 
-[Describe the parameters]
+* **type**: ``UtilsStep``, ``InfoStep``
+* **parameters**: None
 
-[Provide examples]
+Example:
 
-[Provide links to related components]
+.. code-block::
+
+   "printInfo":{
+     "type":["UtilsStep","InfoStep"],
+     "parameters":{}
+   }
+
+.. note::
+   This step is useful for monitoring long-running simulations and estimating completion times.
+
+.. tip::
+   The InfoStep can help identify performance bottlenecks or unexpected slowdowns during the simulation.

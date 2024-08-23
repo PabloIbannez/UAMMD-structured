@@ -8,6 +8,5 @@ SimulationMeasures
    MechanicalMeasure/index
    ThermodynamicMeasure/index
    GeometricalMeasure/index
-   TopologicalMeasures/index
    MagneticMeasure/index
    ExperimentMeasures/index

@@ -1,15 +1,16 @@
 None
 -----
 
-Category: GlobalData
-Type: Units
-Subtype: None
-File: None.cu
+Data entry description:
 
-[Describe the component]
+* **type**: ``Units``, ``None``.
+* **parameters**: ``None``.
+* **data**: ``None``.
 
-[Describe the parameters]
+Example:
 
-[Provide examples]
+.. code-block:: json
 
-[Provide links to related components]
+   "entryName": {
+      "type": ["Units", "None"],
+   }

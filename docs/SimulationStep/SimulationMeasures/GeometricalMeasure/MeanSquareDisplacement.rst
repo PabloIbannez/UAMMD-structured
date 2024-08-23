@@ -1,15 +1,28 @@
 MeanSquareDisplacement
------------------------
+----------------------
 
-Category: SimulationStep
-Type: GeometricalMeasure
-Subtype: MeanSquareDisplacement
-File: MeanSquareDisplacement.cu
+The MeanSquareDisplacement step calculates and records the mean square displacement (MSD) of particles relative to their initial positions.
 
-[Describe the component]
+----
 
-[Describe the parameters]
+* **type**: ``GeometricalMeasure``, ``MeanSquareDisplacement``
+* **parameters**:
 
-[Provide examples]
+  * ``outputFilePath``: ``string``: Path to the output file
 
-[Provide links to related components]
+Example:
+
+.. code-block::
+
+   "msd":{
+     "type":["GeometricalMeasure","MeanSquareDisplacement"],
+     "parameters":{
+       "outputFilePath": "msd.dat"
+     }
+   }
+
+.. note::
+   The output file will contain the step number and the mean square displacement value.
+
+.. tip::
+   The MSD is a key measure for studying diffusion and particle mobility in the system.

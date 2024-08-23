@@ -1,15 +1,30 @@
-MeasureTotalMagnetization
---------------------------
+MeasureMeanMagnetization
+------------------------
 
-Category: SimulationStep
-Type: MagneticMeasure
-Subtype: MeasureTotalMagnetization
-File: MeasureTotalMagnetization.cu
+The MeasureMeanMagnetization step calculates and records the mean magnetization of the system over time, normalized by the maximum possible magnetization.
 
-[Describe the component]
+----
 
-[Describe the parameters]
+* **type**: ``MagneticMeasure``, ``MeasureMeanMagnetization``
+* **parameters**:
 
-[Provide examples]
+  * ``outputFilePath``: ``string``: Path to the output file
+  * ``startStep``: ``int``: Step at which to start the measurement (default: 0)
 
-[Provide links to related components]
+Example:
+
+.. code-block::
+
+   "meanMagnetization":{
+     "type":["MagneticMeasure","MeasureMeanMagnetization"],
+     "parameters":{
+       "outputFilePath": "mean_magnetization.dat",
+       "startStep": 1000
+     }
+   }
+
+.. note::
+   The output file will contain the time and the x, y, z components of the normalized mean magnetization vector.
+
+.. tip::
+   This measure provides insight into the degree of magnetic alignment in the system, with values ranging from 0 (random orientation) to 1 (perfect alignment).

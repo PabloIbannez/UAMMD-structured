@@ -1,15 +1,22 @@
 None
 -----
 
-Category: GlobalData
-Type: Fundamental
-Subtype: None
-File: None.cu
+When ``None`` **Fundamental** is selected no global parameter is defined.
 
-[Describe the component]
+* **type**: ``Fundamental``, ``None``.
+* **parameters**: ``None``.
+* **data**: ``None``.
 
-[Describe the parameters]
+----
 
-[Provide examples]
+Example:
 
-[Provide links to related components]
+.. code-block:: json
+
+   "entryName": {
+     "type": ["Fundamental", "None"]
+   }
+
+.. warning::
+
+    Do not confuse this with the ``None`` type, which is used to indicate that a parameter is not defined.

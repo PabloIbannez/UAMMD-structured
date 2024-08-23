@@ -1,15 +1,38 @@
 NVT
 ----
 
-Category: GlobalData
-Type: Ensemble
-Subtype: NVT
-File: NVT.cu
+Selecting this ensembale will define a global temperature and volume.
+These quantities are used for the other components of the simulation.
+For example, integrators can use the temperature to fix the dynamic properties of
+the particles in order to simulate a system at a given temperature
+(which commonly means reproducing the canonical Boltzmann distribution).
 
-[Describe the component]
+The volume is given as a 3D vector, which is used to define the size of the simulation box.
 
-[Describe the parameters]
+* **type**: ``Ensemble``, ``NVT``.
+* **parameters**: ``None``.
+* **data**:
 
-[Provide examples]
+  .. list-table::
+     :widths: 25 25
+     :header-rows: 1
+     :align: center
 
-[Provide links to related components]
+     * - temperature
+       - box
+     * - ``float``
+       - [``float``, ``float``, ``float``]
+
+----
+
+Example:
+
+.. code-block:: json
+
+   "entryName": {
+     "type": ["Ensemble", "NVT"],
+     "labels": ["box", "temperature"],
+     "data": [
+        [[10.0, 10.0, 10.0], 1.0]
+      ]
+   }
