@@ -13,6 +13,12 @@ namespace Ensemble{
             real temperature;
             real lambda;
 
+            void checkLambda(real lambdaToCheck){
+                if(lambdaToCheck < 0.0 or lambdaToCheck > 1.0){
+                    System::log<System::CRITICAL>("[NVTlambda] Lambda must be between 0 and 1. But it is: %f", lambdaToCheck);
+                }
+            }
+
         public:
 
             NVTlambda(DataEntry& data):EnsembleHandler(data){
@@ -25,6 +31,7 @@ namespace Ensemble{
                 box           = Box(boxSize);
 
                 lambda        = ensembleData[0]["lambda"];
+                checkLambda(lambda);
             }
 
             Box  getBox()         override{return box;}
@@ -33,7 +40,10 @@ namespace Ensemble{
 
             void setBox(Box newBox)                  override{box = newBox;}
             void setTemperature(real newTemperature) override{temperature = newTemperature;}
-            void setLambda(real newLambda)           override{lambda = newLambda;}
+            void setLambda(real newLambda)           override{
+                lambda = newLambda;
+                checkLambda(lambda);
+            }
 
             void updateDataEntry(DataEntry data) override{
                 std::vector<std::string> labels = data.getLabels();
