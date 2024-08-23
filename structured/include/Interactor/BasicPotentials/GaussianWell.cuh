@@ -25,7 +25,7 @@ namespace BasicPotentials{
 
             const real dr = sqrt(r2)-r0;
 
-            return -e*exp(-dr*dr/(real(2.0)*D))/real(2.0);
+            return -e*exp(-dr*dr/(real(2.0)*D));
 
         }
 
