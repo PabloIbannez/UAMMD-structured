@@ -44,13 +44,14 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = []
+html_logo = "img/logo_final.png"
 
 html_sidebars = { '**': ['about.html','navigation.html', 'relations.html','searchbox.html',] }
 
 html_theme_options = {
 #    'analytics_id': 'G-XXXXXXXXXX',  #  Provided by Google in your dashboard
 #    'analytics_anonymize_ip': False,
-#    'logo_only': False,
+    'logo_only': True,
     'display_version': True,
     'prev_next_buttons_location': 'bottom',
     'style_external_links': True,
