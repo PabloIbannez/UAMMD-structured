@@ -3,8 +3,8 @@ import numpy as np
 
 import pyUAMMD
 
-NpartPerBatch  = 2e4
-Nbatch         = 100
+NpartPerBatch  = 1e4
+Nbatch         = 10
 
 conc = 0.1
 

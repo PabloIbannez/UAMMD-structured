@@ -9,23 +9,20 @@ import pyUAMMD
 
 from scipy.spatial.transform import Rotation
 
-with open('parameters.json', 'r') as f:
-    parameters = json.load(f)
+N = 2000
+c = 0.3
 
-N = parameters['N']
-c = parameters['c']
+sigma = 1.0
 
-sigma = parameters['sigma']
+E  = 10.0
+rc = 0.5
+Kb = 1.1
 
-E  = parameters['E']
-rc = parameters['rc']
-Kb = parameters['Kb']
+dt           = 0.001
+nSteps       = 100000
+nStepsOutput = 10000
 
-dt           = parameters['dt']
-nSteps       = parameters['nSteps']
-nStepsOutput = parameters['nStepsOutput']
-
-avoidPBC     = parameters.get('avoidPBC', False)
+avoidPBC     = False
 
 connectionXup   = [ sigma/2.0,  0,  0]
 connectionXdown = [-sigma/2.0,  0,  0]
@@ -98,6 +95,7 @@ simulation["state"] = {}
 simulation["state"]["labels"] = ["id", "position","direction"]
 simulation["state"]["data"] = []
 
+print("Inserting particles...")
 for i in tqdm(range(N)):
     # Generate random position within the box
     clash = True
@@ -231,7 +229,7 @@ simulation["simulationStep"]["output"]["parameters"]["outputFilePath"] = "output
 simulation["simulationStep"]["output"]["parameters"]["outputFormat"]   = "sp"
 
 #Check if ./results folder exists, if not create it
-if not os.path.exists("./results"):
-    os.makedirs("./results")
+if not os.path.exists("./simulation"):
+    os.makedirs("./simulation")
 
 simulation.write("./results/simulation.json")

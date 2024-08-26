@@ -120,6 +120,18 @@ namespace structured{
                     System::log<System::CRITICAL>("[Topology] Error loading interactors,"
                                                   "interactor \"%s\" has already been added.",entry.second.name.c_str());
                 }
+
+            } else {
+
+                DataEntry data = sys->getInput()->getDataEntry(entry.second.path);
+
+                std::string interactorType    = data.getType();
+                std::string interactorSubType = data.getSubType();
+
+                System::log<System::CRITICAL>("[Topology] Error loading interactor: \"%s\". "
+                                              "Interactor (type,subtype): (\"%s\",\"%s\") not recognized.",
+                                              entry.second.name.c_str(),
+                                              interactorType.c_str(),interactorSubType.c_str());
             }
         }
 

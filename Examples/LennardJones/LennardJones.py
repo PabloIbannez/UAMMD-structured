@@ -3,7 +3,7 @@ import numpy as np
 
 import pyUAMMD
 
-N    = 2e6
+N    = 2e5
 conc = 0.1
 
 L = (N / conc)**(1.0/3.0)
