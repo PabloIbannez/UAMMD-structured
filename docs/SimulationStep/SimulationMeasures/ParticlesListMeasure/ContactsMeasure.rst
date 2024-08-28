@@ -3,6 +3,19 @@ ContactsMeasure
 
 The ContactsMeasure step calculates and records the distances between specified pairs of particles over time.
 
+Output format:
+
+.. code-block::
+
+   # Step 1
+   id1 id2 distance
+   id3 id4 distance
+   ...
+   # Step 2
+   id1 id2 distance
+   id3 id4 distance
+   ...
+
 ----
 
 * **type**: ``ParticlesListMeasure``, ``ContactsMeasure``
@@ -22,6 +35,7 @@ Example:
    "contactsMeasure":{
      "type":["ParticlesListMeasure","ContactsMeasure"],
      "parameters":{
+       "intervalStep": 10000,
        "outputFilePath": "contacts.dat"
      },
      "labels":["id_i", "id_j"],

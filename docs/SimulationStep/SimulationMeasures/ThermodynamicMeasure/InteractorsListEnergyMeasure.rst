@@ -3,6 +3,16 @@ InteractorsListEnergyMeasure
 
 The InteractorsListEnergyMeasure step calculates and records the energy contributions from specified interactors over time.
 
+Output format:
+
+.. code-block::
+
+   # Step     Interactor1 Interactor2 Interactor3 ...
+   0          -500.5      -200.3      -100.2      ...
+   100        -502.1      -201.5      -101.8      ...
+   200        -501.8      -200.9      -100.5      ...
+   ...
+
 ----
 
 * **type**: ``ThermodynamicMeasure``, ``InteractorsListEnergyMeasure``
@@ -18,6 +28,7 @@ Example:
    "interactorsEnergy":{
      "type":["ThermodynamicMeasure","InteractorsListEnergyMeasure"],
      "parameters":{
+       "intervalStep": 10000,
        "outputFilePath": "interactors_energy.dat",
        "interactorsList": ["LennardJones", "Coulomb", "Bonds"]
      }

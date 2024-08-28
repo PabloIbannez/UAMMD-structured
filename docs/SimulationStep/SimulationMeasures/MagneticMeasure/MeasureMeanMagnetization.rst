@@ -18,6 +18,7 @@ Example:
    "totalMagnetization":{
      "type":["MagneticMeasure","MeasureTotalMagnetization"],
      "parameters":{
+       "intervalStep": 10000,
        "outputFilePath": "total_magnetization.dat",
        "startStep": 1000
      }

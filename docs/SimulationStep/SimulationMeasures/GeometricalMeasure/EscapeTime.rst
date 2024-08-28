@@ -3,6 +3,16 @@ EscapeTime
 
 The EscapeTime step records the time at which particles escape from a defined region in the simulation box.
 
+Output format:
+
+.. code-block::
+
+   0 3
+   0 7
+   100 12
+   200 18
+   300 25
+
 ----
 
 * **type**: ``GeometricalMeasure``, ``EscapeTime``
@@ -22,12 +32,14 @@ Example:
    "escapeTime":{
      "type":["GeometricalMeasure","EscapeTime"],
      "parameters":{
+       "intervalStep": 10000,
        "outputFilePath": "escape_times.dat"
      },
-     "data":{
-       "normalVector": [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
-       "independentVector": [[5, 0, 0], [0, 5, 0], [0, 0, 5]]
-     }
+     "labels":["normalVector","independentVector"],
+     "data":[
+        [[[1, 0, 0], [0, 1, 0], [0, 0, 1]],[[5, 0, 0], [0, 5, 0], [0, 0, 5]]],
+        [[[1, 0, 0], [0, 1, 0], [0, 0, 1]],[[2,1,0], [0, 2, 0], [0, 0, 2]]]
+     ]
    }
 
 .. note::

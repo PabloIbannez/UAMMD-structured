@@ -3,6 +3,15 @@ MeanAngularCorrelation
 
 The MeanAngularCorrelation step calculates and records the mean angular correlation of particles' orientations relative to their initial orientations.
 
+Output format:
+
+.. code-block::
+
+   # step MAC
+   0 1.000
+   100 0.987
+   200 0.954
+
 ----
 
 * **type**: ``GeometricalMeasure``, ``MeanAngularCorrelation``
@@ -17,6 +26,7 @@ Example:
    "angularCorrelation":{
      "type":["GeometricalMeasure","MeanAngularCorrelation"],
      "parameters":{
+       "intervalStep": 10000,
        "outputFilePath": "angular_correlation.dat"
      }
    }

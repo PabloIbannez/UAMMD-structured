@@ -18,6 +18,7 @@ Example:
    "meanMagnetization":{
      "type":["MagneticMeasure","MeasureMeanMagnetization"],
      "parameters":{
+       "intervalStep": 10000,
        "outputFilePath": "mean_magnetization.dat",
        "startStep": 1000
      }

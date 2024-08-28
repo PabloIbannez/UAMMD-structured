@@ -3,6 +3,22 @@ PairwiseForceMeasure
 
 The PairwiseForceMeasure step calculates and records the pairwise forces between particles or the total force on each particle.
 
+Output format:
+
+.. code-block::
+
+   # For mode "Pairwise_force":
+   #From     To       Fx                  Fy                  Fz
+   1         2        1.2345678901        -0.9876543210       0.5432109876
+   1         3        -0.1111111111       0.2222222222        -0.3333333333
+   ...
+
+   # For mode "Total_force":
+   #Id       Fx                  Fy                  Fz
+   1         1.1234567890        -0.7654321098       0.2098765432
+   2         -0.9876543210       0.8765432109        -0.7654321098
+   ...
+
 ----
 
 * **type**: ``MechanicalMeasure``, ``PairwiseForceMeasure``
@@ -18,6 +34,7 @@ Example:
    "pairwiseForceMeasure":{
      "type":["MechanicalMeasure","PairwiseForceMeasure"],
      "parameters":{
+       "intervalStep": 10000,
        "outputFilePath": "pairwise_force.dat",
        "mode": "Pairwise_force"
      }

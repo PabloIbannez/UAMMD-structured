@@ -3,6 +3,15 @@ MeanRadius
 
 The MeanRadius step calculates and records the mean radius of the system, defined as the average distance of particles from the center of mass.
 
+Output format:
+
+.. code-block::
+
+   # step MeanRadius
+   0 5.678
+   100 5.789
+   200 5.890
+
 ----
 
 * **type**: ``GeometricalMeasure``, ``MeanRadius``
@@ -17,6 +26,7 @@ Example:
    "meanRadius":{
      "type":["GeometricalMeasure","MeanRadius"],
      "parameters":{
+       "intervalStep": 10000,
        "outputFilePath": "mean_radius.dat"
      }
    }

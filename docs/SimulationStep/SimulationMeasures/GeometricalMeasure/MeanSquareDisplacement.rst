@@ -3,6 +3,15 @@ MeanSquareDisplacement
 
 The MeanSquareDisplacement step calculates and records the mean square displacement (MSD) of particles relative to their initial positions.
 
+Output format:
+
+.. code-block::
+
+   # step MSD
+   0 0.000
+   100 1.234
+   200 2.345
+
 ----
 
 * **type**: ``GeometricalMeasure``, ``MeanSquareDisplacement``
@@ -17,6 +26,7 @@ Example:
    "msd":{
      "type":["GeometricalMeasure","MeanSquareDisplacement"],
      "parameters":{
+       "intervalStep": 10000,
        "outputFilePath": "msd.dat"
      }
    }

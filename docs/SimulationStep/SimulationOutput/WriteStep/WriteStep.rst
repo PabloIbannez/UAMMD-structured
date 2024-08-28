@@ -3,6 +3,14 @@ WriteStep
 
 The WriteStep is a simulation step that writes the system state to a file at specified intervals during the simulation. It supports various output formats for particle positions, velocities, and other properties.
 
+Important available output formats include:
+
+- "xyz": XYZ format for particle positions
+- "pdb": PDB (Protein Data Bank) format for particle positions
+- "lammpstrj": LAMMPS trajectory format for particle positions
+- "dcd": DCD format for particle positions (this format is **binary**, which translates to significantly smaller file sizes compared to text-based formats)
+- "sp": `superpunto <https://github.com/RaulPPelaez/superpunto>`_ format for particle positions
+
 ----
 
 * **type**: ``WriteStep``, ``WriteStep``

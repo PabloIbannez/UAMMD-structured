@@ -18,6 +18,7 @@ Example:
    "systemHeight":{
      "type":["GeometricalMeasure","Height"],
      "parameters":{
+       "intervalStep": 10000,
        "outputFilePath": "system_height.dat",
        "particleNumberAverage": 10
      }

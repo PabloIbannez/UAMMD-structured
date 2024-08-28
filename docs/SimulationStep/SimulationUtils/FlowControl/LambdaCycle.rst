@@ -1,7 +1,20 @@
 LambdaCycle
 -----------
 
-The LambdaCycle step implements a cyclic lambda schedule for alchemical transformations or free energy calculations. It allows for repeated cycles of lambda changes, useful for enhanced sampling techniques.
+The LambdaCycle step implements a cyclic lambda schedule for alchemical transformations or free energy calculations. It allows for repeated cycles of lambda changes, useful for measuring free energy of particles immersed in a solvent. The cycle consists of a series of steps for each lambda value, followed by a pause step before the next cycle begins. The cycle is repeated until the simulation is complete.
+
+.. code-block::
+
+    lambda=1                        ...................                               ...................
+    lambdaValues[n]              ...                                               ...
+        .......               ...                                               ...
+        .......            ...                                               ...
+    lambdaValues[0]     ...                                               ...
+    lambda=0                                           ...................                               ...................
+    startStep ---------><-><-><-><-><---measureStep---><----pauseStep----><-><-><-><-><---measureStep---><----pauseStep---->
+                         |
+                         |
+                         L-> activationStep
 
 ----
 

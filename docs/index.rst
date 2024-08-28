@@ -62,9 +62,9 @@ Welcome to UAMMD-structured's documentation!
    :maxdepth: 2
    :caption: Simulation Steps
 
-   SimulationStep/SimulationMeasures/index
-   SimulationStep/SimulationOutput/index
    SimulationStep/SimulationUtils/index
+   SimulationStep/SimulationOutput/index
+   SimulationStep/SimulationMeasures/index
 
 .. toctree::
    :maxdepth: 2

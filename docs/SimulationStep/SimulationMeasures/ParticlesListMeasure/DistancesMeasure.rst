@@ -3,6 +3,18 @@ DistancesMeasure
 
 The DistancesMeasure step calculates and records the distances between specified pairs of particles over time.
 
+Output format:
+
+.. code-block::
+
+   # Step 1
+   distance1 distance2 distance3 ...
+   # Step 2
+   distance1 distance2 distance3 ...
+   # Step 3
+   distance1 distance2 distance3 ...
+   ...
+
 ----
 
 * **type**: ``ParticlesListMeasure``, ``DistancesMeasure``
@@ -22,6 +34,7 @@ Example:
    "distancesMeasure":{
      "type":["ParticlesListMeasure","DistancesMeasure"],
      "parameters":{
+       "intervalStep": 10000,
        "outputFilePath": "distances.dat"
      },
      "labels":["id_i", "id_j"],

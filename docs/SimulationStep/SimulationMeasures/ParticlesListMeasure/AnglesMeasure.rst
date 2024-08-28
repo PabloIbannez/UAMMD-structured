@@ -3,6 +3,19 @@ AnglesMeasure
 
 The AnglesMeasure step calculates and records the angles formed by specified triplets of particles over time.
 
+Output format:
+
+.. code-block::
+
+   # Step 1
+   angle1 angle2 angle3 ...
+   # Step 2
+   angle1 angle2 angle3 ...
+   # Step 3
+   angle1 angle2 angle3 ...
+   ...
+
+
 ----
 
 * **type**: ``ParticlesListMeasure``, ``AnglesMeasure``
@@ -23,6 +36,7 @@ Example:
    "anglesMeasure":{
      "type":["ParticlesListMeasure","AnglesMeasure"],
      "parameters":{
+       "intervalStep": 10000,
        "outputFilePath": "angles.dat"
      },
      "labels":["id_i", "id_j", "id_k"],

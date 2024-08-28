@@ -3,6 +3,40 @@ AFMMeasure
 
 The AFMMeasure step simulates an Atomic Force Microscopy (AFM) experiment, recording force-distance curves and other relevant data.
 
+The output file format depends on the ``mode`` parameter:
+
+**Standard mode**:
+
+.. code-block::
+
+   #Step                    X                    F
+   [step number]     [tip height]     [tip deflection force]
+
+Where:
+
+- ``Step`` is the simulation step number
+- ``X`` is the tip height (tip position minus tip radius)
+- ``F`` is the tip deflection force
+
+**Verbose mode**:
+
+.. code-block::
+
+   #Step        ChipPos        TipPos    tipDeflection    tipForce    sampleForce    tipDeflectionForce
+   [step]       [chip z]       [tip z]    [deflection]    [tip Fz]    [sample Fz]    [deflection F]
+
+Where:
+
+- ``Step`` is the simulation step number
+- ``ChipPos`` is the z-position of the AFM chip
+- ``TipPos`` is the z-position of the AFM tip
+- ``tipDeflection`` is the deflection of the tip from the chip position
+- ``tipForce`` is the z-component of the force on the tip
+- ``sampleForce`` is the z-component of the force on the sample
+- ``tipDeflectionForce`` is the force due to tip deflection
+
+All values are written in scientific notation with 24 character width for alignment.
+
 ----
 
 * **type**: ``ExperimentMeasures``, ``AFMMeasure``
@@ -19,6 +53,7 @@ Example:
    "afmMeasure":{
      "type":["ExperimentMeasures","AFMMeasure"],
      "parameters":{
+       "intervalStep": 10000,
        "outputFilePath": "afm_data.dat",
        "mode": "Verbose",
        "tipType": "TIP"

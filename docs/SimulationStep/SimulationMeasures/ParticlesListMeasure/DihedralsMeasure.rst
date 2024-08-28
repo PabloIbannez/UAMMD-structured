@@ -3,6 +3,18 @@ DihedralsMeasure
 
 The DihedralsMeasure step calculates and records the dihedral angles for specified sets of four particles over time.
 
+Output format:
+
+.. code-block::
+
+   # Step 1
+   dihedral1 dihedral2 dihedral3 ...
+   # Step 2
+   dihedral1 dihedral2 dihedral3 ...
+   # Step 3
+   dihedral1 dihedral2 dihedral3 ...
+   ...
+
 ----
 
 * **type**: ``ParticlesListMeasure``, ``DihedralsMeasure``
@@ -24,6 +36,7 @@ Example:
    "dihedralsMeasure":{
      "type":["ParticlesListMeasure","DihedralsMeasure"],
      "parameters":{
+       "intervalStep": 10000,
        "outputFilePath": "dihedrals.dat"
      },
      "labels":["id_i", "id_j", "id_k", "id_l"],
