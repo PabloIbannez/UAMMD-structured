@@ -136,7 +136,7 @@ The approach combining cell lists and Verlet lists encounters challenges in hand
              # ...
            # ...
     
-    The complete list of available conditions for conditioned Verlet list sets, as well as the various lists they generate, can be found in the online documentation. Similarly, a list of the available potentials can also be located there. UAMMD-structured allows users to easily add more conditions and interactions.
+    The complete list of available conditions for conditioned Verlet list sets, as well as the various lists they generate, can be found in the `condtions section <DataStructures/VerletConditionalListSet/Condition/index.html>`_. Similarly, a list of the available potentials can also be located there. UAMMD-structured allows users to easily add more conditions and interactions.
 
 ----
 

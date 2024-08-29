@@ -6,7 +6,7 @@ Welcome to UAMMD-structured's documentation!
    :caption: About UAMMD-structured
 
    What is UAMMD-structured and what is not?
-   UAMMD-structured installation
+   UAMMD-structured compilation and installation
    First Example
 
 .. toctree::
@@ -71,6 +71,7 @@ Welcome to UAMMD-structured's documentation!
    :caption: Utilities
 
    Utilities/Groups
+   Utilities/Scheduling the components
    Utilities/Batching
 
 .. toctree::
