@@ -24,6 +24,12 @@ if(BUILD_PYTHON_WRAPPER AND NOT INSTALL_PYTHON_PACKAGE)
                         "Please enable INSTALL_PYTHON_PACKAGE to build the Python wrapper.")
 endif()
 
+# BUILD_DEB_PACKAGE is only available if BUILD_PYTHON_WRAPPER and INSTALL_PYTHON_PACKAGE are OFF
+if(BUILD_DEB_PACKAGE AND (BUILD_PYTHON_WRAPPER OR INSTALL_PYTHON_PACKAGE))
+    message(FATAL_ERROR "BUILD_DEB_PACKAGE is ON but BUILD_PYTHON_WRAPPER or INSTALL_PYTHON_PACKAGE are ON. "
+                        "Please disable BUILD_PYTHON_WRAPPER and INSTALL_PYTHON_PACKAGE to build the .deb package.")
+endif()
+
 set(UAMMD_REPO_URL "https://github.com/PabloIbannez/UAMMD.git")
 set(UAMMD_TAG "v2.x")
 
@@ -423,18 +429,16 @@ if(BUILD_DEB_PACKAGE)
     set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
 
     include(CPack)
-endif()
 
-## Installation rules
-if(BUILD_DEB_PACKAGE)
     install(TARGETS UAMMDlauncher
             RUNTIME DESTINATION bin)
-else()
-    install(TARGETS UAMMDlauncher
-            RUNTIME DESTINATION ${INSTALL_DIR})
 endif()
 
 if(NOT BUILD_DEB_PACKAGE)
+
+    install(TARGETS UAMMDlauncher
+            RUNTIME DESTINATION ${INSTALL_DIR})
+
     if(INSTALL_PYTHON_PACKAGE)
         add_custom_target(
             install_python_package
