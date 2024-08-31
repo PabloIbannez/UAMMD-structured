@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 
 from scipy.integrate import simps
 
-import json
+import json5 as json
 
 #######################
 
-COMPONENTS_PATH = os.path.join(os.getenv('UAMMD_PATH'),
-                               'USCM/Components.json')
+COMPONENTS_PATH = os.path.join("../../",
+                               'structured/Components.json')
 
 with open(COMPONENTS_PATH) as f:
     components = json.load(f)
@@ -148,6 +148,22 @@ def Steric6SoftCore(r,epsilon,sigma,cutOffFactor,alpha):
 
 def Steric12SoftCore(r,epsilon,sigma,cutOffFactor,alpha):
     return np.piecewise(r,[r<=sigma*cutOffFactor,r>sigma*cutOffFactor],[lambda r: lambdaTI*epsilon/(alpha*(1.0-lambdaTI)**2+np.power(r/sigma,6))**2,lambda r: 0.0])
+
+def LaTorre(r, epsilon, sigma, w):
+    sgmFactor = sigma * 1.1224620
+    sgmFactorW = sgmFactor + w
+
+    def cos_term(r):
+        x = np.pi / (2.0 * w) * (r - sgmFactor)
+        return -epsilon * np.minimum(np.cos(x)**2, 1.0)
+
+    return np.piecewise(r,
+                        [r <= sgmFactor,
+                         (r > sgmFactor) & (r <= sgmFactorW),
+                         r > sgmFactorW],
+                        [-epsilon,
+                         cos_term,
+                         0.0])
 
 def LennardJonesSoftCoreType1(r,epsilon,sigma,cutOffFactor,alpha):
     return Steric12SoftCore(r,4.0*epsilon,sigma,cutOffFactor,alpha)-Steric6SoftCore(r,4.0*epsilon,sigma,cutOffFactor,alpha)

@@ -21,6 +21,7 @@
 	"bond2bound":{"type":"MaxDistanceRestraint","K":10,"distance":10.0},
 
 	"nonBondedList":{
+        "LaTorre":                  {"parameters":{},"labels":["name_i","name_j","epsilon","sigma","w"],"data":[["A","A",1.0,2.0,3.0]]},
         "DebyeHuckel":              {"parameters":{"dielectricConstant":80.0,"debyeLength":2.3,"cutOffFactor":1.2}},
         "DLVOType1":                {"parameters":{"dielectricConstant":73.0,"debyeLength":2.2,"cutOffNPFactor":1.9,"cutOffDHFactor":1.5},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.1,2.0]]},
         "DLVOType2":                {"parameters":{"dielectricConstant":75.0,"debyeLength":2.1,"cutOffNPFactor":1.8,"cutOffDHFactor":1.7},"labels":["name_i","name_j","epsilon","sigma"],"data":[["A","A",1.0,2.0]]},

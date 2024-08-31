@@ -123,15 +123,20 @@ namespace structured{
 
             } else {
 
-                DataEntry data = sys->getInput()->getDataEntry(entry.second.path);
+                // The following can not be done because sometimes instead of the interactor
+                // we have a group or a neighbour list.
 
-                std::string interactorType    = data.getType();
-                std::string interactorSubType = data.getSubType();
+                // TODO: Add a check to see if the entry is a group or a neighbour list
 
-                System::log<System::CRITICAL>("[Topology] Error loading interactor: \"%s\". "
-                                              "Interactor (type,subtype): (\"%s\",\"%s\") not recognized.",
-                                              entry.second.name.c_str(),
-                                              interactorType.c_str(),interactorSubType.c_str());
+                //DataEntry data = sys->getInput()->getDataEntry(entry.second.path);
+
+                //std::string interactorType    = data.getType();
+                //std::string interactorSubType = data.getSubType();
+
+                //System::log<System::CRITICAL>("[Topology] Error loading interactor: \"%s\". "
+                //                              "Interactor (type,subtype): (\"%s\",\"%s\") not recognized.",
+                //                              entry.second.name.c_str(),
+                //                              interactorType.c_str(),interactorSubType.c_str());
             }
         }
 

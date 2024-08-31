@@ -4,16 +4,13 @@ import pyUAMMD
 
 import numpy as np
 
-import json
+import json5 as json
 import jsbeautifier
 
 #######################
 
-#COMPONENTS_PATH = os.path.join(os.getenv('UAMMD_PATH'),
-#                               'USCM/Components.json')
-
 COMPONENTS_PATH = os.path.join("../../",
-                               'USCM/Components.json')
+                               'structured/Components.json')
 
 with open(COMPONENTS_PATH) as f:
     components = json.load(f)

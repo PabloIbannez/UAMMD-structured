@@ -177,6 +177,7 @@
         ],
         "Pair": [
             ["LongRange", "Electrostatics", "Electrostatics.cu"],
+            ["NonBonded", "LaTorre", "LaTorre.cu"],
             ["NonBonded", "DebyeHuckel", "DebyeHuckel.cu"],
             ["NonBonded", "Zhang", "Zhang.cu"],
             ["NonBonded", "DLVOType1", "DLVO.cu"],
