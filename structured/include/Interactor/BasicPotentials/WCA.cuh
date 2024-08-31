@@ -52,7 +52,7 @@ namespace BasicPotentials{
                 //r2 > (sigma*2^(1/6))^2
                 if(r2 > sigma*sigma*real(1.259921)) return real(0);
 
-                return LennardJones::Type1::energy(rij,r2,epsilon,sigma)+epsilon;
+                return LennardJones::Type1::energy(rij,r2,epsilon,sigma)+epsilon/real(4.0);
             }
         };
 

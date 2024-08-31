@@ -149,3 +149,8 @@ REGISTER_NONBONDED_INTERACTOR(
     NonBonded,StericInner6,
     uammd::structured::Interactor::PairInteractor<uammd::structured::Potentials::NonBonded::StericInner6>
 )
+
+REGISTER_NONBONDED_INTERACTOR(
+    NonBonded,StericInner12,
+    uammd::structured::Interactor::PairInteractor<uammd::structured::Potentials::NonBonded::StericInner12>
+)
