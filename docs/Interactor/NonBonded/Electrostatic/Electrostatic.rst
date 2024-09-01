@@ -5,6 +5,16 @@ The Electrostatics interactor is a wrapper around the UAMMD SpectralEwaldPoisson
 
 For more details on the underlying method, please refer to the `UAMMD SpectralEwaldPoisson documentation <https://uammd.readthedocs.io/en/latest/Interactors.html#spectralewaldpoisson>`_.
 
+Functionality:
+   - Computes electrostatic energies and forces for charged particles in periodic systems.
+   - Uses the Spectral Ewald Poisson method for efficient long-range interactions.
+
+Limitations:
+   - The simulation box cannot be changed after the interactor is initialized.
+   - Stress, hessian, lambda derivative, magnetic field, and pairwise force calculations are not supported.
+
+The Electrostatics interactor is particularly useful for simulations of charged particles in periodic systems, such as electrolytes, ionic solutions, or charged colloids. It provides an efficient method for handling long-range electrostatic interactions, which is crucial for accurate simulations of these systems.
+
 ----
 
 * **type**: ``LongRange``, ``Electrostatics``
@@ -35,13 +45,3 @@ Example:
 .. warning::
    The Electrostatics interactor currently only supports energy and force calculations. Other computables such as stress, hessian, and magnetic field are not implemented and will generate warnings if requested.
 
-Functionality:
-   - Computes electrostatic energies and forces for charged particles in periodic systems.
-   - Uses the Spectral Ewald Poisson method for efficient long-range interactions.
-   - Automatically adjusts to changes in the system's dielectric constant.
-
-Limitations:
-   - The simulation box cannot be changed after the interactor is initialized.
-   - Stress, hessian, lambda derivative, magnetic field, and pairwise force calculations are not supported.
-
-The Electrostatics interactor is particularly useful for simulations of charged particles in periodic systems, such as electrolytes, ionic solutions, or charged colloids. It provides an efficient method for handling long-range electrostatic interactions, which is crucial for accurate simulations of these systems.
