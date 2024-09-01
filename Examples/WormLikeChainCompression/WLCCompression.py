@@ -110,7 +110,7 @@ for i in range(int(nPolymers)):
 
 
 simulation["topology"]["forceField"]["shell"] = {}
-simulation["topology"]["forceField"]["shell"]["type"] = ["KKKKK","SphericalShell"]
+simulation["topology"]["forceField"]["shell"]["type"] = ["External","SphericalShell"]
 simulation["topology"]["forceField"]["shell"]["parameters"] = {}
 simulation["topology"]["forceField"]["shell"]["parameters"]["shellCenter"] = [0.0, 0.0, 0.0]
 simulation["topology"]["forceField"]["shell"]["parameters"]["shellRadius"] = nBeads*sigma+2.0*sigma
