@@ -1,19 +1,19 @@
 KimHummer
 ---------
 
-The KimHummer potential is a specialized interaction model developed by Kim and Hummer for coarse-grained simulations of protein-protein interactions. It combines electrostatic interactions with a modified Lennard-Jones potential and includes a term based on the solvent-accessible surface area (SASA).
+The KimHummer potential is a coarse-grained model for protein-protein interactions developed by Kim and Hummer [Hummer2008]_.
+It combines electrostatic interactions with a modified Lennard-Jones potential and includes solvent-accessible surface area (SASA) weighting.
 
-The potential is composed of three terms:
+The potential consists of two main terms:
 
 .. math::
 
-    U_{KH} = U_{el} + U_{LJ} + U_{SASA}
+    U_{KH} = U_{el} + U_{np}
 
 where:
 
 * :math:`U_{el}` is the electrostatic term (Debye-Hückel potential)
-* :math:`U_{LJ}` is a modified Lennard-Jones term
-* :math:`U_{SASA}` is the SASA-dependent term
+* :math:`U_{np}` is the non-polar term (modified Lennard-Jones potential)
 
 The electrostatic term is given by the Debye-Hückel potential:
 
@@ -21,25 +21,25 @@ The electrostatic term is given by the Debye-Hückel potential:
 
     U_{el} = \frac{q_i q_j}{4\pi\epsilon_0\epsilon_r} \frac{e^{-r/\lambda_D}}{r}
 
-The modified Lennard-Jones term is:
+The non-polar term is a modified Lennard-Jones potential:
 
 .. math::
 
-    U_{LJ} = \epsilon_{ij} \left[ 13\left(\frac{\sigma_{ij}}{r}\right)^{12} - 18\left(\frac{\sigma_{ij}}{r}\right)^{10} + 4\left(\frac{\sigma_{ij}}{r}\right)^6 \right]
+    U_{np} = \epsilon_{ij} \left[ \left(\frac{\sigma_{ij}}{r}\right)^{12} - 2\left(\frac{\sigma_{ij}}{r}\right)^6 \right]
 
-The SASA-dependent term modulates the interaction based on the solvent exposure of the residues.
+Both terms are weighted by SASA-dependent factors for each residue.
 
 ----
 
 * **type**: ``NonBonded``, ``KimHummer``
 * **parameters**:
 
-  * ``cutOffNPFactor``: ``real``: Interaction range for LJ as a multiple of sigma
-  * ``cutOffDHFactor``: ``real``: Interaction range for DH as a multiple of the Debye length
+  * ``cutOffNPFactor``: ``real``: Interaction range for non-polar term as a multiple of sigma
+  * ``cutOffDHFactor``: ``real``: Interaction range for electrostatics as a multiple of the Debye length
   * ``dielectricConstant``: ``real``: Relative permittivity of the medium :math:`\epsilon_r`
   * ``debyeLength``: ``real``: Debye length :math:`\lambda_D` :math:`[distance]`
-  * ``sasaModel``: ``string``: SASA model to use (options: "A", "B", "C", "D", "E", "F")
-  * ``zeroEnergy``: ``real``: Energy shift parameter (default: 0.01) :math:`[energy]`
+  * ``sasaModel``: ``string``: SASA weighting model (options: "A", "B", "C", "D", "E", "F")
+  * ``zeroEnergy``: ``real``: Energy shift parameter for non-polar term (default: 0.01) :math:`[energy]`
 
 * **data**:
 
@@ -60,19 +60,17 @@ Example:
        "dielectricConstant":78.5,
        "debyeLength":1.0,
        "sasaModel":"B",
-       "zeroEnergy":0.01,
-       "condition":"all"
+       "zeroEnergy":0.01
      },
      "labels":["name_i", "name_j", "epsilon", "sigma"],
      "data":[
-       ["ALA", "ALA", 1.0, 1.0],
-       ["ALA", "GLY", 1.2, 0.9],
-       ["GLY", "GLY", 0.8, 1.1]
+       ["ALA", "ALA", -0.137, 5.0],
+       ["ALA", "GLY", -0.068, 4.9],
+       ["GLY", "GLY", 0.0, 4.8]
      ]
    }
 
 .. note::
-   The KimHummer potential uses charge, radius, and SASA information stored in the particle data. Ensure that these properties are properly set for each particle before using this potential.
+   The KimHummer potential requires charge, radius, and SASA information for each particle. Ensure these properties are properly set before using this potential.
 
-.. warning::
-   The KimHummer potential is specifically designed for coarse-grained protein simulations and may not be suitable for other types of systems without modification.
+.. [Hummer2008] Kim, Y. C., & Hummer, G. (2008). Coarse-grained models for simulations of multiprotein complexes: application to ubiquitin binding. Journal of molecular biology, 375(5), 1416-1433.

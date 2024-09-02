@@ -1,38 +1,54 @@
 Zhang
 -----
 
-The Zhang potential is a specialized interaction model developed for coarse-grained simulations of anisotropic particles, particularly useful for modeling protein-protein interactions with orientation dependence.
+The Zhang potential is a coarse-grained, one-particle-thick model for biological and biomimetic fluid membranes developed by Yuan et al. [Yuan2010]_ . It features an anisotropic pair potential that allows particles to self-assemble into fluid membranes with biologically relevant properties.
 
-The potential combines a distance-dependent term with an orientation-dependent term:
+The potential consists of two parts:
+
+1. A distance-dependent function U(r)
+2. An orientation-dependent function Ω(r̂_ij, n_i, n_j)
+
+The total potential is given by:
 
 .. math::
+    U(\mathbf{r}_{ij}, \mathbf{n}_i, \mathbf{n}_j) =
+    \begin{cases}
+        U_R(r) + \varepsilon[1 - \Omega(\hat{\mathbf{r}}_{ij}, \mathbf{n}_i, \mathbf{n}_j)], & r \leq r_{\text{min}} \\
+        U_A(r)\Omega(\hat{\mathbf{r}}_{ij}, \mathbf{n}_i, \mathbf{n}_j), & r_{\text{min}} < r \leq r_c
+    \end{cases}
 
-    U = U_{\text{dist}}(r) \cdot U_{\text{orient}}(\mathbf{r}, \mathbf{n}_i, \mathbf{n}_j)
+The distance-dependent functions:
 
-where:
+.. math::
+    U_R(r) = \varepsilon \left[\left(\frac{r_{\text{min}}}{r}\right)^4 - 2\left(\frac{r_{\text{min}}}{r}\right)^2\right]
 
-* :math:`r` is the distance between particles
-* :math:`\mathbf{n}_i, \mathbf{n}_j` are the orientation vectors of particles i and j
+.. math::
+    U_A(r) = -\varepsilon \cos^2\left[\frac{\pi}{2}\frac{r - r_{\text{min}}}{r_c - r_{\text{min}}}\right]
 
-The distance-dependent term :math:`U_{\text{dist}}(r)` is typically a combination of attractive and repulsive parts, while the orientation-dependent term :math:`U_{\text{orient}}(\mathbf{r}, \mathbf{n}_i, \mathbf{n}_j)` modulates the interaction based on the relative orientations of the particles.
+The orientation-dependent function:
+
+.. math::
+    \Omega = 1 + \mu[(\mathbf{n}_i \cdot \hat{\mathbf{r}}_{ij})(\mathbf{n}_j \cdot \hat{\mathbf{r}}_{ij}) + \sin\theta_0(\mathbf{n}_j - \mathbf{n}_i) \cdot \hat{\mathbf{r}}_{ij} - \sin^2\theta_0]
+
+where :math:`r_{ij}` is the distance between particles, :math:`n_i` and :math:`n_j` are unit vectors representing particle orientations, :math:`r_{\text{min}}` is the distance of minimum energy, and :math:`r_c` is the cutoff distance.
 
 ----
 
 * **type**: ``NonBonded``, ``Zhang``
 * **parameters**:
 
-  * ``cutOffNPFactor``: ``real``: Interaction range as a multiple of sigma
-  * ``cutOffDHFactor``: ``real``: Interaction range for orientation-dependent term
-  * ``axis``: ``real3``: Reference axis for orientation (default: {0, 0, 1})
+  * ``alpha``: ``real``: Controls the slope of the attractive potential branch
+  * ``beta``: ``real``: Related to membrane bending rigidity
+  * ``gamma``: ``real``: Related to membrane spontaneous curvature
+  * ``r_min``: ``real``: Distance of minimum energy [distance]
+  * ``r_c``: ``real``: Cutoff distance [distance]
+  * ``axis``: ``real3``: Reference axis for particle orientations (default: {0, 0, 1})
 
 * **data**:
 
   * ``name_i``: ``string``: Type of particle i
   * ``name_j``: ``string``: Type of particle j
-  * ``epsilon``: ``real``: Strength of interaction :math:`[energy]`
-  * ``sigma``: ``real``: Characteristic distance :math:`[distance]`
-  * ``mu``: ``real``: Anisotropy parameter
-  * ``theta``: ``real``: Preferred angle :math:`[angle]`
+  * ``epsilon``: ``real``: Energy scale [energy]
 
 Example:
 
@@ -41,21 +57,22 @@ Example:
    "zhang":{
      "type":["NonBonded","Zhang"],
      "parameters":{
-       "cutOffNPFactor":2.5,
-       "cutOffDHFactor":3.0,
-       "axis":[0, 0, 1],
-       "condition":"all"
+       "alpha": 4.0,
+       "beta": 3.0,
+       "gamma": 0.0,
+       "r_min": 1.1225,
+       "r_c": 2.6,
+       "axis":[0, 0, 1]
      },
-     "labels":["name_i", "name_j", "epsilon", "sigma", "mu", "theta"],
+     "labels":["name_i", "name_j", "epsilon"],
      "data":[
-       ["A", "A", 1.0, 1.0, 0.5, 1.57],
-       ["A", "B", 1.2, 0.9, 0.6, 1.2],
-       ["B", "B", 0.8, 1.1, 0.4, 1.8]
+       ["A", "A", 1.0],
+       ["A", "B", 1.0],
+       ["B", "B", 1.0]
      ]
    }
 
 .. note::
-   The Zhang potential requires orientation information for each particle. Ensure that the orientation (director) is properly set for each particle before using this potential.
+   This potential requires orientation information for each particle. Ensure that the orientation (director) is properly set for each particle before using this potential.
 
-.. warning::
-   The Zhang potential is specifically designed for anisotropic interactions and may not be suitable for isotropic systems without modification.
+.. [Yuan2010] Yuan, H., Huang, C., Li, J., Lykotrafitis, G., & Zhang, S. (2010). One-particle-thick, solvent-free, coarse-grained model for biological and biomimetic fluid membranes. Physical Review E, 82(1), 011905.
