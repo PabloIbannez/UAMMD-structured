@@ -5,8 +5,8 @@ The Zhang potential is a coarse-grained, one-particle-thick model for biological
 
 The potential consists of two parts:
 
-1. A distance-dependent function U(r)
-2. An orientation-dependent function Ω(r̂_ij, n_i, n_j)
+1. A distance-dependent function :math:`U(r)`
+2. An orientation-dependent function :math:`\Omega(r̂_{ij}, n_{i}, n_{j})`
 
 The total potential is given by:
 
