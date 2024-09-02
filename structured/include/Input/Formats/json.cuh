@@ -2,6 +2,37 @@
 
 #define JSON_TYPE nlohmann::json
 
+inline void to_json(JSON_TYPE& j, const int2& p) {
+    j = JSON_TYPE{p.x,p.y};
+}
+
+inline void from_json(const JSON_TYPE& j, int2& p) {
+    p.x=int(j[0]);
+    p.y=int(j[1]);
+}
+
+
+inline void to_json(JSON_TYPE& j, const int3& p) {
+    j = JSON_TYPE{p.x,p.y,p.z};
+}
+
+inline void from_json(const JSON_TYPE& j, int3& p) {
+    p.x=int(j[0]);
+    p.y=int(j[1]);
+    p.z=int(j[2]);
+}
+
+inline void to_json(JSON_TYPE& j, const int4& p) {
+    j = JSON_TYPE{p.x,p.y,p.z,p.w};
+}
+
+inline void from_json(const JSON_TYPE& j, int4& p) {
+    p.x=int(j[0]);
+    p.y=int(j[1]);
+    p.z=int(j[2]);
+    p.w=int(j[3]);
+}
+
 inline void to_json(JSON_TYPE& j, const float2& p) {
     j = JSON_TYPE{p.x,p.y};
 }
