@@ -1,0 +1,15 @@
+{
+   "sigma": 1.0,
+   "epsilon":1.0,
+   "N": 10000,
+   "Lx": 10.0,
+   "Ly": 10.0,
+   "Lz": 10.0,
+   "T": 0.0,
+   "dt": 1e-09,
+   "nSteps": 1,
+   "plainPosition":0.0,
+   "cylinderRadius":0
+
+}
+

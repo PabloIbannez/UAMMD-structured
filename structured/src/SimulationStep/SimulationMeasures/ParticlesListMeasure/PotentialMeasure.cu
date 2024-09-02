@@ -113,22 +113,22 @@ namespace SimulationMeasures{
 				//Write data
 
 				for(int i = 0; i < ids.size(); i++){
-					outputFile << std::setw(24) << ids[i];
+					outputFile << std::setw(24) << ids[i] << " ";
 
 					for(std::string& interactorName : interactorNames){
-						outputFile << std::setw(24) << energyData[i][interactorName];
+						outputFile << std::setw(24) << energyData[i][interactorName] << " ";
 
 						real3 force = make_real3(forceData[i][interactorName]);
-						outputFile << std::setw(24) << force.x;
-						outputFile << std::setw(24) << force.y;
-						outputFile << std::setw(24) << force.z;
-						outputFile << std::setw(24) << length(force);
+						outputFile << std::setw(24) << force.x << " ";
+						outputFile << std::setw(24) << force.y << " ";
+						outputFile << std::setw(24) << force.z << " ";
+						outputFile << std::setw(24) << length(force) << " ";
 
 						real3 torque = make_real3(torqueData[i][interactorName]);
-						outputFile << std::setw(24) << torque.x;
-						outputFile << std::setw(24) << torque.y;
-						outputFile << std::setw(24) << torque.z;
-						outputFile << std::setw(24) << length(torque);
+						outputFile << std::setw(24) << torque.x << " ";
+						outputFile << std::setw(24) << torque.y << " ";
+						outputFile << std::setw(24) << torque.z << " ";
+						outputFile << std::setw(24) << length(torque) << " ";
 					}
 
 					outputFile << std::endl;
