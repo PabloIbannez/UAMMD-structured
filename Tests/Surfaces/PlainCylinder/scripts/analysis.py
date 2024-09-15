@@ -6,7 +6,7 @@ import numpy as np
 with open("./parameters.json") as f:
     inputData = json.load(f)
 
-tol = 1e-7
+tol = 1e-5
 
 sigma  = inputData["sigma"]
 epsilon = inputData["epsilon"]
@@ -35,7 +35,7 @@ data = np.loadtxt(file_path,skiprows=2)
 E_sim = data[:,1]
 
 def gradientDistance(x,y,z):
-                                
+
     r =  np.sqrt( x* x+ y* y); #//This Surface is defined in Cylindric coordinates
 
     r_cyl   = Rcyl - r;

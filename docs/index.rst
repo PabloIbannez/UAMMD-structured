@@ -81,4 +81,12 @@ Welcome to UAMMD-structured's documentation!
    pyUAMMD/Introduction
    pyUAMMD/Installation
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Implementation
+
+   Implementation/Input/index.rst
+   Implementation/Design/index.rst
+   Implementation/Extending/index.rst
+
 

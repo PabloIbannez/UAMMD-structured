@@ -98,23 +98,23 @@ sim["topology"]["forceField"]["p2"]["data"]=[["A",1,sigma]]
 
 sim["simulationStep"]={}
 
-#sim["simulationStep"]["info"]={}
-#sim["simulationStep"]["info"]["type"]=["ParticlesListMeasure","PotentialMeasure"]
-#sim["simulationStep"]["info"]["parameters"]={
-#        "intervalStep":nSteps,
-#        "outputFilePath":"potential.dat"
-#        }
-#sim["simulationStep"]["info"]["labels"]=["id"]
-#sim["simulationStep"]["info"]["data"]=[[i] for i in range(N)]
+sim["simulationStep"]["info"]={}
+sim["simulationStep"]["info"]["type"]=["ParticlesListMeasure","PotentialMeasure"]
+sim["simulationStep"]["info"]["parameters"]={
+        "intervalStep":nSteps,
+        "outputFilePath":"potential.dat"
+        }
+sim["simulationStep"]["info"]["labels"]=["id"]
+sim["simulationStep"]["info"]["data"]=[[i] for i in range(N)]
 
 
-sim["simulationStep"]["saveState"]={}
-sim["simulationStep"]["saveState"]["type"]=["WriteStep","WriteStep"]
-sim["simulationStep"]["saveState"]["parameters"]={
-    "intervalStep":np.ceil(nSteps/100),
-    "outputFilePath":"output",
-    "outputFormat":"sp"
-    }
+#sim["simulationStep"]["saveState"]={}
+#sim["simulationStep"]["saveState"]["type"]=["WriteStep","WriteStep"]
+#sim["simulationStep"]["saveState"]["parameters"]={
+#    "intervalStep":np.ceil(nSteps/100),
+#    "outputFilePath":"output",
+#    "outputFormat":"sp"
+#    }
 
 try:
     os.makedirs("results")
