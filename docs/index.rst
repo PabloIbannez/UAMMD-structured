@@ -1,11 +1,19 @@
 Welcome to UAMMD-structured's documentation!
 ============================================
 
+..
+  .. toctree::
+     :maxdepth: 2
+     :caption: About UAMMD-structured
+  
+     What is UAMMD-structured and what is not?
+     UAMMD-structured compilation and installation
+     First Example
+
 .. toctree::
    :maxdepth: 2
    :caption: About UAMMD-structured
 
-   What is UAMMD-structured and what is not?
    UAMMD-structured compilation and installation
    First Example
 
@@ -48,7 +56,6 @@ Welcome to UAMMD-structured's documentation!
    Interactor/Bonds/index
    Interactor/Single/index
    Interactor/NonBonded/index
-   Interactor/PatchyParticles/index
    Interactor/Set/index
    Interactor/AFM/index
 
@@ -66,12 +73,20 @@ Welcome to UAMMD-structured's documentation!
    SimulationStep/SimulationOutput/index
    SimulationStep/SimulationMeasures/index
 
+.. 
+  .. toctree::
+     :maxdepth: 2
+     :caption: Utilities
+  
+     Utilities/Groups
+     Utilities/Scheduling the components
+     Utilities/Batching
+
 .. toctree::
    :maxdepth: 2
    :caption: Utilities
 
    Utilities/Groups
-   Utilities/Scheduling the components
    Utilities/Batching
 
 .. toctree::
