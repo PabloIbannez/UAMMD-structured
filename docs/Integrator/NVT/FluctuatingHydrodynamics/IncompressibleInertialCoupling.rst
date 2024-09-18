@@ -3,7 +3,7 @@ IncompressibleInertialCoupling
 
 The IncompressibleInertialCoupling integrator implements a fluctuating hydrodynamics method for simulating particles coupled to an incompressible fluid. This integrator is a wrapper around the UAMMD ICM integrator.
 
-For more details on the underlying method, please refer to the `UAMMD ICM documentation <https://uammd.readthedocs.io/en/latest/Integrators.html#icm>`_.
+For more details on the underlying method, please refer to the `UAMMD ICM documentation <https://uammd.readthedocs.io/en/latest/Integrator/FluctuatingHydrodynamics.html#icm>`_.
 
 ----
 

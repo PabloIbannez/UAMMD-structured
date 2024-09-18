@@ -3,7 +3,7 @@ Quasi2D
 
 The Quasi2D integrator implements Brownian Dynamics with Hydrodynamic Interactions for quasi-two-dimensional systems (periodic in two dimensions, confined in the third). This integrator is a wrapper around the UAMMD BDHI::Quasi2D integrator.
 
-For more details on the underlying method, please refer to the `UAMMD BDHI documentation <https://uammd.readthedocs.io/en/latest/Integrators.html#bdhi>`_.
+For more details on the underlying method, please refer to the `UAMMD BDHI documentation <https://uammd.readthedocs.io/en/latest/Integrator/BrownianHydrodynamics.html>`_.
 
 ----
 

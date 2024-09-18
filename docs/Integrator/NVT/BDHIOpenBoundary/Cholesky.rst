@@ -3,7 +3,7 @@ Cholesky
 
 The Cholesky integrator implements Brownian Dynamics with Hydrodynamic Interactions for open boundary systems using the Cholesky decomposition method. This integrator is a wrapper around the UAMMD BDHI::EulerMaruyama<BDHI::Cholesky> integrator.
 
-For more details on the underlying method, please refer to the `UAMMD BDHI documentation <https://uammd.readthedocs.io/en/latest/Integrators.html#bdhi>`_.
+For more details on the underlying method, please refer to the `UAMMD BDHI documentation <https://uammd.readthedocs.io/en/latest/Integrator/BrownianHydrodynamics.html>`_.
 
 ----
 

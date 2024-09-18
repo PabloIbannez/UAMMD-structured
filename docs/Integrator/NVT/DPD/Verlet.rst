@@ -3,7 +3,7 @@ Verlet
 
 The Verlet integrator for DPD (Dissipative Particle Dynamics) implements a velocity Verlet algorithm with DPD thermostat. This integrator is a wrapper around the UAMMD VerletNVE integrator combined with a DPD potential.
 
-For more details on the underlying method, please refer to the `UAMMD VerletNVE documentation <https://uammd.readthedocs.io/en/latest/Integrators.html#verletnve>`_ and `UAMMD DPD Potential documentation <https://uammd.readthedocs.io/en/latest/Potentials.html#dpd>`_.
+For more details on the underlying method, please refer to the `UAMMD VerletNVE documentation <https://uammd.readthedocs.io/en/latest/Integrator/MolecularDynamics.html#verletnve>`_ and `UAMMD DPD Potential documentation <https://uammd.readthedocs.io/en/latest/Interactor/PairForces.html#dpd>`_.
 
 ----
 
