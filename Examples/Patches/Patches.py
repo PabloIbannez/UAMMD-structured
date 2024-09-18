@@ -1,20 +1,3 @@
-# %%
-# Setting up the environment if running in Jupyter
-import sys
-in_jupyter = 'ipykernel' in sys.modules
-
-if in_jupyter:
-    # Install necessary packages
-    get_ipython().system('pip install pyUAMMD')
-    get_ipython().system('apt install libomp-dev')
-
-    # Download and install UAMMD-structured
-    get_ipython().system('gdown 1rQYRMRFAEdmv8UCN5gcIpJL95fCtIBJg')
-    get_ipython().system('dpkg -i uammdstructured-1.0.0-Linux.deb')
-else:
-    # Not in Jupyter, so we assume that the library is already installed
-    pass
-
 # %% [markdown]
 # # Patchy Particles Simulation Tutorial for UAMMD-structured
 
@@ -328,18 +311,14 @@ print()
 # To run the simulation, you would typically use the UAMMD-structured executable with the generated JSON file.
 
 # %%
-if in_jupyter:
-    get_ipython().system('UAMMDlauncher simulation.json')
-else:
-    print()
-    print("You can run the code now using: UAMMDlauncher simulation.json")
+print()
+print("You can run the code now using: UAMMDlauncher simulation.json")
 
 # %% [markdown]
 # ## Conclusion
 #
 # This tutorial demonstrated how to set up and prepare a simulation of patchy particles using UAMMD-structured. We covered:
-# 1. Setting up the environment for Jupyter/Google Colab
-# 2. Defining simulation parameters, including patch-specific parameters
+# 1. Defining simulation parameters, including patch-specific parameters
 # 3. Creating the simulation object
 # 4. Setting up the system, global parameters, and integrator
 # 5. Initializing particle positions and orientations
