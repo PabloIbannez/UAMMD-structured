@@ -88,4 +88,9 @@ Welcome to UAMMD-structured's documentation!
    Implementation/Design/index.rst
    Implementation/Extending/index.rst
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Online Examples
+
+   Online Examples
 
