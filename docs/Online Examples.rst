@@ -6,6 +6,9 @@ By default, the chosen output format is ".sp" which is the `superpunto <https://
 modifying the proper paramter in the output simulationStep, there are other options like for example ".xyz" or ".dcd" which are popular formats for visualization.
 Output files must be downloaded to visualize them in a local machine.
 
+.. warning::
+   Remember that you have to select an environment with a GPU to run the examples. You can do this by going to the "Runtime" menu and selecting "Change runtime type".
+
 * `Ideal Gas <https://drive.google.com/file/d/1L98BblbAjRO0OlvzqlHFLlhv-10DOvUl/view?usp=drive_link>`_.
 * `Lennard Jones <https://drive.google.com/file/d/15MYASGtzxTpezdjzfV_fVClOuT2FRYg2/view?usp=drive_link>`_.
 * `Lennard Jones Batches <https://drive.google.com/file/d/1FqHJD96sWhtM4EuxH6Een7w8--T26oTe/view?usp=drive_link>`_.
