@@ -96,3 +96,18 @@ If you are looking to implement a new ``Property``, go to `ParticleData <../Part
         uammd::structured::Types::MyType
     )
 
+To register your own Types system create the file
+``src/GlobalData/Types/Types/myTypes.cu`` and add to
+the ``Components.json``.
+
+.. code-block:: json
+   :emphasize-lines: 5
+
+   {
+   "GlobalData":
+        "Types":[
+            ["..."],
+            ["Types","myTypes","myTypes.cu"]
+            ]
+   }
+

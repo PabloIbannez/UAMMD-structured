@@ -8,7 +8,7 @@ implemented, you should read `UAMMD <https://uammd.readthedocs.io/en/latest/Part
 However, UAMMD-structured offers a very simple way to add a new property
 to ParticleData without needing to understand how ParticleData works at
 a low level. Simply add the new property to the Data.json file,
-and the compiler will automatically define the functions ``gd->getMyProperty()``, ``gd->isMyPropertyAllocated()``, and ``gd->getPropertyIfAllocate()``.
+and the compiler will automatically define the functions ``pd->getMyProperty()``, ``pd->isMyPropertyAllocated()``, and ``pd->getPropertyIfAllocate()``.
 This will allow you to use your new property anywhere in the code.
 
 There is an example of how to add to ``Data.json`` a new property. Write the first string with lowercase and the second with uppercase

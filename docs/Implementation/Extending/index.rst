@@ -32,16 +32,6 @@ Multiple modules can be implemented in the same **module.cu** file by simply usi
 
 Available minimal code examples:
 
-..
-  .. toctree::
-     :maxdepth: 1
-  
-     ParticleData/index
-     Global/index
-     Interactor/index
-     Integrator/index
-     SimulationStep/index
-
 .. toctree::
    :maxdepth: 1
 
@@ -49,3 +39,5 @@ Available minimal code examples:
    Global/index
    Interactor/index
    Integrator/index
+   SimulationStep/index
+
