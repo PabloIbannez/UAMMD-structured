@@ -1,19 +1,3 @@
-# %%
-# Seting up the environment if running in Jupyter
-import sys
-in_jupyter = 'ipykernel' in sys.modules
-
-if in_jupyter:
-    get_ipython().system('pip install pyUAMMD')
-
-    get_ipython().system('apt install libomp-dev')
-
-    get_ipython().system('gdown 1rQYRMRFAEdmv8UCN5gcIpJL95fCtIBJg')
-    get_ipython().system('dpkg -i uammdstructured-1.0.0-Linux.deb')
-else:
-    # Not in Jupyter, so we assume that the library is already installed
-    pass
-
 # %% [markdown]
 # # Ideal Gas Simulation Tutorial for UAMMD-structured
 
@@ -204,12 +188,8 @@ print()
 # To run the simulation, you would typically use the UAMMD-structured executable with the generated JSON file.
 
 # %%
-if in_jupyter:
-    get_ipython().system('UAMMDlauncher simulation.json')
-else:
-    print()
-    print("You can run the code now using: UAMMDlauncher simulation.json")
-
+print()
+print("You can run the code now using: UAMMDlauncher simulation.json")
 
 # %% [markdown]
 # ## Conclusion

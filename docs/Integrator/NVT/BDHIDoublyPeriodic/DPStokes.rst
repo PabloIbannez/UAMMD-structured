@@ -3,7 +3,7 @@ DPStokes
 
 The DPStokes integrator implements Brownian Dynamics with Hydrodynamic Interactions for doubly periodic systems using the Doubly Periodic Stokes (DPStokes) method. This integrator is a wrapper around the UAMMD DPStokesSlab_ns::DPStokesIntegrator.
 
-For more details on the underlying method, please refer to the `UAMMD DPStokes documentation <https://uammd.readthedocs.io/en/latest/Integrators.html#dpstokes>`_.
+For more details on the underlying method, please refer to the `UAMMD BDHI documentation <https://uammd.readthedocs.io/en/latest/Integrator/BrownianHydrodynamics.html#dpstokes>`_.
 
 ----
 

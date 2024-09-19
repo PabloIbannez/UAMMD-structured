@@ -3,7 +3,7 @@ ForceCouplingMethod
 
 The ForceCouplingMethod integrator implements Brownian Dynamics with Hydrodynamic Interactions using the Force Coupling Method for triply periodic systems. This integrator is a wrapper around the UAMMD BDHI::EulerMaruyama<BDHI::FCM> integrator.
 
-For more details on the underlying method, please refer to the `UAMMD BDHI documentation <https://uammd.readthedocs.io/en/latest/Integrators.html#bdhi>`_.
+For more details on the underlying method, please refer to the `UAMMD BDHI documentation <https://uammd.readthedocs.io/en/latest/Integrator/BrownianHydrodynamics.html>`_.
 
 ----
 

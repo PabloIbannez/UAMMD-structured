@@ -3,7 +3,7 @@ VelocityVerlet
 
 The VelocityVerlet integrator implements the velocity Verlet algorithm for simulating particles in the NVE ensemble. This integrator is a wrapper around the UAMMD VerletNVE integrator.
 
-For more details on the underlying method, please refer to the `UAMMD VerletNVE documentation <https://uammd.readthedocs.io/en/latest/Integrators.html#verletnve>`_.
+For more details on the underlying method, please refer to the `UAMMD VerletNVE documentation <https://uammd.readthedocs.io/en/latest/Integrator/MolecularDynamics.html#molecular-dynamics>`_.
 
 ----
 

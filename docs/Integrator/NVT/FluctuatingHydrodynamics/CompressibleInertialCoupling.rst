@@ -3,7 +3,7 @@ CompressibleInertialCoupling
 
 The CompressibleInertialCoupling integrator implements a fluctuating hydrodynamics method for simulating particles coupled to a compressible fluid. This integrator is a wrapper around the UAMMD ICM_Compressible integrator.
 
-For more details on the underlying method, please refer to the `UAMMD ICM_Compressible documentation <https://uammd.readthedocs.io/en/latest/Integrators.html#icm-compressible>`_.
+For more details on the underlying method, please refer to the `UAMMD ICM_Compressible documentation <https://uammd.readthedocs.io/en/latest/Integrator/FluctuatingHydrodynamics.html#icm-compressible>`_.
 
 ----
 
