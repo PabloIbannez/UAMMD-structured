@@ -56,3 +56,19 @@ doing ``gd->getFundamental()``. So your can read and write your Fundamental vari
         Fundamental,myFundamental,
         uammd::structured::Fundamental::myFundamental
     )
+
+To register your own Fundamental variable create the file
+``src/GlobalData/Fundamental/Fundamental/myFundamental.cu`` and add to
+the ``Components.json``.
+
+.. code-block:: json
+   :emphasize-lines: 5
+
+   {
+   "GlobalData":
+        "Fundamental":[
+            ["..."],
+            ["Fundamental","myFundamental","myFundamental.cu"]
+            ]
+   }
+

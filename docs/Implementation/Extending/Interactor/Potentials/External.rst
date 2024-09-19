@@ -85,3 +85,19 @@ particles one by one, so the computables calculate properties for each particle.
         External,MyPotential,
         uammd::structured::Interactor::SingleInteractor<uammd::structured::Potentials::External::MyPotential>
     )
+
+To register your own External potential create the file
+``src/Interactor/Single/External/myPotential.cu`` and add to
+the ``Components.json``.
+
+.. code-block:: json
+   :emphasize-lines: 5
+
+   {
+   "Interactor":
+        "Single":[
+                 ["..."],
+                 ["External","myPotential","myPotential.cu"]
+                 ]
+   }
+

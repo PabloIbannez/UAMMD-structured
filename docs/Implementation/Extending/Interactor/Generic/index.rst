@@ -16,14 +16,14 @@ The most simple version of an Interactor:
     namespace structured{
     namespace Interactor{
     
-        class MyInteractor: public Interactor{
+        class myInteractor: public Interactor{
             public:
                 // The constructor must respect this format
                 // Add code you want to be executed when the simulation creates the Interactor.
-                MyInteractor(std::shared_ptr<GlobalData>           gd,
+                myInteractor(std::shared_ptr<GlobalData>           gd,
                              std::shared_ptr<ParticleGroup>        pg,
                              DataEntry& data,
-                             std::string name): Interactor(pg,"MyInteractor: \"" +name+"\""){}
+                             std::string name): Interactor(pg,"myInteractor: \"" +name+"\""){}
 
                 // Only mandatory function of an Interactor.
                 void sum(Computables comp,cudaStream_t st) override {
@@ -33,8 +33,8 @@ The most simple version of an Interactor:
     }}}
 
     REGISTER_INTERACTOR(
-        MyType,MyInteractor,
-        uammd::structured::Interactor::MyInteractor
+        myType,myInteractor,
+        uammd::structured::Interactor::myInteractor
     )
 
 
@@ -55,7 +55,7 @@ This is an example were we have a basic Interactor that sum a constant force rea
     namespace structured{
     namespace Interactor{
     
-        class MyInteractor: public Interactor{
+        class myInteractor: public Interactor{
     
             protected:
 
@@ -65,10 +65,10 @@ This is an example were we have a basic Interactor that sum a constant force rea
                 real3 constant3;
 
             public:
-                MyInteractor(std::shared_ptr<GlobalData>           gd,
+                myInteractor(std::shared_ptr<GlobalData>           gd,
                              std::shared_ptr<ParticleGroup>        pg,
                              DataEntry& data,
-                             std::string name): Interactor(pg,"MyInteractor: \"" +name+"\""), gd(gd){
+                             std::string name): Interactor(pg,"myInteractor: \"" +name+"\""), gd(gd){
 
                     // Read input parameters, you will read them from the .json with the name you give them. 
                     // An error will rise if the data from the .json don't match the dataType 
@@ -103,8 +103,8 @@ This is an example were we have a basic Interactor that sum a constant force rea
     }}}
 
     REGISTER_INTERACTOR(
-        MyType,MyInteractor,
-        uammd::structured::Interactor::MyInteractor
+        myType,myInteractor,
+        uammd::structured::Interactor::myInteractor
     )
 
 
@@ -114,7 +114,7 @@ The .json input file that reads this Interactor should be:
 .. code-block::
 
    "name":{
-     "type":["MyType","MyInteractor"],
+     "type":["myType","myInteractor"],
      "parameters":{"constant3": [1.0,4.0,-1.0]},
      "labels":["someInput", "someInput3"],
      "data":[[0.0, [0.0,1.0,2.0]],
@@ -122,5 +122,20 @@ The .json input file that reads this Interactor should be:
              [2.0, [6.0,7.0,8.0]],
              .....
              [N, [3N,3N+1,3N+2]]
+   }
+
+To register your own Interactor create the file
+``src/Interactor/Family/myType/myInteractor.cu`` and add to
+the ``Components.json``.
+
+.. code-block:: json
+   :emphasize-lines: 5
+
+   {
+   "Interactor":
+        "Family":[
+                 ["..."],
+                 ["myType","myInteractor","myInteractor.cu"]
+                 ]
    }
 

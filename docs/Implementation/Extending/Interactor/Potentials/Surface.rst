@@ -1,4 +1,4 @@
-External
+Surface
 ========
 
 Surface follows the minimal template example for potential. In this case, the
@@ -20,7 +20,7 @@ particles one by one, so the computables calculate properties for each particle.
     namespace uammd{
     namespace structured{
     namespace Potentials{
-    namespace External{
+    namespace Surface{
 
         struct MyPotential_{
 
@@ -68,7 +68,7 @@ particles one by one, so the computables calculate properties for each particle.
             }
         };
 
-        using MyPotential = External_<MyPotential_>;
+        using MyPotential = Surface_<MyPotential_>;
 
     }}}}
 
@@ -76,3 +76,19 @@ particles one by one, so the computables calculate properties for each particle.
         Surface,MyPotential,
         uammd::structured::Interactor::SingleInteractor<uammd::structured::Potentials::Surface::MyPotential>
     )
+
+To register your own Surface potential create the file
+``src/Interactor/Single/Surface/myPotential.cu`` and add to
+the ``Components.json``.
+
+.. code-block:: json
+   :emphasize-lines: 5
+
+   {
+   "Interactor":
+        "Single":[
+                 ["..."],
+                 ["Surface","myPotential","myPotential.cu"]
+                 ]
+   }
+

@@ -118,4 +118,18 @@ The computables receive the pair of indices as arguments. (``index_i`` ``index_j
         uammd::structured::Interactor::BondsInteractor<uammd::structured::Potentials::Bond2::YourPotential>
     )
 
+To register your own Bond2 potential create the file
+``src/Interactor/Bonds/Bond2/myPotential.cu`` and add to
+the ``Components.json``.
+
+.. code-block:: json
+   :emphasize-lines: 5
+
+   {
+   "Interactor":
+        "Bonds":[
+                ["..."],
+                ["Bond2","myPotential","myPotential.cu"]
+                ]
+   }
 
