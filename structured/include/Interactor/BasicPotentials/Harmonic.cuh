@@ -29,28 +29,28 @@ namespace BasicPotentials{
 
         }
 
-        static inline __device__ tensor3 hessian(const real3& rij, const real& r2,
-                const real& K,const real& r0){
-            //TODO: Manage r = 0
-            tensor3 H = tensor3(0.0);
-
-            const real invr2 = real(1.0)/r2;
-            const real invr  = sqrt(invr2);
-
-            H.xx =  K*(real(-1.0)+r0*invr*(real(1.0)-rij.x*rij.x*invr2));
-            H.xy = -K*r0*invr*rij.x*rij.y*invr2;
-            H.xz = -K*r0*invr*rij.x*rij.z*invr2;
-
-            H.yx =  H.xy;
-            H.yy =  K*(real(-1.0)+r0*invr*(real(1.0)-rij.y*rij.y*invr2));
-            H.yz = -K*r0*invr*rij.y*rij.z*invr2;
-
-            H.zx = H.xz;
-            H.zy = H.yz;
-            H.zz = K*(real(-1.0)+r0*invr*(real(1.0)-rij.z*rij.z*invr2));
-
-            return H;
-        }
+      static inline __device__ tensor3 hessian(const real3& rij, const real& r2,
+                                               const real& K,const real& r0){
+	    
+        tensor3 H = tensor3(0.0);
+        
+        const real invr2 = real(1.0)/r2;
+        const real invr  = sqrt(invr2);
+	    
+        H.xx =  (r0 == real(0.0))?-K:K*(real(-1.0)+r0*invr*(real(1.0)-rij.x*rij.x*invr2));
+        H.xy =  (r0 == real(0.0))?real(0.0):-K*r0*invr*rij.x*rij.y*invr2;
+        H.xz =  (r0 == real(0.0))?real(0.0):-K*r0*invr*rij.x*rij.z*invr2;
+        
+        H.yx =  H.xy;
+        H.yy =  (r0 == real(0.0))?-K:K*(real(-1.0)+r0*invr*(real(1.0)-rij.y*rij.y*invr2));
+        H.yz =  (r0 == real(0.0))?real(0.0):-K*r0*invr*rij.y*rij.z*invr2;
+        
+        H.zx = H.xz;
+        H.zy = H.yz;
+        H.zz = (r0 == real(0.0))?-K:K*(real(-1.0)+r0*invr*(real(1.0)-rij.z*rij.z*invr2));
+        
+        return H;
+      }
     };
 
     struct lambdaHarmonic{
