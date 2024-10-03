@@ -160,6 +160,46 @@ namespace BasicPotentials{
             };
         }
 
+        namespace IntegratedLennardJones{
+
+            struct Type2{
+
+                //Force
+                static inline __device__ real3 force(const real3& pos, const real& surfacePos,
+                                                     const real& epsilon,const real& sigma){
+
+                    const real dz = fabs(pos.z - surfacePos);
+
+                    const real invdz    = real(1.0)/dz;
+                    const real invdz2   = invdz*invdz;
+                    const real sinvdz   = sigma*invdz;
+                    const real sinvdz2  = sinvdz*sinvdz;
+                    const real sinvdz3  = sinvdz2*sinvdz;
+                    const real sinvdz9  = sinvdz3*sinvdz3*sinvdz3;
+
+                    real fmod = epsilon*(real(9.0)*sinvdz9-real(6.0)*sinvdz3)*invdz2;
+
+                    return make_real3(0.0,0.0,fmod*(pos.z-surfacePos));
+                }
+
+                //Energy
+                static inline __device__ real energy(const real3& pos, const real& surfacePos,
+                                                     const real& epsilon,const real& sigma){
+
+                    const real dz = fabs(pos.z - surfacePos);
+
+                    const real invdz    = real(1.0)/dz;
+                    const real sinvdz   = sigma*invdz;
+                    const real sinvdz2  = sinvdz*sinvdz;
+                    const real sinvdz3  = sinvdz2*sinvdz;
+                    const real sinvdz9  = sinvdz3*sinvdz3*sinvdz3;
+
+                    return epsilon*(sinvdz9-real(2.0)*sinvdz3);
+                }
+            };
+
+        }
+
         namespace WCA{
 
             struct Type1{

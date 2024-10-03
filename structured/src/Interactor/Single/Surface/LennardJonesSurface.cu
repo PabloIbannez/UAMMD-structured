@@ -123,22 +123,29 @@ namespace Surface{
 
     };
 
-    using SurfaceLennardJonesType1        = Surface_<LennardJonesSurface_<BasicPotentials::Surface::LennardJones::Type1>>;
-    using SurfaceLennardJonesType2        = Surface_<LennardJonesSurface_<BasicPotentials::Surface::LennardJones::Type2>>;
+    using SurfaceLennardJonesType1           = Surface_<LennardJonesSurface_<BasicPotentials::Surface::LennardJones::Type1>>;
+    using SurfaceLennardJonesType2           = Surface_<LennardJonesSurface_<BasicPotentials::Surface::LennardJones::Type2>>;
 
-    using SurfaceWCAType1                 = Surface_<LennardJonesSurface_<BasicPotentials::Surface::WCA::Type1>>;
-    using SurfaceWCAType2                 = Surface_<LennardJonesSurface_<BasicPotentials::Surface::WCA::Type2>>;
+    using SurfaceIntegratedLennardJonesType2 = Surface_<LennardJonesSurface_<BasicPotentials::Surface::IntegratedLennardJones::Type2>>;
 
-    using SurfaceGeneralLennardJonesType1 = Surface_<LennardJonesSurface_<BasicPotentials::Surface::GeneralLennardJones::Type1>>;
-    using SurfaceGeneralLennardJonesType2 = Surface_<LennardJonesSurface_<BasicPotentials::Surface::GeneralLennardJones::Type2>>;
+    using SurfaceWCAType1                    = Surface_<LennardJonesSurface_<BasicPotentials::Surface::WCA::Type1>>;
+    using SurfaceWCAType2                    = Surface_<LennardJonesSurface_<BasicPotentials::Surface::WCA::Type2>>;
 
-    using SurfaceAnchorage                = Surface_<LennardJonesSurface_<BasicPotentials::Surface::HarmonicWell>>;
+    using SurfaceGeneralLennardJonesType1    = Surface_<LennardJonesSurface_<BasicPotentials::Surface::GeneralLennardJones::Type1>>;
+    using SurfaceGeneralLennardJonesType2    = Surface_<LennardJonesSurface_<BasicPotentials::Surface::GeneralLennardJones::Type2>>;
+
+    using SurfaceAnchorage                   = Surface_<LennardJonesSurface_<BasicPotentials::Surface::HarmonicWell>>;
 
 }}}}
 
 REGISTER_SINGLE_INTERACTOR(
     Surface,SurfaceLennardJonesType1,
     uammd::structured::Interactor::SingleInteractor<uammd::structured::Potentials::Surface::SurfaceLennardJonesType1>
+)
+
+REGISTER_SINGLE_INTERACTOR(
+    Surface,SurfaceIntegratedLennardJonesType2,
+    uammd::structured::Interactor::SingleInteractor<uammd::structured::Potentials::Surface::SurfaceIntegratedLennardJonesType2>
 )
 
 REGISTER_SINGLE_INTERACTOR(
