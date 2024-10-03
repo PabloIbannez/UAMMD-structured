@@ -29,7 +29,7 @@ The simplest example of an Integrator is:
     namespace uammd{
     namespace structured{
     namespace Integrator{
-    namespace Type{
+    namespace myType{
     namespace myIntegrator{
 
         class  myIntegrator: public IntegratorBase{
@@ -56,7 +56,22 @@ The simplest example of an Integrator is:
     }}}}}
 
     REGISTER_INTEGRATOR(
-            Type,myIntegrator,
-            uammd::structured::Integrator::Type::myIntegrator
+            myType,myIntegrator,
+            uammd::structured::Integrator::myType::myIntegrator
             )
+
+To register your own Integrator create the file
+``src/Integrator/Family/myType/myIntegrator.cu`` and add to
+the ``Components.json``.
+
+.. code-block:: json
+   :emphasize-lines: 5
+
+   {
+   "Integractor":
+        "Family":[
+                 ["..."],
+                 ["myType","myIntegrator","myIntegrator.cu"]
+                 ]
+   }
 

@@ -15,7 +15,7 @@ particle index (``currentParticleIndex``) and bond index (``index_i``).
     #include "Interactor/Bonds/Bond1/Bond1.cuh"
     #include "Interactor/InteractorFactory.cuh"
 
-    #include "Interactor/BasicPotentials/YourPotential.cuh"  // Replace with the actual potential file
+    #include "Interactor/BasicPotentials/myPotential.cuh"  // Replace with the actual potential file
     // if your creating a new BasicPotential, remember to add it to Interactor/BasicPotentials to use
     // it in other places of the code.
 
@@ -24,7 +24,7 @@ particle index (``currentParticleIndex``) and bond index (``index_i``).
     namespace Potentials {
     namespace Bond1 {
 
-        struct YourPotential_ {
+        struct myPotential_ {
 
             struct ComputationalData {
                 real4* pos; // In case you are using positions to calculate computables.
@@ -110,13 +110,27 @@ particle index (``currentParticleIndex``) and bond index (``index_i``).
         };
 
         // Alias the struct for ease of use
-        using YourPotential = Bond1_<YourPotential_>;
+        using myPotential = Bond1_<myPotential_>;
 
     }}}}
 
     REGISTER_BOND_INTERACTOR(
-        Bond1, YourPotential,
-        uammd::structured::Interactor::BondsInteractor<uammd::structured::Potentials::Bond1::YourPotential>
+        Bond1, myPotential,
+        uammd::structured::Interactor::BondsInteractor<uammd::structured::Potentials::Bond1::myPotential>
     )
 
+To register your own Bond1 potential create the file
+``src/Interactor/Bonds/Bond1/myPotential.cu`` and add to
+the ``Components.json``.
+
+.. code-block:: json
+   :emphasize-lines: 5
+
+   {
+   "Interactor":
+        "Bonds":[
+                ["..."],
+                ["Bond1","myPotential","myPotential.cu"]
+                ]
+   }
 

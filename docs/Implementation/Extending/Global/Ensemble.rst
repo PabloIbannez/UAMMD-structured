@@ -75,7 +75,7 @@ comunication with the dataEntry object.
         uammd::structured::Ensemble::myEnsemble
     )
 
-To register your own Units system create the file
+To register your own Ensemble system create the file
 ``src/GlobalData/Ensemble/myEnsemble/myEnsemble.cu`` and add to
 the ``Components.json``.
 

@@ -121,4 +121,18 @@ energySecondDerivate().
             uammd::structured::Interactor::BondsInteractor<uammd::structured::Potentials::Bond4::MyAngularPotential>
             )
 
+To register your own Bond4 potential create the file
+``src/Interactor/Bonds/Bond4/myPotential.cu`` and add to
+the ``Components.json``.
+
+.. code-block:: json
+   :emphasize-lines: 5
+
+   {
+   "Interactor":
+        "Bonds":[
+                ["..."],
+                ["Bond4","myPotential","myPotential.cu"]
+                ]
+   }
 
