@@ -63,6 +63,7 @@ file(MAKE_DIRECTORY ${UAMMD_STRUCTURED_PATH}/extensions)
 
 set(UAMMD_COMPONENTS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/structured/Components.json")
 set(UAMMD_DATA_PATH "${CMAKE_CURRENT_SOURCE_DIR}/structured/Data.json")
+set(UAMMD_COMPUTABLES_PATH "${CMAKE_CURRENT_SOURCE_DIR}/structured/Computables.json")
 ###############################################################
 # Copy structured/ folder to UAMMDstructured/
 
@@ -86,85 +87,29 @@ add_custom_target(
 
 add_dependencies(CopyUAMMD UAMMD)
 ################################################################
-# Include necessary directories
-
-# Include UAMMD
-include_directories(${UAMMD_STRUCTURED_PATH}/uammd/)
-# Include UAMMD third party
-include_directories(${UAMMD_STRUCTURED_PATH}/uammd/third_party/)
-# Include UAMMD structured
-include_directories(${UAMMD_STRUCTURED_PATH}/extensions/structured/include/)
-include_directories(${UAMMD_STRUCTURED_PATH}/extensions/structured/src/)
-# Include CUDA
-include_directories(${CUDA_INCLUDE_DIRS})
-
-################################################################
 # Set the precision of UAMMD, SINGLE or DOUBLE
 set(UAMMD_PRECISION "SINGLE" CACHE STRING "Choose the precision of UAMMD, SINGLE or DOUBLE")
 
 # If UAMMD_PRECISION is not SINGLE or DOUBLE, set it to SINGLE
-# If UAMMD_PRECISION is DOUBLE, set the flag -DDOUBLE_PRECISION
 if(NOT UAMMD_PRECISION STREQUAL "SINGLE" AND NOT UAMMD_PRECISION STREQUAL "DOUBLE")
   set(UAMMD_PRECISION "SINGLE")
   message(WARNING "UAMMD_PRECISION is not SINGLE or DOUBLE, set it to SINGLE")
 endif()
-if(UAMMD_PRECISION STREQUAL "DOUBLE")
-  add_definitions(-DDOUBLE_PRECISION)
-endif()
-################################################################
-# Debug mode
-
-# TODO: Add debug mode
 
 ################################################################
-# Compilation flags
-# Set C++ Standard
+# Set Compiler Standards
 set(CMAKE_CXX_STANDARD 17)
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fPIC")
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CUDA_STANDARD 17)
+set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
 ################################################################
 # CUDA Compiler options
 
-# Add definitions: UAMMD_EXTENSIONS, UAMMD_EXTENSIONS_PREAMBLE=${UAMMD_STRUCTURED_PATH}/extensions/structured/preamble.h, MAXLOGLEVEL=5
-add_definitions(-DUAMMD_EXTENSIONS -DUAMMD_EXTENSIONS_PREAMBLE=${UAMMD_STRUCTURED_PATH}/extensions/structured/preamble.h -DMAXLOGLEVEL=5)
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr --expt-extended-lambda -O3 -Xcompiler=\"-O3 -fPIC\" -w")
-
-# Set ccbin if CUDA_HOST_COMPILER is provided and not DEFAULT
+# Set CMAKE_CUDA_HOST_COMPILER if CUDA_HOST_COMPILER is provided and not DEFAULT
 if(NOT "${CUDA_HOST_COMPILER}" STREQUAL "DEFAULT")
-    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -ccbin=${CUDA_HOST_COMPILER}")
+    set(CMAKE_CUDA_HOST_COMPILER "${CUDA_HOST_COMPILER}")
 endif()
-
-# Specify the CUDA architecture(s)
-set(CUDA_ARCHITECTURES 60 61 62 70 72 75 80 86 87 89 CACHE STRING "CUDA architectures to compile for")
-# Filter out architectures that are not supported by the current CUDA version
-execute_process(
-    COMMAND nvcc --help
-    OUTPUT_VARIABLE NVCC_OUTPUT
-)
-
-# Parse the NVCC_OUTPUT to extract supported architectures
-# This will need to be adjusted based on the actual format of the nvcc output
-string(REGEX MATCHALL "compute_[0-9]+" SUPPORTED_ARCHS "${NVCC_OUTPUT}")
-
-# Convert the architecture names to the format used in CUDA_ARCHITECTURES
-set(PROCESSED_ARCHS "")
-foreach(ARCH IN LISTS SUPPORTED_ARCHS)
-    string(REGEX REPLACE "compute_" "" ARCH_NUM "${ARCH}")
-    list(APPEND PROCESSED_ARCHS "${ARCH_NUM}")
-endforeach()
-
-# Filter CUDA_ARCHITECTURES based on the supported architectures
-set(FILTERED_CUDA_ARCHITECTURES "")
-foreach(ARCH IN LISTS CUDA_ARCHITECTURES)
-    if(ARCH IN_LIST PROCESSED_ARCHS)
-        list(APPEND FILTERED_CUDA_ARCHITECTURES ${ARCH})
-    else()
-        message(STATUS "Architecture ${ARCH} is not supported by the current NVCC version and has been removed.")
-    endif()
-endforeach()
-
-# Set the filtered architectures
-set(CMAKE_CUDA_ARCHITECTURES ${FILTERED_CUDA_ARCHITECTURES})
 
 ################################################################
 # Packages
@@ -173,7 +118,7 @@ set(CMAKE_CUDA_ARCHITECTURES ${FILTERED_CUDA_ARCHITECTURES})
 if(DEFINED ENV{MKLROOT})
   message(STATUS "Detected MKLROOT: $ENV{MKLROOT}")
   set(BLA_VENDOR Intel10_64lp_seq)
-  add_definitions(-DUSE_MKL)
+  set(USE_MKL 1)
 else()
   message(STATUS "MKLROOT not found. Using OpenBLAS.")
 endif()
@@ -218,7 +163,7 @@ function(generate_property_definitions json_file section output_var)
     string(JSON name GET ${item} 0)
     string(JSON cpp_type GET ${item} 1)
     string(JSON c_type GET ${item} 2)
-    string(APPEND properties "((${cpp_type},${name},${c_type}))\\\n")
+    string(APPEND properties "((${cpp_type})(${name})(${c_type}))\\\n")
   endforeach()
 
   # Remove the last newline and backslash
@@ -240,7 +185,8 @@ foreach(SECTION ${SECTIONS})
   file(WRITE ${HEADER_FILE}
 "#pragma once
 
-#define ${SECTION_UPPER}_PROPERTIES ${PROPERTIES}
+#define ${SECTION_UPPER}_PROPERTIES \\
+${PROPERTIES}
 ")
 
   # Add a custom target for generating the header file
@@ -250,10 +196,76 @@ foreach(SECTION ${SECTIONS})
   )
 endforeach()
 
+# Generate computables
+
+# Function to generate Computables.cuh
+function(generate_computables_header json_file output_file)
+  file(READ ${json_file} json_content)
+
+  # Parse Computables
+  string(JSON computables GET ${json_content} Computables)
+  set(computables_list "")
+  string(JSON computables_length LENGTH ${computables})
+  math(EXPR computables_length "${computables_length} - 1")
+  foreach(index RANGE ${computables_length})
+    string(JSON item GET ${computables} ${index})
+    string(JSON name GET ${item} 0)
+    string(JSON type GET ${item} 1)
+    string(APPEND computables_list "((${name})(${type}))\\\n")
+  endforeach()
+
+  # Remove the last newline and backslash
+  string(REGEX REPLACE "\\\\n$" "" computables_list "${computables_list}")
+
+  # Parse ComputablesCombinations
+  string(JSON combinations GET ${json_content} ComputablesCombinations)
+  set(combinations_list "")
+  string(JSON combinations_length LENGTH ${combinations})
+  math(EXPR combinations_length "${combinations_length} - 1")
+  foreach(index RANGE ${combinations_length})
+    string(JSON item GET ${combinations} ${index})
+    string(JSON item_length LENGTH ${item})
+    set(combination "")
+    math(EXPR item_length "${item_length} - 1")
+
+    foreach(item_index RANGE ${item_length})
+      string(JSON element GET ${item} ${item_index})
+      string(APPEND combination "(${element})")
+    endforeach()
+
+    string(APPEND combinations_list "(${combination})\\\n")
+  endforeach()
+
+  # Remove the last newline and backslash
+  string(REGEX REPLACE "\\\\n$" "" combinations_list "${combinations_list}")
+
+  #Write the header file
+  file(WRITE ${output_file}
+"#pragma once
+
+#define COMPUTABLES \\
+${computables_list}
+
+#define COMPUTABLES_COMBINATIONS \\
+${combinations_list}
+")
+
+endfunction()
+
+set(COMPUTABLES_HEADER_FILE "${UAMMD_STRUCTURED_INCLUDE_PATH}/Definitions/Computables.cuh")
+
+generate_computables_header(${UAMMD_COMPUTABLES_PATH} ${COMPUTABLES_HEADER_FILE})
+
+# Add a custom target for generating the header file
+add_custom_target(
+  GenerateComputablesData ALL
+  DEPENDS ${COMPUTABLES_HEADER_FILE}
+)
+
 ################################################################
 set(UAMMD_STRUCTURED_SRC_PATH "${UAMMD_STRUCTURED_PATH}/extensions/structured/src")
 # Add backbone files to STRUCTURED_BACKBONE_FILES
-# Add System/ExtendedSystem.cu
+
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Input/Input.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/Input/InputEntryManager.cu")
 list(APPEND STRUCTURED_BACKBONE_FILES "${UAMMD_STRUCTURED_SRC_PATH}/System/ExtendedSystem.cu")
@@ -341,7 +353,7 @@ function(parse_json_array current_path array)
           set(file_path "${base_path}${current_path}/${component_type}/${component_file}")
           list(APPEND STRUCTURED_COMPONENTS ${file_path})
           set(STRUCTURED_COMPONENTS ${STRUCTURED_COMPONENTS} PARENT_SCOPE)
-          message(STATUS "Added component ${component_name} at src${current_path}/${component_type}/${component_file}")
+          # message(STATUS "Added component ${component_name} at src${current_path}/${component_type}/${component_file}")
         else()
           message(FATAL_ERROR "Error parsing JSON: ${value} is not a valid file")
         endif()
@@ -357,22 +369,85 @@ parse_json_and_add_files(${UAMMD_COMPONENTS_PATH} ${UAMMD_STRUCTURED_PATH}/exten
 # Remove duplicates in STRUCTURED_COMPONENTS
 list(REMOVE_DUPLICATES STRUCTURED_COMPONENTS)
 
-# Print the components
-#message(STATUS "Components files:")
-#foreach(component IN LISTS STRUCTURED_COMPONENTS)
-#  message(STATUS ${component})
-#endforeach()
-
 # Create an object library for the structured .cpp and .cu files
 add_library(structured_objects STATIC ${STRUCTURED_BACKBONE_FILES} ${STRUCTURED_COMPONENTS})
 add_dependencies(structured_objects CopyUAMMD)
-foreach(SECTION ${SECTIONS})
-  add_dependencies(structured_objects Generate${SECTION}Data)
-endforeach()
+
+# Add necessary definitions to structured_objects
+target_compile_definitions(structured_objects PRIVATE
+    UAMMD_EXTENSIONS
+    UAMMD_EXTENSIONS_PREAMBLE="${UAMMD_STRUCTURED_PATH}/extensions/structured/preamble.h"
+    MAXLOGLEVEL=5
+)
+
+if(UAMMD_PRECISION STREQUAL "DOUBLE")
+    target_compile_definitions(structured_objects PRIVATE DOUBLE_PRECISION)
+endif()
+
+if(USE_MKL)
+    target_compile_definitions(structured_objects PRIVATE USE_MKL)
+endif()
+
+# Set include directories for structured_objects
+target_include_directories(structured_objects PRIVATE
+    ${UAMMD_STRUCTURED_PATH}/uammd/
+    ${UAMMD_STRUCTURED_PATH}/uammd/third_party/
+    ${UAMMD_STRUCTURED_PATH}/extensions/structured/include/
+    ${UAMMD_STRUCTURED_PATH}/extensions/structured/src/
+    ${CUDA_INCLUDE_DIRS}
+)
+
+# Set compile options for structured_objects
+target_compile_options(structured_objects PRIVATE
+    $<$<COMPILE_LANGUAGE:CUDA>:--expt-relaxed-constexpr --expt-extended-lambda -O3 -Xcompiler=-O3,-fPIC -w>
+)
+
+# Set properties for structured_objects
+set_target_properties(structured_objects PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+    CXX_STANDARD 17
+    CUDA_STANDARD 17
+)
 
 # Define the executable
 add_executable(UAMMDlauncher ${CMAKE_CURRENT_SOURCE_DIR}/main/UAMMDlauncher.cu)
 add_dependencies(UAMMDlauncher CopyUAMMD)
+
+if(UAMMD_PRECISION STREQUAL "DOUBLE")
+    target_compile_definitions(UAMMDlauncher PRIVATE DOUBLE_PRECISION)
+endif()
+
+if(USE_MKL)
+    target_compile_definitions(UAMMDlauncher PRIVATE USE_MKL)
+endif()
+
+# Set include directories for UAMMDlauncher
+target_include_directories(UAMMDlauncher PRIVATE
+    ${UAMMD_STRUCTURED_PATH}/uammd/
+    ${UAMMD_STRUCTURED_PATH}/uammd/third_party/
+    ${UAMMD_STRUCTURED_PATH}/extensions/structured/include/
+    ${UAMMD_STRUCTURED_PATH}/extensions/structured/src/
+    ${CUDA_INCLUDE_DIRS}
+)
+
+# Set compile options for UAMMDlauncher
+target_compile_options(UAMMDlauncher PRIVATE
+    $<$<COMPILE_LANGUAGE:CUDA>:--expt-relaxed-constexpr --expt-extended-lambda -O3 -Xcompiler=-O3,-fPIC -w>
+)
+
+# Set definitions for UAMMDlauncher
+target_compile_definitions(UAMMDlauncher PRIVATE
+    UAMMD_EXTENSIONS
+    UAMMD_EXTENSIONS_PREAMBLE="${UAMMD_STRUCTURED_PATH}/extensions/structured/preamble.h"
+    MAXLOGLEVEL=5
+)
+
+# Set properties for UAMMDlauncher
+set_target_properties(UAMMDlauncher PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+    CXX_STANDARD 17
+    CUDA_STANDARD 17
+)
 
 # Link libraries
 target_link_libraries(UAMMDlauncher PRIVATE
@@ -383,7 +458,7 @@ target_link_libraries(UAMMDlauncher PRIVATE
 # Specify that the main build depends on the external project and generated files
 add_dependencies(UAMMDlauncher CopyUAMMD)
 foreach(SECTION ${SECTIONS})
-  add_dependencies(UAMMDlauncher Generate${SECTION}Data)
+    add_dependencies(UAMMDlauncher Generate${SECTION}Data)
 endforeach()
 
 if(BUILD_PYTHON_WRAPPER)
@@ -395,6 +470,42 @@ if(BUILD_PYTHON_WRAPPER)
                           structured_objects
                           $<TARGET_OBJECTS:structured_objects>
                           ${LIBRARIES})
+
+    # Set include directories for pyUAMMDlauncher
+    target_include_directories(pyUAMMDlauncher PRIVATE
+        ${UAMMD_STRUCTURED_PATH}/uammd/
+        ${UAMMD_STRUCTURED_PATH}/uammd/third_party/
+        ${UAMMD_STRUCTURED_PATH}/extensions/structured/include/
+        ${UAMMD_STRUCTURED_PATH}/extensions/structured/src/
+        ${CUDA_INCLUDE_DIRS}
+    )
+
+    # Set compile options for pyUAMMDlauncher
+    target_compile_options(pyUAMMDlauncher PRIVATE
+        $<$<COMPILE_LANGUAGE:CUDA>:--expt-relaxed-constexpr --expt-extended-lambda -O3 -Xcompiler=-O3,-fPIC -w>
+    )
+
+    # Set definitions for pyUAMMDlauncher
+    target_compile_definitions(pyUAMMDlauncher PRIVATE
+        UAMMD_EXTENSIONS
+        UAMMD_EXTENSIONS_PREAMBLE="${UAMMD_STRUCTURED_PATH}/extensions/structured/preamble.h"
+        MAXLOGLEVEL=5
+    )
+
+    if(UAMMD_PRECISION STREQUAL "DOUBLE")
+        target_compile_definitions(pyUAMMDlauncher PRIVATE DOUBLE_PRECISION)
+    endif()
+
+    if(USE_MKL)
+        target_compile_definitions(pyUAMMDlauncher PRIVATE USE_MKL)
+    endif()
+
+    # Set properties for pyUAMMDlauncher
+    set_target_properties(pyUAMMDlauncher PROPERTIES
+        POSITION_INDEPENDENT_CODE ON
+        CXX_STANDARD 17
+        CUDA_STANDARD 17
+    )
 
     # Add dependencies
     add_dependencies(pyUAMMDlauncher CopyUAMMD)
@@ -413,18 +524,6 @@ if(BUILD_DEB_PACKAGE)
     set(CPACK_PACKAGE_CONTACT "Pablo Ibanez Freire <p.ibanez.fre@gmail.com>")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "UAMMDstructured")
     set(CPACK_PACKAGE_VENDOR "Universidad Autonoma de Madrid")
-
-    ## Set dependencies
-    ## libcufft
-    #set(CPACK_DEBIAN_PACKAGE_DEPENDS "libcufft")
-    ## libcublas
-    #set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libcublas")
-    ## libcurand
-    #set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libcurand")
-    ## libcusolver
-    #set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libcusolver")
-    ## libcusparse
-    #set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libcusparse")
 
     set(CPACK_GENERATOR "DEB")
     set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")

@@ -39,15 +39,17 @@ class EnsembleHandler{
                                           std::string(#NAME).c_str(), subType.c_str()); \
         }
 
-        #define VARIABLE_AUX(NAME, name, type) VARIABLE_IMPL(NAME, name, type)
+        // We have to use an intermediate macro to evaluate the previous expressions.
+        // Otherwise, the preprocessor will not expand the __DATA_CAPS__ and __DATA_NAME__ macros.
+        #define VARIABLE_EVAL(NAME, name, type) VARIABLE_IMPL(NAME, name, type)
 
-        #define VARIABLE(r, data, tuple) \
-            VARIABLE_AUX(__DATA_CAPS__(tuple), __DATA_NAME__(tuple), __DATA_TYPE__(tuple))
+        #define VARIABLE(r, data, seq) \
+            VARIABLE_EVAL(__DATA_CAPS__(seq), __DATA_NAME__(seq), __DATA_TYPE__(seq))
 
         __MACRO_OVER_ENSEMBLE__(VARIABLE)
 
         #undef VARIABLE
-        #undef VARIABLE_AUX
+        #undef VARIABLE_EVAL
         #undef VARIABLE_IMPL
 
         virtual void updateDataEntry(DataEntry data) = 0;

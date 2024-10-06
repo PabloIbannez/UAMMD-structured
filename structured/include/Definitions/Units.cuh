@@ -1,5 +1,6 @@
 #pragma once
 
-#define UNITS_PROPERTIES ((BoltzmannConstant,BoltzmannConstant,real))\
-((ElectricConversionFactor,electricConversionFactor,real))\
+#define UNITS_PROPERTIES \
+((BoltzmannConstant)(BoltzmannConstant)(real))\
+((ElectricConversionFactor)(electricConversionFactor)(real))\
 
