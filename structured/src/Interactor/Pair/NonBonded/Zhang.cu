@@ -360,7 +360,7 @@ namespace NonBonded{
         }
     };
 
-    using Zhang     = NonBondedTorque_<Zhang_>;
+    using Zhang     = NonBonded_<Zhang_>;
 
 }}}}
 

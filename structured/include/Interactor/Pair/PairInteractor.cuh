@@ -74,7 +74,6 @@ namespace Interactor{
             ////////////////////////////////////
             //Warnings
 
-            bool warningEnergy           = false;
             bool warningForce            = false;
             bool warningForceMagnetic    = false;
             bool warningLambdaDerivative = false;
@@ -117,14 +116,11 @@ namespace Interactor{
                 return pot;
             }
 
-            void sum(Computables comp,cudaStream_t st) override {
+            bool computeEnergy(cudaStream_t st) {
 
-                nl->setCutOff(std::max(pot->getCutOff(),nl->getCutOff()));
-                nl->update(st);
+                static bool warningEnergy = false;
 
-                if(comp.energy == true){
-
-                    if constexpr (has_getEnergyTransverser<PotentialType>::value){
+                if constexpr (PotentialType::isEnergyTransverserAvailable){
 
                         auto nlData   = nl->getNeighbourList(conditionInteractionName);
 
@@ -135,33 +131,46 @@ namespace Interactor{
                         int Nblocks=numberParticles/Nthreads + ((numberParticles%Nthreads)?1:0);
 
                         PairInteractor_ns::transverseNeighboursThreadPerParticle<
-                            typename PotentialType::ComputationalData,
-                                     typename NeighbourList::NeighbourListData,
-                                     typename PotentialType::EnergyTransverser>
-                                         <<<Nblocks,Nthreads,0, st>>>(numberParticles,
-                                                 groupMask,
-                                                 pot->getComputationalData(comp,st),
-                                                 nlData,
-                                                 pot->getEnergyTransverser());
-
+                                           typename PotentialType::ComputationalData,
+                                           typename NeighbourList::NeighbourListData,
+                                           typename PotentialType::EnergyTransverser>
+                                           <<<Nblocks,Nthreads,0, st>>>(numberParticles,
+                                                                        groupMask,
+                                                                        pot->getComputationalData({.energy=true},st),
+                                                                        nlData,
+                                                                        pot->getEnergyTransverser());
                         CudaCheckError();
+                        return true;
+                }
 
+                if(!warningEnergy){
+                    System::log<System::WARNING>("[PairInteractor] (%s) Requested non-implemented transverser (energy)",
+                            name.c_str());
+                    warningEnergy = true;
+                }
 
-                    } else {
-                        if(!warningEnergy){
-                            System::log<System::WARNING>("[PairInteractor] (%s) Requested non-implemented transverser (energy)",
-                                    name.c_str());
-                            warningEnergy = true;
-                        }
+                return false;
+            }
+
+            void sum(Computables comp,cudaStream_t st) override {
+
+                nl->setCutOff(std::max(pot->getCutOff(),nl->getCutOff()));
+                nl->update(st);
+
+                Computables toCompute = comp;
+
+                if(comp.energy == true){
+                    bool computed = computeEnergy(st);
+                    if(computed){
+                        toCompute.energy = false;
                     }
-
                 }
 
                 if(comp.force == true){
 
                     if(comp.magneticField == false){
 
-                        if constexpr (has_getForceTransverser<PotentialType>::value){
+                        if constexpr (PotentialType::isForceTransverserAvailable){
 
                             auto nlData   = nl->getNeighbourList(conditionInteractionName);
 
@@ -194,7 +203,7 @@ namespace Interactor{
 
                     } else {
 
-                        if constexpr (has_getForceTorqueMagneticFieldTransverser<PotentialType>::value){
+                        if constexpr (PotentialType::isForceTorqueMagneticFieldTransverserAvailable){
 
                             auto nlData   = nl->getNeighbourList(conditionInteractionName);
 
@@ -228,7 +237,7 @@ namespace Interactor{
                 }
 
                 if(comp.magneticField == true and comp.force == false){
-                    if constexpr (has_getMagneticFieldTransverser<PotentialType>::value){
+                    if constexpr (PotentialType::isMagneticFieldTransverserAvailable){
 
                         auto nlData   = nl->getNeighbourList(conditionInteractionName);
 
@@ -262,7 +271,7 @@ namespace Interactor{
 
                 if(comp.lambdaDerivative == true){
 
-                    if constexpr (has_getLambdaTransverser<PotentialType>::value){
+                    if constexpr (PotentialType::isLambdaTransverserAvailable){
 
                         auto nlData   = nl->getNeighbourList(conditionInteractionName);
 
@@ -296,7 +305,7 @@ namespace Interactor{
 
                 if(comp.stress == true){
 
-                    if constexpr (has_getStressTransverser<PotentialType>::value){
+                    if constexpr (PotentialType::isStressTransverserAvailable){
 
                         auto nlData   = nl->getNeighbourList(conditionInteractionName);
 
@@ -330,7 +339,7 @@ namespace Interactor{
 
                 if(comp.hessian == true){
 
-                    if constexpr (has_getHessianTransverser<PotentialType>::value){
+                    if constexpr (PotentialType::isHessianTransverserAvailable){
 
                         auto nlData   = nl->getNeighbourList(conditionInteractionName);
 
@@ -364,7 +373,7 @@ namespace Interactor{
 
                 if(comp.pairwiseForce == true){
 
-                    if constexpr (has_getPairwiseForceTransverser<PotentialType>::value){
+                    if constexpr (PotentialType::isPairwiseForceTransverserAvailable){
 
                         auto nlData   = nl->getNeighbourList(conditionInteractionName);
 
@@ -398,7 +407,7 @@ namespace Interactor{
 
                 if(comp.magneticField == true){
 
-                    if constexpr (has_getMagneticFieldTransverser<PotentialType>::value){
+                    if constexpr (PotentialType::isMagneticFieldTransverserAvailable){
 
                         auto nlData   = nl->getNeighbourList(conditionInteractionName);
 
