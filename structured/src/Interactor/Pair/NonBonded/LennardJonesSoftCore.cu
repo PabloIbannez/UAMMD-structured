@@ -204,11 +204,11 @@ namespace NonBonded{
 
     };
 
-    using LennardJonesSoftCoreType1 = NonBonded_<LennardJonesSoftCore_<BasicPotentials::LennardJones::SoftCoreType1>>;
-    using LennardJonesSoftCoreType2 = NonBonded_<LennardJonesSoftCore_<BasicPotentials::LennardJones::SoftCoreType2>>;
+    using LennardJonesSoftCoreType1 = NonBondedLambda_<LennardJonesSoftCore_<BasicPotentials::LennardJones::SoftCoreType1>>;
+    using LennardJonesSoftCoreType2 = NonBondedLambda_<LennardJonesSoftCore_<BasicPotentials::LennardJones::SoftCoreType2>>;
 
-    using Steric6SoftCore           = NonBonded_<LennardJonesSoftCore_<BasicPotentials::Steric::Steric6SoftCore>>;
-    using Steric12SoftCore          = NonBonded_<LennardJonesSoftCore_<BasicPotentials::Steric::Steric12SoftCore>>;
+    using Steric6SoftCore           = NonBondedLambda_<LennardJonesSoftCore_<BasicPotentials::Steric::Steric6SoftCore>>;
+    using Steric12SoftCore          = NonBondedLambda_<LennardJonesSoftCore_<BasicPotentials::Steric::Steric12SoftCore>>;
 
 }}}}
 

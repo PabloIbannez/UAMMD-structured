@@ -226,7 +226,7 @@ namespace NonBonded{
 
     };
 
-    using SplitLennardJones = NonBonded_<SplitLennardJones_>;
+    using SplitLennardJones = NonBondedHessian_<SplitLennardJones_>;
 
 }}}}
 

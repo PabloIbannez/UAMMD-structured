@@ -243,9 +243,9 @@ namespace NonBonded{
 
     };
 
-    using DLVOType1 = NonBonded_<DLVO_<BasicPotentials::LennardJones::Type1>>;
-    using DLVOType2 = NonBonded_<DLVO_<BasicPotentials::LennardJones::Type2>>;
-    using DLVOType3 = NonBonded_<DLVO_<BasicPotentials::LennardJones::Type3>>;
+    using DLVOType1 = NonBondedHessian_<DLVO_<BasicPotentials::LennardJones::Type1>>;
+    using DLVOType2 = NonBondedHessian_<DLVO_<BasicPotentials::LennardJones::Type2>>;
+    using DLVOType3 = NonBondedHessian_<DLVO_<BasicPotentials::LennardJones::Type3>>;
 
 }}}}
 

@@ -358,7 +358,7 @@ namespace NonBonded{
 
     };
 
-    using KimHummer = NonBonded_<KimHummer_>;
+    using KimHummer = NonBondedHessian_<KimHummer_>;
 
 }}}}
 

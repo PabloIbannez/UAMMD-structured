@@ -209,13 +209,13 @@
             ["NonBonded", "SplitLennardJones", "SplitLennardJones.cu"]
         ],
         "Patches": [
-            ["SurfacePatches", "Linker", "Linker.cu"]
-            //["NonBondedPatches", "HelixExponential", "Helix.cu"],
-            //["NonBondedPatches", "HelixExponential2States", "Helix.cu"],
-            //["NonBondedPatches", "HelixCosine", "Helix.cu"],
-            //["NonBondedPatches", "HelixCosine2States", "Helix.cu"],
-            //["NonBondedPatches", "DistanceSwitchExponential", "DistanceSwitch.cu"],
-            //["NonBondedPatches", "DistanceSwitchCosine", "DistanceSwitch.cu"]
+            ["SurfacePatches", "Linker", "Linker.cu"],
+            ["NonBondedPatches", "HelixExponential", "Helix.cu"],
+            ["NonBondedPatches", "HelixExponential2States", "Helix.cu"],
+            ["NonBondedPatches", "HelixCosine", "Helix.cu"],
+            ["NonBondedPatches", "HelixCosine2States", "Helix.cu"],
+            ["NonBondedPatches", "DistanceSwitchExponential", "DistanceSwitch.cu"],
+            ["NonBondedPatches", "DistanceSwitchCosine", "DistanceSwitch.cu"]
         ],
         "AFM": [
             ["AFM", "SphericalTip", "SphericalTip.cu"],
