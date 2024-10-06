@@ -37,10 +37,10 @@ namespace NonBonded{
         };
 
         static __host__ ComputationalData getComputationalData(std::shared_ptr<GlobalData>    gd,
-                                                               std::shared_ptr<ParticleGroup> pg,
-                                                               const StorageData& storage,
-                                                               const Computables& comp,
-                                                               const cudaStream_t& st){
+                std::shared_ptr<ParticleGroup> pg,
+                const StorageData& storage,
+                const Computables& comp,
+                const cudaStream_t& st){
 
             ComputationalData computational;
 
@@ -58,8 +58,8 @@ namespace NonBonded{
         }
 
         static __host__ StorageData getStorageData(std::shared_ptr<GlobalData>    gd,
-                                                   std::shared_ptr<ParticleGroup> pg,
-                                                   DataEntry& data){
+                std::shared_ptr<ParticleGroup> pg,
+                DataEntry& data){
 
             StorageData storage;
 
@@ -89,7 +89,7 @@ namespace NonBonded{
         }
 
         static inline __device__ real energy(int index_i, int index_j,
-                                             const ComputationalData& computational){
+                const ComputationalData& computational){
 
             const real4 posi = computational.pos[index_i];
             const real4 posj = computational.pos[index_j];
@@ -108,7 +108,7 @@ namespace NonBonded{
 
 
         static inline __device__ real3 force(int index_i, int index_j,
-                                             const ComputationalData& computational){
+                const ComputationalData& computational){
 
             const real4 posi =  computational.pos[index_i];
             const real4 posj =  computational.pos[index_j];
@@ -128,39 +128,39 @@ namespace NonBonded{
             return computational.lambda*fmod*rij;
         }
 
-      static inline __device__ tensor3 hessian(int index_i, int index_j,
-					       const ComputationalData& computational){
+        static inline __device__ tensor3 hessian(int index_i, int index_j,
+                const ComputationalData& computational){
 
-	const real4 posi =  computational.pos[index_i];
-	const real4 posj =  computational.pos[index_j];
+            const real4 posi =  computational.pos[index_i];
+            const real4 posj =  computational.pos[index_j];
 
-	const real3 rij = computational.box.apply_pbc(make_real3(posj)-make_real3(posi));
-	const real r2   = dot(rij, rij);
-	const real r    = sqrt(r2);
+            const real3 rij = computational.box.apply_pbc(make_real3(posj)-make_real3(posi));
+            const real r2   = dot(rij, rij);
+            const real r    = sqrt(r2);
 
-	real d  = computational.gamma*(computational.radius[index_i]+computational.radius[index_j]);
-	real d2 = d*d;
+            real d  = computational.gamma*(computational.radius[index_i]+computational.radius[index_j]);
+            real d2 = d*d;
 
-	tensor3 H = tensor3();
+            tensor3 H = tensor3();
 
-	if(r2>0 and d2>=r2){
-	  const real invr2 = real(1.0)/r2;
-	  const real invr  = real(1.0)/r;
+            if(r2>0 and d2>=r2){
+                const real invr2 = real(1.0)/r2;
+                const real invr  = real(1.0)/r;
 
-	  real energyDerivative       = -real(4.0)*(d2-r2)*r;
-	  real energySecondDerivative = -real(4.0)*(d2-real(3.0)*r2);
+                real energyDerivative       = -real(4.0)*(d2-r2)*r;
+                real energySecondDerivative = -real(4.0)*(d2-real(3.0)*r2);
 
-	  H = computeHessianRadialPotential(rij, invr, invr2,
-					    energyDerivative,
-					    energySecondDerivative);
-	}
+                H = computeHessianRadialPotential(rij, invr, invr2,
+                        energyDerivative,
+                        energySecondDerivative);
+            }
 
-	return computational.lambda*H;
-      }
+            return computational.lambda*H;
+        }
 
     };
 
-    using Clashed = NonBondedHessian_<Clashed_>;
+    using Clashed = NonBonded_<Clashed_>;
 
 }}}}
 

@@ -1,336 +1,25 @@
 #pragma once
 
+#include "Interactor/Pair/NonBonded/Transversers.cuh"
+
+#define DECLARE_TRANSVERSER(name, Name) \
+    template<typename T, typename = void> \
+    struct Name##Transverser { \
+        using impl = void; \
+    }; \
+    \
+    template<typename T> \
+    struct Name##Transverser<T, std::enable_if_t<has_##name<T>::value>> { \
+        using impl = Name##Transverser_<T>; \
+    };
+
 namespace uammd{
 namespace structured{
 namespace Potentials{
 namespace NonBonded{
 
-    template <class NonBondedType_>
-    struct EnergyTransverser_{
-
-        real*  energy;
-
-        using NonBondedType = NonBondedType_;
-        using resultType    = real;
-
-        EnergyTransverser_(real*  energy):energy(energy){}
-
-        inline __device__ resultType zero(){return real(0.0);}
-
-        inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
-
-        inline __device__ resultType compute(const int& index_i,
-                                             const int& index_j,
-                                             const typename NonBondedType::ComputationalData& computational){
-            return NonBondedType::energy(index_i, index_j, computational)/real(2.0); //We divide by 2 because we are counting each interaction twice
-        }
-
-        inline __device__ void set(const int& index_i,resultType& quantity){
-            energy[index_i] += quantity;
-        }
-    };
-
-    template <class NonBondedType_>
-    struct ForceTransverser_{
-
-        real4*  force;
-
-        using NonBondedType  = NonBondedType_;
-        using resultType = real4;
-
-        ForceTransverser_(real4*  force):force(force){}
-
-        inline __device__ resultType zero(){return make_real4(0.0);}
-
-        inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
-
-        inline __device__ resultType compute(const int& index_i,
-                                             const int& index_j,
-                                             const typename NonBondedType::ComputationalData& computational){
-            return make_real4(NonBondedType::force(index_i, index_j, computational),0.0);
-        }
-
-        inline __device__ void set(const int& index_i,resultType& quantity){
-            force[index_i] += quantity;
-        }
-    };
-
-    template <class NonBondedType_>
-    struct LambdaTransverser_{
-
-        real* lambdaDerivative;
-
-        using NonBondedType  = NonBondedType_;
-        using resultType = real;
-
-        LambdaTransverser_(real* lambdaDerivative):lambdaDerivative(lambdaDerivative){}
-
-        inline __device__ resultType zero(){return real(0.0);}
-
-        inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
-
-        inline __device__ resultType compute(const int& index_i,
-                                             const int& index_j,
-                                             const typename NonBondedType::ComputationalData& computational){
-            return NonBondedType::lambdaDerivative(index_i, index_j, computational)/real(2.0); //We divide by 2 because we are counting each interaction twice
-        }
-
-        inline __device__ void set(const int& index_i,resultType& quantity){
-            lambdaDerivative[index_i] += quantity;
-        }
-    };
-
-    template <class NonBondedType_>
-    struct StressTransverser_{
-
-        tensor3*  stress;
-
-        using NonBondedType  = NonBondedType_;
-        using resultType = tensor3;
-
-        StressTransverser_(tensor3*  stress):stress(stress){}
-
-        inline __device__ resultType zero(){return tensor3(0.0);}
-
-        inline __device__ void accumulate(resultType& total,const resultType current){
-            total+=current;
-        }
-
-        inline __device__ resultType compute(const int& index_i,
-                                             const int& index_j,
-                                             const typename NonBondedType::ComputationalData& computational){
-            real3 fij = NonBondedType::force(index_i, index_j, computational);
-            real3 rij = computational.box.apply_pbc(make_real3(computational.pos[index_j]) - make_real3(computational.pos[index_i]));
-
-            return computeStress(rij,fij);
-        }
-
-        inline __device__ void set(const int& index_i,resultType& quantity){
-            stress[index_i] += quantity;
-        }
-    };
-
-
-    template <class NonBondedType_>
-    struct HessianTransverser_{
-
-        tensor3*    hessian;
-        const int*  id;
-        const int*  selectedId;
-        const int*  id2index;
-
-        using NonBondedType   = NonBondedType_;
-        using resultType      = tensor3;
-
-        HessianTransverser_(tensor3* hessian,
-                const int* id,
-                const int* selectedId,
-                const int* id2index):hessian(hessian),
-        id(id),
-        selectedId(selectedId),
-        id2index(id2index){}
-
-        inline __device__ resultType zero(){return tensor3(0.0);}
-
-        inline __device__ void accumulate(resultType& total,const resultType current){
-            total+=current;
-        }
-
-        inline __device__ resultType compute(const int& index_i,
-                                             const int& index_j,
-                                             const typename NonBondedType::ComputationalData& computational){
-
-            // 11 12 13
-            // 21 22 23
-            // 31 32 33
-
-            //We compute a column of the hessian
-            //The element hessian[i] will store the block (i,selectedId)
-            //We first derevite i and then selectedId
-
-            const int id_i = id[index_i];
-            const int id_j = id[index_j];
-
-            const int selId     = selectedId[index_i];
-
-            tensor3 H = tensor3(0.0);
-
-            if (selId == id_i){ //Contribution to the self term
-                                //self term has a minus sign
-                H = -NonBondedType::hessian(id_i,id_j,computational);
-            } else if (selId == id_j){
-                H =  NonBondedType::hessian(id_i,id_j,computational);
-            }
-
-            return H;
-        }
-
-        inline __device__ void set(const int& index_i,resultType& quantity){
-            hessian[index_i] += quantity;
-        }
-    };
-
-
-    template <class NonBondedType_>
-    struct PairwiseForceTransverser_{
-
-        real4*    pairwiseForce;
-        const int*  id;
-        const int*  selectedId;
-        const int*  id2index;
-
-        using NonBondedType   = NonBondedType_;
-        using resultType = real4;
-
-        PairwiseForceTransverser_(real4* pairwiseForce,
-                const int* id,
-                const int* selectedId,
-                const int* id2index):pairwiseForce(pairwiseForce),
-        id(id),
-        selectedId(selectedId),
-        id2index(id2index){}
-
-        inline __device__ resultType zero(){return real4();}
-
-        inline __device__ void accumulate(resultType& total,const resultType current){
-            total+=current;
-        }
-
-        inline __device__ resultType compute(const int index_i,
-                                             const int index_j,
-                                             const typename NonBondedType::ComputationalData& computational){
-
-            const int id_j  = id2index[index_j];
-            const int selId = selectedId[index_i];
-
-            real4 f = real4();
-            if (id_j == selId){
-                f = make_real4(NonBondedType::force(index_i,index_j,computational),0.0);
-                //Force that particle j (selId here) makes over particle i
-            }
-            return f;
-        }
-
-        inline __device__ void set(const int& index_i,resultType& quantity){
-            //I want to store the force that all the particles make over selId, but in compute I compute
-            //the force that selId makes over the other particles.
-            //That is the reason of the -= instead of +=
-            pairwiseForce[index_i] -= quantity;
-        }
-    };
-
-    template <class NonBondedType_>
-    struct ForceTorqueTransverser_{
-
-        real4*  force;
-        real4*  torque;
-
-        using NonBondedType = NonBondedType_;
-        using resultType    = ForceTorque;
-
-        ForceTorqueTransverser_(real4*  force,real4*  torque):force(force),torque(torque){}
-
-        inline __device__ resultType zero(){
-            resultType result;
-            result.force  = make_real4(0.0);
-            result.torque = make_real4(0.0);
-            return result;
-        }
-
-        inline __device__ void accumulate(resultType& total,const resultType current){
-            total.force  += current.force;
-            total.torque += current.torque;
-        }
-
-        inline __device__ resultType compute(const int& index_i,
-                                             const int& index_j,
-                                             const typename NonBondedType::ComputationalData& computational){
-            return NonBondedType::forceTorque(index_i, index_j, computational);
-        }
-
-        inline __device__ void set(const int& index_i,resultType& quantity){
-            force[index_i]  += quantity.force;
-            torque[index_i] += quantity.torque;
-        }
-    };
-
-    template <class NonBondedType_>
-    struct MagneticFieldTransverser_{
-
-        real4* magneticField;
-
-        using NonBondedType = NonBondedType_;
-        using resultType    = real4;
-
-        MagneticFieldTransverser_(real4* magneticField):magneticField(magneticField){}
-
-        inline __device__ resultType zero(){return make_real4(0.0);}
-
-        inline __device__ void accumulate(resultType& total,const resultType current){total+=current;}
-
-        inline __device__ resultType compute(const int& index_i,
-                                             const int& index_j,
-                                             const typename NonBondedType::ComputationalData& computational){
-            return NonBondedType::magneticField(index_i, index_j, computational);
-        }
-
-        inline __device__ void set(const int& index_i,resultType& quantity){
-            magneticField[index_i] += quantity;
-        }
-    };
-
-    template <class NonBondedType_>
-    struct ForceTorqueMagneticFieldTransverser_{
-
-        real4*  force;
-        real4*  torque;
-        real4*  magneticField;
-
-        using NonBondedType = NonBondedType_;
-        using resultType    = ForceTorqueMagneticField;
-
-        ForceTorqueMagneticFieldTransverser_(real4*  force,real4*  torque,real4*  magneticField)
-            :force(force),torque(torque),magneticField(magneticField){}
-
-        inline __device__ resultType zero(){
-            resultType result;
-            result.force        = make_real4(0.0);
-            result.torque       = make_real4(0.0);
-            result.magneticField= make_real4(0.0);
-            return result;
-        }
-
-        inline __device__ void accumulate(resultType& total,const resultType current){
-            total.force         += current.force;
-            total.torque        += current.torque;
-            total.magneticField += current.magneticField;
-        }
-
-        inline __device__ resultType compute(const int& index_i,
-                const int& index_j,
-                const typename NonBondedType::ComputationalData& computational){
-            ForceTorque forceTorque = NonBondedType::forceTorque(index_i, index_j, computational);
-            real4 magneticField     = NonBondedType::magneticField(index_i, index_j, computational);
-
-            resultType result;
-            result.force         = forceTorque.force;
-            result.torque        = forceTorque.torque;
-            result.magneticField = magneticField;
-
-            return result;
-        }
-
-        inline __device__ void set(const int& index_i,resultType& quantity){
-            force[index_i]         += quantity.force;
-            torque[index_i]        += quantity.torque;
-            magneticField[index_i] += quantity.magneticField;
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////
-
     template<class NonBondedType_>
-    class NonBondedBase_{
+    class NonBonded_{
 
         public:
 
@@ -345,9 +34,59 @@ namespace NonBonded{
             ///////////////////////////
 
             ComputationalData getComputationalData(const Computables& comp,
-                    const cudaStream_t& st){
+                                                   const cudaStream_t& st){
                 return NonBondedType::getComputationalData(this->gd,this->pg,storage,comp,st);
             }
+
+            ///////////////////////////
+
+            // Conditionally define all transverser types
+
+            struct Transversers_{
+                // Simple transversers
+                DECLARE_TRANSVERSER(energy, Energy)
+                DECLARE_TRANSVERSER(force, Force)
+                DECLARE_TRANSVERSER(lambdaDerivative, Lambda)
+                DECLARE_TRANSVERSER(stress, Stress)
+                DECLARE_TRANSVERSER(force, PairwiseForce)
+                DECLARE_TRANSVERSER(hessian, Hessian)
+                DECLARE_TRANSVERSER(magneticField, MagneticField)
+
+                // Combined transversers
+                DECLARE_TRANSVERSER(forceTorque, ForceTorque)
+                DECLARE_TRANSVERSER(forceTorqueMagneticField, ForceTorqueMagneticField)
+            };
+
+            // Simple transversers
+            using EnergyTransverser        = typename Transversers_::EnergyTransverser<NonBondedType>::impl;
+            using ForceTransverser         = typename Transversers_::ForceTransverser<NonBondedType>::impl;
+            using LambdaTransverser        = typename Transversers_::LambdaTransverser<NonBondedType>::impl;
+            using StressTransverser        = typename Transversers_::StressTransverser<NonBondedType>::impl;
+            using PairwiseForceTransverser = typename Transversers_::PairwiseForceTransverser<NonBondedType>::impl;
+            using HessianTransverser       = typename Transversers_::HessianTransverser<NonBondedType>::impl;
+            using MagneticFieldTransverser = typename Transversers_::MagneticFieldTransverser<NonBondedType>::impl;
+
+            // Combined transversers
+            using ForceTorqueTransverser              = typename Transversers_::ForceTorqueTransverser<NonBondedType>::impl;
+            using ForceTorqueMagneticFieldTransverser = typename Transversers_::ForceTorqueMagneticFieldTransverser<NonBondedType>::impl;
+
+            // Check if transversers are available
+            template<typename T>
+            struct is_transverser_available : std::bool_constant<!std::is_same_v<T, void>> {};
+
+            // Simple transversers
+            static constexpr bool isEnergyTransverserAvailable        = is_transverser_available<EnergyTransverser>::value;
+            static constexpr bool isForceTransverserAvailable         = is_transverser_available<ForceTransverser>::value;
+            static constexpr bool isLambdaTransverserAvailable        = is_transverser_available<LambdaTransverser>::value;
+            static constexpr bool isStressTransverserAvailable        = is_transverser_available<StressTransverser>::value;
+            static constexpr bool isPairwiseForceTransverserAvailable = is_transverser_available<PairwiseForceTransverser>::value;
+            static constexpr bool isHessianTransverserAvailable       = is_transverser_available<HessianTransverser>::value;
+            static constexpr bool isMagneticFieldTransverserAvailable = is_transverser_available<MagneticFieldTransverser>::value;
+
+            // Combined transversers
+            static constexpr bool isForceTorqueTransverserAvailable              = is_transverser_available<ForceTorqueTransverser>::value;
+            static constexpr bool isForceTorqueMagneticFieldTransverserAvailable = is_transverser_available<ForceTorqueMagneticFieldTransverser>::value;
+
 
         protected:
 
@@ -360,215 +99,104 @@ namespace NonBonded{
 
         public:
 
-            NonBondedBase_(std::shared_ptr<GlobalData>    gd,
-                    std::shared_ptr<ParticleGroup> pg,
-                    DataEntry& data):gd(gd),
-            pg(pg),pd(getExtendedParticleData(pg)){
-
+            NonBonded_(std::shared_ptr<GlobalData>    gd,
+                       std::shared_ptr<ParticleGroup> pg,
+                       DataEntry& data):
+                       gd(gd),pg(pg),pd(getExtendedParticleData(pg)){
                 storage = NonBondedType::getStorageData(gd,pg,data);
-
             }
 
             ///////////////////////////
 
             real getCutOff(){return storage.cutOff;}
-    };
-
-    template<class NonBondedType_>
-    class NonBonded_ : public NonBondedBase_<NonBondedType_>{
-
-        public:
-
-            using NonBondedType = typename NonBondedBase_<NonBondedType_>::NonBondedType;
 
             ///////////////////////////
 
-            //Transversers
+            // Getters for the transversers
 
-            using EnergyTransverser = EnergyTransverser_<NonBondedType>;
-            using ForceTransverser  = ForceTransverser_<NonBondedType>;
-            using StressTransverser = StressTransverser_<NonBondedType>;
-            using PairwiseForceTransverser = PairwiseForceTransverser_<NonBondedType>;
-
-            ///////////////////////////
-
-            NonBonded_(std::shared_ptr<GlobalData>    gd,
-                    std::shared_ptr<ParticleGroup> pg,
-                    DataEntry& data):NonBondedBase_<NonBondedType_>(gd,pg,data){}
-
-            ///////////////////////////
-
-            EnergyTransverser getEnergyTransverser(){
-
-                real*  energy = this->pd->getEnergy(access::location::gpu, access::mode::readwrite).raw();
-
-                return EnergyTransverser(energy);
+            // Simple transversers
+            EnergyTransverser getEnergyTransverser() {
+                if constexpr (isEnergyTransverserAvailable) {
+                    return EnergyTransverser(this->pd);
+                } else {
+                    System::log<System::CRITICAL>("[NonBonded] Energy transverser not available.");
+                    return EnergyTransverser();
+                }
             }
 
-            ForceTransverser getForceTransverser(){
-
-                real4*  force = this->pd->getForce(access::location::gpu, access::mode::readwrite).raw();
-
-                return ForceTransverser(force);
+            ForceTransverser getForceTransverser() {
+                if constexpr (isForceTransverserAvailable) {
+                    return ForceTransverser(this->pd);
+                } else {
+                    System::log<System::CRITICAL>("[NonBonded] Force transverser not available.");
+                    return ForceTransverser();
+                }
             }
 
-            StressTransverser getStressTransverser(){
-
-                tensor3*  stress = this->pd->getStress(access::location::gpu, access::mode::readwrite).raw();
-
-                return StressTransverser(stress);
+            LambdaTransverser getLambdaTransverser() {
+                if constexpr (isLambdaTransverserAvailable) {
+                    return LambdaTransverser(this->pd);
+                } else {
+                    System::log<System::CRITICAL>("[NonBonded] Lambda transverser not available.");
+                    return LambdaTransverser();
+                }
             }
 
-            PairwiseForceTransverser getPairwiseForceTransverser(){
-
-                real4*  pforce        = this->pd->getPairwiseForce(access::location::gpu, access::mode::readwrite).raw();
-                const int* id2index   = this->pd->getIdOrderedIndices(access::location::gpu);
-                const int* id         = this->pd->getId(access::location::gpu, access::mode::read).raw();
-                const int* selectedId = this->pd->getSelectedId(access::location::gpu, access::mode::read).raw();
-
-
-                return PairwiseForceTransverser(pforce,
-                        id,
-                        selectedId,id2index);
-            }
-    };
-
-    template<class NonBondedType_>
-    class NonBondedLambda_ : public NonBonded_<NonBondedType_>{
-
-        public:
-
-            using NonBondedType = typename NonBonded_<NonBondedType_>::NonBondedType;
-
-            ///////////////////////////
-
-            //Transversers
-
-            using LambdaTransverser = LambdaTransverser_<NonBondedType>;
-
-            ///////////////////////////
-
-            NonBondedLambda_(std::shared_ptr<GlobalData>    gd,
-                    std::shared_ptr<ParticleGroup> pg,
-                    DataEntry& data):NonBonded_<NonBondedType_>(gd,pg,data){}
-
-            ///////////////////////////
-
-            LambdaTransverser getLambdaTransverser(){
-
-                real*  lambdaDerivative = this->pd->getLambdaDerivative(access::location::gpu, access::mode::readwrite).raw();
-
-                return LambdaTransverser(lambdaDerivative);
-            }
-    };
-
-    template<class NonBondedType_>
-    class NonBondedTorque_ : public NonBondedBase_<NonBondedType_>{
-
-        public:
-
-            using NonBondedType = typename NonBondedBase_<NonBondedType_>::NonBondedType;
-
-            ///////////////////////////
-
-            //Transversers
-
-            using EnergyTransverser = EnergyTransverser_<NonBondedType>;
-            using ForceTransverser  = ForceTorqueTransverser_<NonBondedType>;
-
-            ///////////////////////////
-
-            NonBondedTorque_(std::shared_ptr<GlobalData>    gd,
-                    std::shared_ptr<ParticleGroup> pg,
-                    DataEntry& data):NonBondedBase_<NonBondedType_>(gd,pg,data){}
-
-            ///////////////////////////
-
-            EnergyTransverser getEnergyTransverser(){
-
-                real*  energy = this->pd->getEnergy(access::location::gpu, access::mode::readwrite).raw();
-
-                return EnergyTransverser(energy);
+            StressTransverser getStressTransverser() {
+                if constexpr (isStressTransverserAvailable) {
+                    return StressTransverser(this->pd);
+                } else {
+                    System::log<System::CRITICAL>("[NonBonded] Stress transverser not available.");
+                    return StressTransverser();
+                }
             }
 
-            ForceTransverser getForceTransverser(){
-
-                real4*  force  = this->pd->getForce(access::location::gpu, access::mode::readwrite).raw();
-                real4*  torque = this->pd->getTorque(access::location::gpu, access::mode::readwrite).raw();
-
-                return ForceTransverser(force,torque);
-            }
-    };
-
-    template<class NonBondedType_>
-    class NonBondedForceTorqueMagneticField_ : public NonBondedTorque_<NonBondedType_>{
-
-        public:
-
-            using NonBondedType = typename NonBondedTorque_<NonBondedType_>::NonBondedType;
-
-            ///////////////////////////
-
-            //Transversers
-
-            using MagneticFieldTransverser = MagneticFieldTransverser_<NonBondedType>;
-            using ForceTorqueMagneticFieldTransverser = ForceTorqueMagneticFieldTransverser_<NonBondedType>;
-
-            ///////////////////////////
-
-            NonBondedForceTorqueMagneticField_(std::shared_ptr<GlobalData>    gd,
-                    std::shared_ptr<ParticleGroup> pg,
-                    DataEntry& data):NonBondedTorque_<NonBondedType_>(gd,pg,data){}
-
-            ///////////////////////////
-
-            MagneticFieldTransverser getMagneticFieldTransverser(){
-
-                real4*  magneticField = this->pd->getMagneticField(access::location::gpu, access::mode::readwrite).raw();
-
-                return MagneticFieldTransverser(magneticField);
+            PairwiseForceTransverser getPairwiseForceTransverser() {
+                if constexpr (isPairwiseForceTransverserAvailable) {
+                    return PairwiseForceTransverser(this->pd);
+                } else {
+                    System::log<System::CRITICAL>("[NonBonded] Pairwise force transverser not available.");
+                    return PairwiseForceTransverser();
+                }
             }
 
-            ForceTorqueMagneticFieldTransverser getForceTorqueMagneticFieldTransverser(){
-
-                real4*  magneticField = this->pd->getMagneticField(access::location::gpu, access::mode::readwrite).raw();
-                real4*  force         = this->pd->getForce(access::location::gpu, access::mode::readwrite).raw();
-                real4*  torque        = this->pd->getTorque(access::location::gpu, access::mode::readwrite).raw();
-                return ForceTorqueMagneticFieldTransverser(force, torque, magneticField);
+            HessianTransverser getHessianTransverser() {
+                if constexpr (isHessianTransverserAvailable) {
+                    return HessianTransverser(this->pd);
+                } else {
+                    System::log<System::CRITICAL>("[NonBonded] Hessian transverser not available.");
+                    return HessianTransverser();
+                }
             }
-    };
 
-    template<class NonBondedType_>
-    class NonBondedHessian_ : public NonBonded_<NonBondedType_> {
-
-        public:
-
-            using NonBondedType = typename NonBonded_<NonBondedType_>::NonBondedType;
-
-            ///////////////////////////
-
-            //Transverser
-            using HessianTransverser = HessianTransverser_<NonBondedType>;
-
-        public:
-
-            NonBondedHessian_(std::shared_ptr<GlobalData>    gd,
-                    std::shared_ptr<ParticleGroup> pg,
-                    DataEntry& data):NonBonded_<NonBondedType_>(gd,pg,data){}
-
-            ///////////////////////////
-
-            HessianTransverser getHessianTransverser(){
-
-                tensor3*  hessian     = this->pd->getHessian(access::location::gpu, access::mode::readwrite).raw();
-                const int* id         = this->pd->getId(access::location::gpu, access::mode::read).raw();
-                const int* selectedId = this->pd->getSelectedId(access::location::gpu, access::mode::read).raw();
-                const int* id2index   = this->pd->getIdOrderedIndices(access::location::gpu);
-
-                return HessianTransverser(hessian,
-                        id,
-                        selectedId,id2index);
+            MagneticFieldTransverser getMagneticFieldTransverser() {
+                if constexpr (isMagneticFieldTransverserAvailable) {
+                    return MagneticFieldTransverser(this->pd);
+                } else {
+                    System::log<System::CRITICAL>("[NonBonded] Magnetic field transverser not available.");
+                    return MagneticFieldTransverser();
+                }
             }
+
+            // Combined transversers
+            ForceTorqueTransverser getForceTorqueTransverser() {
+                if constexpr (isForceTorqueTransverserAvailable) {
+                    return ForceTorqueTransverser(this->pd);
+                } else {
+                    System::log<System::CRITICAL>("[NonBonded] Force-torque transverser not available.");
+                    return ForceTorqueTransverser();
+                }
+            }
+
+            ForceTorqueMagneticFieldTransverser getForceTorqueMagneticFieldTransverser() {
+                if constexpr (isForceTorqueMagneticFieldTransverserAvailable) {
+                    return ForceTorqueMagneticFieldTransverser(this->pd);
+                } else {
+                    System::log<System::CRITICAL>("[NonBonded] Force-torque-magnetic field transverser not available.");
+                    return ForceTorqueMagneticFieldTransverser();
+                }
+            }
+
     };
 
 }}}}

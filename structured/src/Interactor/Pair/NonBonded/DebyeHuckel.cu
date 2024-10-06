@@ -171,7 +171,7 @@ namespace NonBonded{
         }
     };
 
-    using DebyeHuckel = NonBondedHessian_<DebyeHuckel_>;
+    using DebyeHuckel = NonBonded_<DebyeHuckel_>;
 
 }}}}
 

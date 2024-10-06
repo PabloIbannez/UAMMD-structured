@@ -159,7 +159,7 @@ namespace NonBonded{
         }
     };
 
-    using DipolarMagnetic = NonBondedForceTorqueMagneticField_<DipolarMagnetic_>;
+    using DipolarMagnetic = NonBonded_<DipolarMagnetic_>;
 
 }}}}
 

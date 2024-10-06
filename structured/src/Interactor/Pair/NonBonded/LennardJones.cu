@@ -172,20 +172,20 @@ namespace NonBonded{
 
     };
 
-    using LennardJonesType1        = NonBondedHessian_<LennardJones_<BasicPotentials::LennardJones::Type1>>;
-    using LennardJonesType2        = NonBondedHessian_<LennardJones_<BasicPotentials::LennardJones::Type2>>;
-    using LennardJonesType3        = NonBondedHessian_<LennardJones_<BasicPotentials::LennardJones::Type3>>;
+    using LennardJonesType1        = NonBonded_<LennardJones_<BasicPotentials::LennardJones::Type1>>;
+    using LennardJonesType2        = NonBonded_<LennardJones_<BasicPotentials::LennardJones::Type2>>;
+    using LennardJonesType3        = NonBonded_<LennardJones_<BasicPotentials::LennardJones::Type3>>;
 
-    using WCAType1                 = NonBondedHessian_<LennardJones_<BasicPotentials::WCA::Type1>>;
-    using WCAType2                 = NonBondedHessian_<LennardJones_<BasicPotentials::WCA::Type2>>;
-    using WCAType3                 = NonBondedHessian_<LennardJones_<BasicPotentials::WCA::Type3>>;
+    using WCAType1                 = NonBonded_<LennardJones_<BasicPotentials::WCA::Type1>>;
+    using WCAType2                 = NonBonded_<LennardJones_<BasicPotentials::WCA::Type2>>;
+    using WCAType3                 = NonBonded_<LennardJones_<BasicPotentials::WCA::Type3>>;
 
-    using GeneralLennardJonesType1 = NonBondedHessian_<LennardJones_<BasicPotentials::GeneralLennardJones::Type1>>;
-    using GeneralLennardJonesType2 = NonBondedHessian_<LennardJones_<BasicPotentials::GeneralLennardJones::Type2>>;
-    using GeneralLennardJonesType3 = NonBondedHessian_<LennardJones_<BasicPotentials::GeneralLennardJones::Type3>>;
+    using GeneralLennardJonesType1 = NonBonded_<LennardJones_<BasicPotentials::GeneralLennardJones::Type1>>;
+    using GeneralLennardJonesType2 = NonBonded_<LennardJones_<BasicPotentials::GeneralLennardJones::Type2>>;
+    using GeneralLennardJonesType3 = NonBonded_<LennardJones_<BasicPotentials::GeneralLennardJones::Type3>>;
 
-    using Steric6                  = NonBondedHessian_<LennardJones_<BasicPotentials::Steric::Steric6>>;
-    using Steric12                 = NonBondedHessian_<LennardJones_<BasicPotentials::Steric::Steric12>>;
+    using Steric6                  = NonBonded_<LennardJones_<BasicPotentials::Steric::Steric6>>;
+    using Steric12                 = NonBonded_<LennardJones_<BasicPotentials::Steric::Steric12>>;
 
 }}}}
 
