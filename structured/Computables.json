@@ -1,0 +1,23 @@
+{
+    "Computables":[
+        ["energy","Energy"],
+        ["force","Force"],
+        ["torque","Torque"],
+        ["virial","Virial"],
+        ["stress","Stress"],
+        ["magneticField","MagneticField"],
+        ["transitionProbability","TransitionProbability"],
+        ["hessian","Hessian"],
+        ["lambdaDerivative","LambdaDerivative"],
+        ["pairwiseForce","PairwiseForce"]
+    ],
+    "ComputablesCombinations":[
+        //Be careful order matters!!!
+        //The order in which the different combinations are listed 
+        //will also be the order in which they will be attempted to be evaluated.
+        ["energyForceTorque","EnergyForceTorque","energy","force","torque"],
+        ["energyForce","EnergyForce","energy","force"],
+        ["forceTorqueMagneticField","ForceTorqueMagneticField","force","torque","magneticField"],
+        ["forceTorque","ForceTorque","force","torque"]
+    ]
+}

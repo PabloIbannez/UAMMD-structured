@@ -82,10 +82,10 @@ void stateLoader(ParticleData* pd,DataEntry& data){
         isLabelLoaded[#name] = true; \
     }
 
-    #define LOAD_PROPERTIES_AUX(NAME, name, type) LOAD_PROPERTIES_IMPL(NAME, name, type)
+    #define LOAD_PROPERTIES_EVAL(NAME, name, type) LOAD_PROPERTIES_IMPL(NAME, name, type)
 
-    #define LOAD_PROPERTIES(r, data, tuple) \
-        LOAD_PROPERTIES_AUX(__DATA_CAPS__(tuple), __DATA_NAME__(tuple), __DATA_TYPE__(tuple))
+    #define LOAD_PROPERTIES(r, data, seq) \
+        LOAD_PROPERTIES_EVAL(__DATA_CAPS__(seq), __DATA_NAME__(seq), __DATA_TYPE__(seq))
 
     __MACRO_OVER_STATE__(LOAD_PROPERTIES)
 
@@ -111,10 +111,10 @@ void updateState(ParticleData* pd,DataEntry& data){
         toUpdate.push_back(#name); \
     }
 
-    #define CHECK_PROPERTY_AUX(NAME, name, type) CHECK_PROPERTY_IMPL(NAME, name, type)
+    #define CHECK_PROPERTY_EVAL(NAME, name, type) CHECK_PROPERTY_IMPL(NAME, name, type)
 
-    #define CHECK_PROPERTY(r, data, tuple) \
-        CHECK_PROPERTY_AUX(__DATA_CAPS__(tuple), __DATA_NAME__(tuple), __DATA_TYPE__(tuple))
+    #define CHECK_PROPERTY(r, data, seq) \
+        CHECK_PROPERTY_EVAL(__DATA_CAPS__(seq), __DATA_NAME__(seq), __DATA_TYPE__(seq))
 
     __MACRO_OVER_STATE__(CHECK_PROPERTY)
 
@@ -156,10 +156,10 @@ void updateState(ParticleData* pd,DataEntry& data){
                 } \
             }
 
-            #define UPDATE_PROPERTY_AUX(NAME, name, type) UPDATE_PROPERTY_IMPL(NAME, name, type)
+            #define UPDATE_PROPERTY_EVAL(NAME, name, type) UPDATE_PROPERTY_IMPL(NAME, name, type)
 
-            #define UPDATE_PROPERTY(r, data, tuple) \
-                UPDATE_PROPERTY_AUX(__DATA_CAPS__(tuple), __DATA_NAME__(tuple), __DATA_TYPE__(tuple))
+            #define UPDATE_PROPERTY(r, data, seq) \
+                UPDATE_PROPERTY_EVAL(__DATA_CAPS__(seq), __DATA_NAME__(seq), __DATA_TYPE__(seq))
 
             __MACRO_OVER_STATE__(UPDATE_PROPERTY)
 
@@ -169,15 +169,15 @@ void updateState(ParticleData* pd,DataEntry& data){
 }
 
 #undef LOAD_PROPERTIES_IMPL
-#undef LOAD_PROPERTIES_AUX
+#undef LOAD_PROPERTIES_EVAL
 #undef LOAD_PROPERTIES
 
 #undef CHECK_PROPERTY_IMPL
-#undef CHECK_PROPERTY_AUX
+#undef CHECK_PROPERTY_EVAL
 #undef CHECK_PROPERTY
 
 #undef UPDATE_PROPERTY_IMPL
-#undef UPDATE_PROPERTY_AUX
+#undef UPDATE_PROPERTY_EVAL
 #undef UPDATE_PROPERTY
 
 }}

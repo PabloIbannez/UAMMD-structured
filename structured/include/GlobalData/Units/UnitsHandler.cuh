@@ -34,15 +34,17 @@ class UnitsHandler{
             throw std::runtime_error("Constant not defined for units."); \
         }
 
-        #define CONSTANT_AUX(NAME, name, type) CONSTANT_IMPL(NAME, name, type)
+        // We have to use an intermediate macro to evaluate the previous expressions.
+        // Otherwise, the preprocessor will not expand the __DATA_CAPS__ and __DATA_NAME__ macros.
+        #define CONSTANT_EVAL(NAME, name, type) CONSTANT_IMPL(NAME, name, type)
 
-        #define CONSTANT(r, data, tuple) \
-            CONSTANT_AUX(__DATA_CAPS__(tuple), __DATA_NAME__(tuple), __DATA_TYPE__(tuple))
+        #define CONSTANT(r, data, seq) \
+            CONSTANT_EVAL(__DATA_CAPS__(seq), __DATA_NAME__(seq), __DATA_TYPE__(seq))
 
         __MACRO_OVER_UNITS__(CONSTANT)
 
         #undef CONSTANT
-        #undef CONSTANT_AUX
+        #undef CONSTANT_EVAL
         #undef CONSTANT_IMPL
 };
 
