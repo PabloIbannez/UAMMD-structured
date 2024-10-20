@@ -217,6 +217,9 @@
             ["NonBondedPatches", "DistanceSwitchExponential", "DistanceSwitch.cu"],
             ["NonBondedPatches", "DistanceSwitchCosine", "DistanceSwitch.cu"]
         ],
+        "ManyBodyNonBonded": [
+            ["ShortRange", "MADNArev", "MADNArev.cu"]
+        ],
         "AFM": [
             ["AFM", "SphericalTip", "SphericalTip.cu"],
             ["AFM", "SphericallyBluntedConicTip", "SphericallyBluntedConicTip.cu"]
