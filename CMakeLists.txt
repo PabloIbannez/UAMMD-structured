@@ -1,4 +1,12 @@
 cmake_minimum_required(VERSION 3.26 FATAL_ERROR)
+
+if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+    set(CMAKE_CUDA_ARCHITECTURES all-major CACHE STRING "CUDA architectures")
+    message(WARNING "CMAKE_CUDA_ARCHITECTURES set to \"all-major\".\
+ This option will generate PTX code for all major CUDA architectures, which may increase the build time.\
+ Consider setting CMAKE_CUDA_ARCHITECTURES to a specific architecture (e.g. 70) or a list of architectures (e.g. 70;75;86) to reduce the build time.")
+endif()
+
 project(UAMMDstructured LANGUAGES CXX CUDA)
 
 set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
