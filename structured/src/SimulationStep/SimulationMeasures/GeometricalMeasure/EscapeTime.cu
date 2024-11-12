@@ -179,7 +179,9 @@ class EscapeTime: public SimulationStepBase{
                     isParticleInsideSystem[index] = false;
                     particlesIn++;
                     if(stopSimulation and (particlesIn >= particlesToEscape)){
-                        System::log<System::CRITICAL>("[EscapeTime] Simulation interrumpted, all particles have escaped");
+                        //System::log<System::CRITICAL>("[EscapeTime] Simulation interrumpted, all particles have escaped");
+                        System::log<System::MESSAGE>("[EscapeTime] All particlesToEscape have escaped!");
+                        this->sys->setState(ExtendedSystem::SIMULATION_STATE::STOPPED);
                     }
                 }
             }
