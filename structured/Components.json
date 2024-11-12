@@ -2,7 +2,8 @@
     "GlobalData": {
         "Units": [
             ["Units", "None", "None.cu"],
-            ["Units", "KcalMol_A", "KcalMol_A.cu"]
+            ["Units", "KcalMol_A", "KcalMol_A.cu"],
+            ["Units", "lenSI", "lenSI.cu"]
         ],
         "Types": [
             ["Types", "Basic", "Basic.cu"],
@@ -74,7 +75,8 @@
             ["GeometricalMeasure", "MeanSquareDisplacement", "MeanSquareDisplacement.cu"],
             ["GeometricalMeasure", "MeanAngularCorrelation", "MeanAngularCorrelation.cu"],
             ["GeometricalMeasure", "CenterOfMassPosition", "CenterOfMassPosition.cu"],
-            ["GeometricalMeasure", "EscapeTime", "EscapeTime.cu"],
+            ["GeometricalMeasure", "EscapePolygonTime", "EscapeTime.cu"],
+            ["GeometricalMeasure", "EscapeSphereTime", "EscapeTime.cu"],
             ["GeometricalMeasure", "Height", "Height.cu"],
             ["TopologicalMeasures", "PatchPolymers", "PatchPolymers.cu"],
             ["ParticlesListMeasure", "PotentialMeasure", "PotentialMeasure.cu"],
