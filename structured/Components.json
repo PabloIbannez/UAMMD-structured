@@ -150,6 +150,7 @@
             ["Surface", "SurfaceGeneralLennardJonesType2", "LennardJonesSurface.cu"],
             ["Surface", "SurfaceWCAType1", "LennardJonesSurface.cu"],
             ["Surface", "SurfaceWCAType2", "LennardJonesSurface.cu"],
+            ["External", "AFMimage", "AFMimage.cu"],
             ["External", "PolarizationTabulated", "PolarizationTabulated.cu"],
             ["External", "ConstantForce", "ConstantForce.cu"],
             ["Surface", "WCA_PlainCylinder", "WCA_Custom.cu"],
