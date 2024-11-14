@@ -1,7 +1,7 @@
 Examples
 ========
 
-All the examples can be transformed into a Jupyter notebook by running: 
+Some examples can be transformed into a Jupyter notebook by running: 
 
 ```bash
 
