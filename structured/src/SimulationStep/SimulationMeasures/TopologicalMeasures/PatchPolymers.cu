@@ -48,23 +48,36 @@ namespace SimulationMeasures{
                 #pragma pack(pop)
 
                 __device__ inline void recordPolimerizationEvents(int id,
-                                ullint step,
-                                int Nmonomers,
-                                ullint bufferSize,
-                                const int* id2indexMonomers,
-                                const int* id2indexPatches,
-                                const int2 * monomer2patches,
-                                const int  * patch2monomer,
-                                int4 * previousState,
-                                const int4 * currentState,
-                                event* eventBuffer,
-                                int*   nEventsPerMonomer){
+                                       ullint step,
+                                       int Nmonomers,
+                                       ullint bufferSize,
+                                       const int* id2indexMonomers,
+                                       const int* id2indexPatches,
+                                       const int2 * monomer2patches,
+                                       const int  * patch2monomer,
+                                       int4 * previousState,
+                                       const int4 * currentState,
+                                       event* eventBuffer,
+                                       int*   nEventsPerMonomer){
+
+                        //Note each thread is responsible for a monomer (not a patch)
+                        //Each monomer has two patches, one at the beginning and one at the end
 
                         const int endPatchId = monomer2patches[id].x;
+                        const int begPatchId = monomer2patches[id].y;
+
+                        const int currEndState = currentState[id2indexPatches[endPatchId]].x;
+                        const int currBegState = currentState[id2indexPatches[begPatchId]].x;
 
                         //Check endPatch
+                        // We can see the same event from the endPatch or the begPatch
+                        // I mean, a polimerization/depolimerization event in the endPatch appears as a polimerization/depolimerization event in the begPatch
+                        // The only difference is the info field, which is the patch id. But if we consider both options the same event is detected twice.
+                        // This is the reason why we only check the begPatch and all this code is commented.
+
+                        // We ensure each event is detected only once by checking the previous state of the begPatch
+
                         //const int prevEndState = previousState[endPatchId].x;
-                        const int currEndState = currentState[id2indexPatches[endPatchId]].x;
 
                         //if(prevEndState != currEndState){
                         //	//Event detected
@@ -78,9 +91,10 @@ namespace SimulationMeasures{
                         //		newEvent.info = patch2monomer[currEndState];
 
                         //		UAMMD_SET_2D_ROW_MAJOR(eventBuffer,
-                        //													 bufferSize, Nmonomers,
-                        //													 nEventsPerMonomer[id], id,
-                        //													 newEvent);
+                        //							   bufferSize, Nmonomers,
+                        //							   nEventsPerMonomer[id], id,
+                        //							   newEvent);
+
                         //		nEventsPerMonomer[id]++;
                         //	}
 
@@ -94,21 +108,20 @@ namespace SimulationMeasures{
                         //		newEvent.info = patch2monomer[prevEndState];
 
                         //		UAMMD_SET_2D_ROW_MAJOR(eventBuffer,
-                        //													 bufferSize, Nmonomers,
-                        //													 nEventsPerMonomer[id], id,
-                        //													 newEvent);
+                        //							   bufferSize, Nmonomers,
+                        //							   nEventsPerMonomer[id], id,
+                        //							   newEvent);
+
                         //		nEventsPerMonomer[id]++;
                         //	}
                         //}
 
-                        const int begPatchId = monomer2patches[id].y;
-
                         //Check begPatch
                         const int prevBegState = previousState[begPatchId].x;
-                        const int currBegState = currentState[id2indexPatches[begPatchId]].x;
 
                         if(prevBegState != currBegState){
                                 //Event detected
+
                                 if(prevBegState == int(-1)){
                                         //Polimerization
                                         event newEvent;
@@ -119,9 +132,9 @@ namespace SimulationMeasures{
                                         newEvent.info = patch2monomer[currBegState];
 
                                         UAMMD_SET_2D_ROW_MAJOR(eventBuffer,
-                                                        bufferSize, Nmonomers,
-                                                        nEventsPerMonomer[id], id,
-                                                        newEvent);
+                                                               bufferSize, Nmonomers,
+                                                               nEventsPerMonomer[id], id,
+                                                               newEvent);
                                         nEventsPerMonomer[id]++;
                                 }
 
@@ -135,9 +148,9 @@ namespace SimulationMeasures{
                                         newEvent.info = patch2monomer[prevBegState];
 
                                         UAMMD_SET_2D_ROW_MAJOR(eventBuffer,
-                                                        bufferSize, Nmonomers,
-                                                        nEventsPerMonomer[id], id,
-                                                        newEvent);
+                                                               bufferSize, Nmonomers,
+                                                               nEventsPerMonomer[id], id,
+                                                               newEvent);
                                         nEventsPerMonomer[id]++;
                                 }
                         }
@@ -149,18 +162,18 @@ namespace SimulationMeasures{
                 }
 
                 __device__ inline void recordSurfaceEvents(int id,
-                                ullint step,
-                                int Nmonomers,
-                                ullint bufferSize,
-                                const int* id2indexMonomers,
-                                const int* id2indexSurfPatches,
-                                const int  * monomer2surfPatches,
-                                real * previousSurfaceEnergy,
-                                typename Potentials::SurfacePatches::Linker::EnergyTransverser transverser,
-                                typename Potentials::SurfacePatches::Linker::ComputationalData computationalData,
-                                real surfaceEnergyThreshold,
-                                event* eventBuffer,
-                                int*   nEventsPerMonomer){
+                                                           ullint step,
+                                                           int Nmonomers,
+                                                           ullint bufferSize,
+                                                           const int* id2indexMonomers,
+                                                           const int* id2indexSurfPatches,
+                                                           const int  * monomer2surfPatches,
+                                                           real * previousSurfaceEnergy,
+                                                           typename Potentials::SurfacePatches::Linker::EnergyTransverser transverser,
+                                                           typename Potentials::SurfacePatches::Linker::ComputationalData computationalData,
+                                                           real surfaceEnergyThreshold,
+                                                           event* eventBuffer,
+                                                           int*   nEventsPerMonomer){
 
                         const int surfacePatchId    = monomer2surfPatches[id];
                         const int indexSurfacePatch = id2indexSurfPatches[surfacePatchId];
@@ -170,7 +183,7 @@ namespace SimulationMeasures{
                         const real currSurfaceEnergy = transverser.compute(indexSurfacePatch,computationalData);
 
                         if(prevSurfaceEnergy >= surfaceEnergyThreshold and
-                                        currSurfaceEnergy <  surfaceEnergyThreshold){
+                           currSurfaceEnergy <  surfaceEnergyThreshold){
                                 //Bulk to surface
                                 event newEvent;
 
@@ -180,14 +193,14 @@ namespace SimulationMeasures{
                                 newEvent.info = 0;
 
                                 UAMMD_SET_2D_ROW_MAJOR(eventBuffer,
-                                                bufferSize, Nmonomers,
-                                                nEventsPerMonomer[id], id,
-                                                newEvent);
+                                                       bufferSize, Nmonomers,
+                                                       nEventsPerMonomer[id], id,
+                                                       newEvent);
                                 nEventsPerMonomer[id]++;
                         }
 
                         if(prevSurfaceEnergy < surfaceEnergyThreshold and
-                                        currSurfaceEnergy >= surfaceEnergyThreshold){
+                           currSurfaceEnergy >= surfaceEnergyThreshold){
                                 //Surface to bulk
                                 event newEvent;
 
@@ -197,30 +210,29 @@ namespace SimulationMeasures{
                                 newEvent.info = 0;
 
                                 UAMMD_SET_2D_ROW_MAJOR(eventBuffer,
-                                                bufferSize, Nmonomers,
-                                                nEventsPerMonomer[id], id,
-                                                newEvent);
+                                                       bufferSize, Nmonomers,
+                                                       nEventsPerMonomer[id], id,
+                                                       newEvent);
                                 nEventsPerMonomer[id]++;
                         }
 
                         //Update
-
                         previousSurfaceEnergy[id] = currSurfaceEnergy;
 
                 }
 
                 __global__ void recordEvents(const ullint step,
-                                const int Nmonomers,
-                                const ullint bufferSize,
-                                const int* id2indexMonomers,
-                                const int* id2indexPatches,
-                                const int2 * __restrict__ monomer2patches,
-                                const int  * __restrict__ patch2monomer,
-                                int4 * __restrict__ previousState,
-                                const int4 * __restrict__ currentState,
-                                event* __restrict__ eventBuffer,
-                                int*   __restrict__ nEventsPerMonomer,
-                                int*                maxEvents){
+                                             const int Nmonomers,
+                                             const ullint bufferSize,
+                                             const int* id2indexMonomers,
+                                             const int* id2indexPatches,
+                                             const int2 * __restrict__ monomer2patches,
+                                             const int  * __restrict__ patch2monomer,
+                                             int4 * __restrict__ previousState,
+                                             const int4 * __restrict__ currentState,
+                                             event* __restrict__ eventBuffer,
+                                             int*   __restrict__ nEventsPerMonomer,
+                                             int*                maxEvents){
 
                         //One thread per monomer
                         const int id = blockIdx.x*blockDim.x + threadIdx.x;
@@ -228,36 +240,36 @@ namespace SimulationMeasures{
                         if(id >= Nmonomers) return;
 
                         recordPolimerizationEvents(id,
-                                        step,
-                                        Nmonomers,
-                                        bufferSize,
-                                        id2indexMonomers,id2indexPatches,
-                                        monomer2patches,patch2monomer,
-                                        previousState,
-                                        currentState,
-                                        eventBuffer,nEventsPerMonomer);
+                                                   step,
+                                                   Nmonomers,
+                                                   bufferSize,
+                                                   id2indexMonomers,id2indexPatches,
+                                                   monomer2patches,patch2monomer,
+                                                   previousState,
+                                                   currentState,
+                                                   eventBuffer,nEventsPerMonomer);
 
                         atomicMax(maxEvents, nEventsPerMonomer[id]);
                 }
 
                 __global__ void recordEventsSurf(const ullint step,
-                                const int Nmonomers,
-                                const ullint bufferSize,
-                                const int* id2indexMonomers,
-                                const int* id2indexPatches,
-                                const int* id2indexSurfPatches,
-                                const int2 * __restrict__ monomer2patches,
-                                const int  * __restrict__ patch2monomer,
-                                const int  * __restrict__ monomer2surfPatches,
-                                int4 * __restrict__ previousState,
-                                const int4 * __restrict__ currentState,
-                                real*  __restrict__ previousSurfaceEnergy,
-                                typename Potentials::SurfacePatches::Linker::EnergyTransverser transverser,
-                                typename Potentials::SurfacePatches::Linker::ComputationalData computationalData,
-                                const real surfaceEnergyThreshold,
-                                event* __restrict__ eventBuffer,
-                                int*   __restrict__ nEventsPerMonomer,
-                                int*                maxEvents){
+                                                 const int Nmonomers,
+                                                 const ullint bufferSize,
+                                                 const int* id2indexMonomers,
+                                                 const int* id2indexPatches,
+                                                 const int* id2indexSurfPatches,
+                                                 const int2 * __restrict__ monomer2patches,
+                                                 const int  * __restrict__ patch2monomer,
+                                                 const int  * __restrict__ monomer2surfPatches,
+                                                 int4 * __restrict__ previousState,
+                                                 const int4 * __restrict__ currentState,
+                                                 real*  __restrict__ previousSurfaceEnergy,
+                                                 typename Potentials::SurfacePatches::Linker::EnergyTransverser transverser,
+                                                 typename Potentials::SurfacePatches::Linker::ComputationalData computationalData,
+                                                 const real surfaceEnergyThreshold,
+                                                 event* __restrict__ eventBuffer,
+                                                 int*   __restrict__ nEventsPerMonomer,
+                                                 int*                maxEvents){
 
                         //One thread per monomer
                         const int id = blockIdx.x*blockDim.x + threadIdx.x;
@@ -265,27 +277,27 @@ namespace SimulationMeasures{
                         if(id >= Nmonomers) return;
 
                         recordPolimerizationEvents(id,
-                                        step,
-                                        Nmonomers,
-                                        bufferSize,
-                                        id2indexMonomers,id2indexPatches,
-                                        monomer2patches,patch2monomer,
-                                        previousState,
-                                        currentState,
-                                        eventBuffer,nEventsPerMonomer);
+                                                   step,
+                                                   Nmonomers,
+                                                   bufferSize,
+                                                   id2indexMonomers,id2indexPatches,
+                                                   monomer2patches,patch2monomer,
+                                                   previousState,
+                                                   currentState,
+                                                   eventBuffer,nEventsPerMonomer);
 
                         recordSurfaceEvents(id,
-                                        step,
-                                        Nmonomers,
-                                        bufferSize,
-                                        id2indexMonomers,id2indexSurfPatches,
-                                        monomer2surfPatches,
-                                        previousSurfaceEnergy,
-                                        transverser,
-                                        computationalData,
-                                        surfaceEnergyThreshold,
-                                        eventBuffer,
-                                        nEventsPerMonomer);
+                                            step,
+                                            Nmonomers,
+                                            bufferSize,
+                                            id2indexMonomers,id2indexSurfPatches,
+                                            monomer2surfPatches,
+                                            previousSurfaceEnergy,
+                                            transverser,
+                                            computationalData,
+                                            surfaceEnergyThreshold,
+                                            eventBuffer,
+                                            nEventsPerMonomer);
 
                         atomicMax(maxEvents, nEventsPerMonomer[id]);
                 }
@@ -354,11 +366,12 @@ namespace SimulationMeasures{
                         static thrust::host_vector<int>                       nEventsPerMonomerRead;
                         static thrust::host_vector<PatchPolymers_ns::event>   eventBufferRead;
 
-                        void writeEvents(){
+                        void processEvents(){
 
                                 //Get the ids of the particles in the group
+                                //Here is the place where we particularize the group of particles
                                 auto pgIds = this->pg->getPropertyIterator(this->pd->getId(access::location::cpu, access::mode::read).begin(),
-                                                access::location::cpu);
+                                                                           access::location::cpu);
 
                                 eventWriteBuffer.resize(0);
 
@@ -366,18 +379,18 @@ namespace SimulationMeasures{
                                         int id = pgIds[i];
                                         for(int n=0; n < nEventsPerMonomerRead[id]; n++){
                                                 PatchPolymers_ns::event e = UAMMD_GET_2D_ROW_MAJOR(eventBufferRead,
-                                                                bufferSize+6, this->pd->getNumParticles(),
-                                                                n, id);
+                                                                                                   bufferSize+6, this->pd->getNumParticles(),
+                                                                                                   n, id);
                                                 eventWriteBuffer.push_back(e);
                                         }
                                 }
 
                                 //Sort the events by step and id
                                 std::sort(eventWriteBuffer.begin(), eventWriteBuffer.end(),
-                                                [](const PatchPolymers_ns::event& a, const PatchPolymers_ns::event& b){
-                                                if(a.step == b.step) return a.id < b.id;
-                                                else return a.step < b.step;
-                                                });
+                                          [](const PatchPolymers_ns::event& a, const PatchPolymers_ns::event& b){
+                                          if(a.step == b.step) return a.id < b.id;
+                                          else return a.step < b.step;
+                                          });
 
                                 //Write the events to the file in binary format
                                 for(auto e : eventWriteBuffer){
@@ -386,30 +399,40 @@ namespace SimulationMeasures{
                         }
 
                         void resetBuffer(cudaStream_t st){
+                            // Reset the buffer copying the events to the CPU and resetting the GPU buffer
+                            // The array eventBufferRead is used to store the events in the CPU
+                            // The array nEventsPerMonomerRead is used to store the number of events per monomer in the CPU
 
-                                eventBufferRead       = eventBufferGPU;
-                                nEventsPerMonomerRead = nEventsPerMonomerGPU;
+                            eventBufferRead       = eventBufferGPU;
+                            nEventsPerMonomerRead = nEventsPerMonomerGPU;
 
-                                /////////////////////////////////////////////
+                            /////////////////////////////////////////////
 
-                                maxEventsCPU[0] = 0;
-                                cudaMemcpyAsync(thrust::raw_pointer_cast(maxEventsGPU.data()), maxEventsCPU,
-                                                sizeof(int), cudaMemcpyHostToDevice,st);
+                            //We reset the maxEvents to 0
+                            maxEventsCPU[0] = 0;
+                            cudaMemcpyAsync(thrust::raw_pointer_cast(maxEventsGPU.data()), maxEventsCPU,
+                                            sizeof(int), cudaMemcpyHostToDevice,st);
 
-                                std::fill(nEventsPerMonomerCPU.begin(),nEventsPerMonomerCPU.end(),0);
-                                nEventsPerMonomerGPU = nEventsPerMonomerCPU;
+                            //We reset the events counter per monomer to 0
+                            std::fill(nEventsPerMonomerCPU.begin(),nEventsPerMonomerCPU.end(),0);
+                            nEventsPerMonomerGPU = nEventsPerMonomerCPU;
 
-                                cudaStreamSynchronize(st);
+                            // WARNING: We do not reset the eventBufferGPU. We just overwrite the events in the buffer.
+                            // We get this behavior because we are resetting nEventsPerMonomerGPU to 0.
+                            // This array tells us where to write the next event in the buffer.
+                            // This is done for performance reasons. We do not need to reset the whole buffer, just the counter.
+
+                            cudaStreamSynchronize(st);
 
                         }
 
                 public:
 
                         PatchPolymers(std::shared_ptr<ParticleGroup>             pg,
-                                        std::shared_ptr<IntegratorManager>  integrator,
-                                        std::shared_ptr<ForceField>                 ff,
-                                        DataEntry& data,
-                                        std::string name):SimulationStepBase(pg,integrator,ff,data,name){
+                                      std::shared_ptr<IntegratorManager> integrator,
+                                      std::shared_ptr<ForceField>                ff,
+                                      DataEntry& data,
+                                      std::string name):SimulationStepBase(pg,integrator,ff,data,name){
 
                                 //Read the output file path
                                 outputFilePath = data.getParameter<std::string>("outputFilePath");
@@ -496,15 +519,15 @@ namespace SimulationMeasures{
                                         startType = types->getTypeId(startTypeName);
                                         endType   = types->getTypeId(endTypeName);
 
-                    //Check polymer has the correct type
-                    for(auto inte : polymerPatchyParticles->getPatchesInteractors()){
-                            if( polymerPatchyParticles->getPatchesInteractorInfo(inte.first).entryType    != "NonBondedPatches" or
-                               (polymerPatchyParticles->getPatchesInteractorInfo(inte.first).entrySubType != "HelixExponential" and
-                                polymerPatchyParticles->getPatchesInteractorInfo(inte.first).entrySubType != "HelixCosine")){
-                                    System::log<System::CRITICAL>("[PatchPolymers] The patches of the DynamicallyBondedPatchyParticles"
-                                                                  " must be NonBondedPatches of type HeliExponential or HelixCosine.");
-                            }
-                    }
+                                        //Check polymer has the correct type
+                                        for(auto inte : polymerPatchyParticles->getPatchesInteractors()){
+                                                if( polymerPatchyParticles->getPatchesInteractorInfo(inte.first).entryType    != "NonBondedPatches" or
+                                                   (polymerPatchyParticles->getPatchesInteractorInfo(inte.first).entrySubType != "HelixExponential" and
+                                                    polymerPatchyParticles->getPatchesInteractorInfo(inte.first).entrySubType != "HelixCosine")){
+                                                        System::log<System::CRITICAL>("[PatchPolymers] The patches of the DynamicallyBondedPatchyParticles"
+                                                                                      " must be NonBondedPatches of type HeliExponential or HelixCosine.");
+                                                }
+                                        }
                                 }
 
                                 if(isSurface){
@@ -518,7 +541,8 @@ namespace SimulationMeasures{
                                                 if(surfacePatchyParticles->getPatchesInteractorInfo(inte.first).entryType != "SurfacePatches"){
                                                         System::log<System::CRITICAL>("[PatchPolymers] The patches of the PatchyParticles must be SurfacePatches.");
                                                 } else {
-                                                        linker = std::dynamic_pointer_cast<typename Interactor::SingleInteractor<Potentials::SurfacePatches::Linker>>(inte.second)->getPotential();
+                                                        linker = std::dynamic_pointer_cast<typename Interactor::SingleInteractor<Potentials::SurfacePatches::Linker>>
+                                                        (inte.second)->getPotential();
                                                 }
                                         }
                                 }
@@ -679,7 +703,15 @@ namespace SimulationMeasures{
                                         }
                                         maxEventsGPU.resize(1);
 
-                                        eventBufferGPU.resize(this->pd->getNumParticles()*(bufferSize+6)); //6 is the number of events per particle
+                                        // COMMENT ABOUT THE SIZE OF THE BUFFER
+                                        // You can see that the size of the buffer is bufferSize+6.
+                                        // 6 comes from the number of event types. Summing 6 to the bufferSize we
+                                        // ensure that the buffer is big enough to store all the events. Somehow it is assuming
+                                        // that a particle can have all the events at the same time. This is not true
+                                        // (I think the maximum would be 4, or 2 since we are ignoring the negative direction events).
+                                        // But in any case, the buffer is big enough to store all the events and we do not expect out of bounds errors.
+
+                                        eventBufferGPU.resize(this->pd->getNumParticles()*(bufferSize+6)); //6 is the number of event types
                                         lastBufferStep = this->gd->getFundamental()->getCurrentStep();
 
                                         isBufferSet = true;
@@ -688,6 +720,7 @@ namespace SimulationMeasures{
                         }
 
                         ~PatchPolymers(){
+
                                 System::log<System::DEBUG>("[PatchPolymers] Destroying patch polymers.");
                                 if(isBufferSet){
 
@@ -728,24 +761,32 @@ namespace SimulationMeasures{
                                 }
 
                                 System::log<System::DEBUG>("[PatchPolymers] Writing remaining events to file.");
-                                writeEvents();
+                                processEvents();
                         }
 
-                        void applyStep(ullint step, cudaStream_t st) override {
+                        void update(ullint step, cudaStream_t st) override {
+
+                                //Update is called at each integration step. We record the events at each step (we record ALL the events).
+                                //Events are stored in a buffer. When the buffer is full, we write the events to a file and reset the buffer.
+                                //Events buffer is considered full when the maximum number of events is reached for a SINGLE monomer.
 
                                 if(!isBufferSet){
                                         System::log<System::CRITICAL>("[PatchPolymers] The buffer is not set.");
                                 }
 
                                 //Update buffer
-                                if(step > lastBufferStep or firstStep){
+                                if(step > lastBufferStep or firstStep){ // Comparing with lastBufferStep ensure that just one update is done across all the instances of the class.
+                                // The different instances can work over different groups of particles. But this group is only taken into account when writing the events to the file.
+                                // All the instances share the same buffer and the same buffer size, so we have to ensure that only one update is done across all the instances.
 
                                         if(firstStep){
+
+                                                //Init stuff. Here we assume that at beginning there are no polymers or patches attached to the surface.
 
                                                 auto polPPd = polymerPatchyParticles->getPatchesParticleData();
 
                                                 thrust::host_vector<int4> previousState_h(polPPd->getNumParticles(),{-1,-1,-1,-1});
-                                                previousState         = previousState_h;
+                                                previousState         =   previousState_h;
 
                                                 if(isSurface){
                                                         thrust::host_vector<real> previousSurfaceEnergy_h(this->pd->getNumParticles(),0.0);
@@ -784,42 +825,42 @@ namespace SimulationMeasures{
 
                                         if(!isSurface){
                                                 PatchPolymers_ns::recordEvents
-                                                        <<<Nblocks,Nthreads,0, st>>>(step,
-                                                                        Nmonomers,
-                                                                        bufferSize+6,
-                                                                        id2indexMonomers,
-                                                                        id2indexPatches,
-                                                                        thrust::raw_pointer_cast(monomer2patches.data()),
-                                                                        thrust::raw_pointer_cast(patch2monomer.data()),
-                                                                        thrust::raw_pointer_cast(previousState.data()),
-                                                                        currentState,
-                                                                        thrust::raw_pointer_cast(eventBufferGPU.data()),
-                                                                        thrust::raw_pointer_cast(nEventsPerMonomerGPU.data()),
-                                                                        thrust::raw_pointer_cast(maxEventsGPU.data()));
+                                                <<<Nblocks,Nthreads,0, st>>>(step,
+                                                                Nmonomers,
+                                                                bufferSize+6,
+                                                                id2indexMonomers,
+                                                                id2indexPatches,
+                                                                thrust::raw_pointer_cast(monomer2patches.data()),
+                                                                thrust::raw_pointer_cast(patch2monomer.data()),
+                                                                thrust::raw_pointer_cast(previousState.data()),
+                                                                currentState,
+                                                                thrust::raw_pointer_cast(eventBufferGPU.data()),
+                                                                thrust::raw_pointer_cast(nEventsPerMonomerGPU.data()),
+                                                                thrust::raw_pointer_cast(maxEventsGPU.data()));
                                         } else {
 
                                                 auto surfPPd = surfacePatchyParticles->getPatchesParticleData();
                                                 auto id2indexSurfPatches = surfPPd->getIdOrderedIndices(access::location::gpu);
 
                                                 PatchPolymers_ns::recordEventsSurf
-                                                        <<<Nblocks,Nthreads,0, st>>>(step,
-                                                                        Nmonomers,
-                                                                        bufferSize+6,
-                                                                        id2indexMonomers,
-                                                                        id2indexPatches,
-                                                                        id2indexSurfPatches,
-                                                                        thrust::raw_pointer_cast(monomer2patches.data()),
-                                                                        thrust::raw_pointer_cast(patch2monomer.data()),
-                                                                        thrust::raw_pointer_cast(monomer2surfPatches.data()),
-                                                                        thrust::raw_pointer_cast(previousState.data()),
-                                                                        currentState,
-                                                                        thrust::raw_pointer_cast(previousSurfaceEnergy.data()),
-                                                                        linker->getEnergyTransverser(),
-                                                                        linker->getComputationalData(Computables(),st),
-                                                                        surfaceEnergyThreshold,
-                                                                        thrust::raw_pointer_cast(eventBufferGPU.data()),
-                                                                        thrust::raw_pointer_cast(nEventsPerMonomerGPU.data()),
-                                                                        thrust::raw_pointer_cast(maxEventsGPU.data()));
+                                                <<<Nblocks,Nthreads,0, st>>>(step,
+                                                                Nmonomers,
+                                                                bufferSize+6,
+                                                                id2indexMonomers,
+                                                                id2indexPatches,
+                                                                id2indexSurfPatches,
+                                                                thrust::raw_pointer_cast(monomer2patches.data()),
+                                                                thrust::raw_pointer_cast(patch2monomer.data()),
+                                                                thrust::raw_pointer_cast(monomer2surfPatches.data()),
+                                                                thrust::raw_pointer_cast(previousState.data()),
+                                                                currentState,
+                                                                thrust::raw_pointer_cast(previousSurfaceEnergy.data()),
+                                                                linker->getEnergyTransverser(),
+                                                                linker->getComputationalData(Computables(),st),
+                                                                surfaceEnergyThreshold,
+                                                                thrust::raw_pointer_cast(eventBufferGPU.data()),
+                                                                thrust::raw_pointer_cast(nEventsPerMonomerGPU.data()),
+                                                                thrust::raw_pointer_cast(maxEventsGPU.data()));
 
                                         }
 
@@ -831,6 +872,7 @@ namespace SimulationMeasures{
                                         CudaCheckError();
 
                                         int maxEvents = maxEventsCPU[0];
+                                        //Here we check if we have reached the maximum number of events for a single monomer
                                         if(maxEvents > bufferSize){
                                                 if(lastUpdateStep == std::numeric_limits<ullint>::max()){
                                                         System::log<System::DEBUG>("[PatchPolymers] Buffer full. "
@@ -845,18 +887,24 @@ namespace SimulationMeasures{
                                                 }
 
                                                 resetBuffer(st);
-
                                                 lastUpdateStep = step;
+                                                // We can access the buffer in the CPU and write the events to the file.
+                                                // The information is stored in the CPU arrays eventBufferRead and nEventsPerMonomerRead.
                                         }
-
                                         lastBufferStep = step;
 
                                 }
 
                                 if(step == lastUpdateStep){
-                                        writeEvents();
+                                        // This means that the buffer has been reset in this step.
+                                        // It is ensured that the buffer information is stored in the CPU arrays eventBufferRead and nEventsPerMonomerRead.
+                                        processEvents();
                                 }
 
+                        }
+
+                        void applyStep(ullint step, cudaStream_t st) override {
+                            System::log<System::MESSAGE>("[PatchPolymers] Applying step %llu.", step);
                         }
 
         };
