@@ -9,6 +9,9 @@
 
 #include "Definitions/Matrices.cuh"
 
+//TODO: Add batch offset logic. Currently, if the batch ids of the particles are in the range [batchOffset,batchOffset+nBatches-1], then the memory used is
+//      (batchOffset+nBatches)*nPairTypes*nPairTypes*sizeof(PairParameters). This is not optimal. We should use only nBatches*nPairTypes*nPairTypes*sizeof(PairParameters) memory.
+
 namespace uammd{
 namespace structured{
 
