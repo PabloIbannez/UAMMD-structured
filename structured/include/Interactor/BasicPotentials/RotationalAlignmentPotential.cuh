@@ -5,8 +5,6 @@
 
 #include "Utils/Maths/MatrixOperations.cuh"
 
-#include "Interactor/BasicPotentials/StiffnessMask.cuh"
-
 namespace uammd{
 namespace structured{
 namespace Potentials{

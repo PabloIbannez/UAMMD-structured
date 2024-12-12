@@ -24,10 +24,12 @@ namespace Bond2{
         };
 
         //Potential parameters
-        struct StorageData{
-        };
+        struct StorageData{};
 
-        struct BondParameters{};
+        struct BondParameters{
+            real K;
+            Quat R;// Rotation encoded as a quaternion
+        };
 
         //Computational data getter
 
@@ -67,17 +69,31 @@ namespace Bond2{
                                                              std::map<std::string,T>& bondParametersMap){
 
             BondParameters param;
+            param.K   = bondParametersMap.at("K");
+            real4 R   = bondParametersMap.at("R");
+            param.R   = Quat(R);
             return param;
         }
 
         //Energy and force definition
-
         static inline __device__ real energy(int index_i, int index_j,
                                              int currentParticleIndex,
                                              const ComputationalData &computational,
                                              const BondParameters &bondParam){
 
-            real e;
+
+            const tensor3 A = MatrixOperations::quat2mat(computational.dir[index_i]);
+            const tensor3 B = MatrixOperations::quat2mat(computational.dir[index_j]);
+
+            real    K = bondParam.K;
+            tensor3 R = MatrixOperations::quat2mat(bondParam.R);
+
+            if(index_j == currentParticleIndex){
+                R = R.transpose();
+            }
+
+            real e = BasicPotentials::RAP::energy(A, B, R);
+
             return e;
         }
 
@@ -86,6 +102,21 @@ namespace Bond2{
                                                          const ComputationalData &computational,
                                                          const BondParameters &bondParam){
             ForceTorque forceTorque;
+            forceTorque.force = make_real4(0.0);
+
+            const tensor3 A = MatrixOperations::quat2mat(computational.dir[index_i]);
+            const tensor3 B = MatrixOperations::quat2mat(computational.dir[index_j]);
+
+            real    K = bondParam.K;
+            tensor3 R = MatrixOperations::quat2mat(bondParam.R);
+
+            if(index_j == currentParticleIndex){
+                R = R.transpose();
+            }
+
+            real3 t = -K*BasicPotentials::RAP::torque(A, B, R)/real(4.0);
+            forceTorque.torque = make_real4(t, 0.0);
+
             return forceTorque;
         }
 
