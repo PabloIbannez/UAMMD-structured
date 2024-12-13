@@ -15,9 +15,9 @@ c = parameters['c']
 
 sigma = parameters['sigma']
 
-E       = parameters['E']
-rc      = parameters['rc']
-r_start = parameters['r_start']
+E  = parameters['E']
+K  = parameters['K']
+rc = parameters['rc']
 
 dt           = parameters['dt']
 nSteps       = parameters['nSteps']
@@ -38,8 +38,8 @@ print('N =', N)
 print('c =', c)
 print('sigma =', sigma)
 print('E =', E)
+print('K =', K)
 print('rc =', rc)
-print('r_start =', r_start)
 
 # c = N/L^3
 L = (N/c)**(1.0/3.0)
@@ -171,10 +171,10 @@ simulation["topology"]["forceField"]["cosine"]["patchesTopology"]["forceField"][
 simulation["topology"]["forceField"]["cosine"]["patchesTopology"]["forceField"]["cosine"]={}
 simulation["topology"]["forceField"]["cosine"]["patchesTopology"]["forceField"]["cosine"]["type"]       =  ["NonBondedPatches", "DistanceSwitchCosine"]
 simulation["topology"]["forceField"]["cosine"]["patchesTopology"]["forceField"]["cosine"]["parameters"] =  {"condition":"all"}
-simulation["topology"]["forceField"]["cosine"]["patchesTopology"]["forceField"]["cosine"]["labels"]     =  ["name_i", "name_j", "E", "r_start", "rc"]
+simulation["topology"]["forceField"]["cosine"]["patchesTopology"]["forceField"]["cosine"]["labels"]     =  ["name_i", "name_j", "E", "K", "rc"]
 simulation["topology"]["forceField"]["cosine"]["patchesTopology"]["forceField"]["cosine"]["data"]       =  []
 
-d = ["P", "P", E, r_start, rc]
+d = ["P", "P", E, K, rc]
 
 simulation["topology"]["forceField"]["cosine"]["patchesTopology"]["forceField"]["cosine"]["data"].append(d)
 

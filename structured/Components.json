@@ -212,7 +212,6 @@
         ],
         "Patches": [
             ["SurfacePatches", "Linker", "Linker.cu"],
-            ["NonBondedPatches", "DistanceSwitchExponential", "DistanceSwitch.cu"],
             ["NonBondedPatches", "DistanceSwitchCosine", "DistanceSwitch.cu"]
         ],
         "AFM": [

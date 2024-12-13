@@ -16,8 +16,10 @@ from tqdm import tqdm
 
 Eb_sym = sp.symbols("Eb_sym")
 
-r_s_sym = sp.symbols("r_s_sym")
+K_sym  = sp.symbols("K_sym")
 rc_sym = sp.symbols("rc_sym")
+
+x = sp.symbols('x')
 
 # Define position vectors for the start and end particles
 r_start = sp.Matrix(sp.symbols('r_sx r_sy r_sz'))
@@ -62,17 +64,21 @@ def analyticPotential():
 
     r = sp.sqrt((c_i_lab[0]-c_j_lab[0])**2 + (c_i_lab[1]-c_j_lab[1])**2 + (c_i_lab[2]-c_j_lab[2])**2)
 
-    normalized_r = (r - r_s_sym)/(rc_sym - r_s_sym)
+    normalized_r = r/rc_sym
 
-    Ub = sp.Piecewise((-1.0,r < r_s_sym),
-                      (-sp.cos(sp.pi*normalized_r),(r >= r_s_sym) & (r <= rc_sym)),
+    swt = (1.0/2.0)*(1.0 - sp.cos(sp.pi*normalized_r))
+
+    def g(x,K):
+        return (K*x)/(K*x + (1.0 - x))
+
+    Ub = sp.Piecewise((g(swt,K_sym),r < rc_sym),
                       ( 1.0,r > rc_sym))
 
-    Ub = (1.0 - Ub)/2.0
+    Ub = (Ub - 1.0)
 
     ####################################################
 
-    U = -Eb_sym*Ub
+    U = Eb_sym*Ub
 
     #print("Computing S force ...")
     Uforce   = -U.diff(r_start)
@@ -90,7 +96,7 @@ def analyticPotential():
 
     # Lambdify all the expressions
     var_list = [Eb_sym,
-                r_s_sym,
+                K_sym,
                 rc_sym,
                 r_start[0],r_start[1],r_start[2],
                 r_end[0],r_end[1],r_end[2],
@@ -116,7 +122,7 @@ def evalAnalytic(analyticExpression,
                  cn_i,cn_j,
                  pos_i,pos_j, # Parent
                  ori_i,ori_j,Eb,
-                 r_s,rc):
+                 K,rc):
 
     cn_s  = cn_i
     pos_s = pos_i
@@ -127,7 +133,7 @@ def evalAnalytic(analyticExpression,
     ori_e = ori_j
 
     analyticEval = analyticExpression(Eb,
-                                      r_s,rc,
+                                      K,rc,
                                       pos_s[0],pos_s[1],pos_s[2],
                                       pos_e[0],pos_e[1],pos_e[2],
                                       ori_s[0,0],ori_s[1,0],ori_s[2,0],
@@ -146,7 +152,7 @@ def computePerParticleEnergyForceTorque(pos,ori,
                                         box,
                                         Eb,
                                         sigma,
-                                        r_s,rc,
+                                        K,rc,
                                         conn_X_up,conn_X_down,
                                         conn_Y_up,conn_Y_down,
                                         conn_Z_up,conn_Z_down):
@@ -305,7 +311,7 @@ def computePerParticleEnergyForceTorque(pos,ori,
                                       cn_i,cn_j,
                                       pos_i,pos_j,
                                       ori_i,ori_j,Eb,
-                                      r_s,rc)
+                                      K,rc)
 
             if bondEnergy/2.0 < minimalEnergy:
                 minimalEnergy = bondEnergy/2.0
@@ -320,7 +326,7 @@ def computePerParticleEnergyForceTorque(pos,ori,
                               cn_i,cn_j,
                               pos_i,pos_j,
                               ori_i,ori_j,Eb,
-                              r_s,rc)
+                              K,rc)
 
             localForce  += np.asarray([float(x) for x in fs])
 
@@ -329,7 +335,7 @@ def computePerParticleEnergyForceTorque(pos,ori,
                               cn_i,cn_j,
                               pos_i,pos_j,
                               ori_i,ori_j,Eb,
-                              r_s,rc)
+                              K,rc)
 
             localTorque += np.asarray([float(x) for x in ts])
 

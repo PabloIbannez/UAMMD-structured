@@ -69,8 +69,8 @@ cosineParams = {l:d for l,d in zip(cosineParamsLabels, cosineParamsData)}
 
 Eb = cosineParams["E"]
 
-r_start = cosineParams["r_start"]
-rc      = cosineParams["rc"]
+K  = cosineParams["K"]
+rc = cosineParams["rc"]
 
 connections = sim["topology"]["forceField"]["cosine"]["patchesState"]["data"]
 
@@ -138,7 +138,7 @@ energyTheo,forcesTheo,torquesTheo,bonds = computePerParticleEnergyForceTorque(po
                                                                               box,
                                                                               Eb,
                                                                               sigma,
-                                                                              r_start,rc,
+                                                                              K,rc,
                                                                               conn_X_up,conn_X_down,
                                                                               conn_Y_up,conn_Y_down,
                                                                               conn_Z_up,conn_Z_down)
@@ -246,7 +246,7 @@ energyTheo,forcesTheo,torquesTheo,_ = computePerParticleEnergyForceTorque(positi
                                                                           box,
                                                                           Eb,
                                                                           sigma,
-                                                                          r_start,rc,
+                                                                          K,rc,
                                                                           conn_X_up,conn_X_down,
                                                                           conn_Y_up,conn_Y_down,
                                                                           conn_Z_up,conn_Z_down)
