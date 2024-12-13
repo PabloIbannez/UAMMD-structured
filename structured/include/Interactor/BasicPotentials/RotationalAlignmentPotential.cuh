@@ -22,8 +22,8 @@ namespace RAP{
     }
 
     static inline __device__ real3 torque(const tensor3& A, const tensor3& B, const tensor3& R){
-        tensor3 denergydA = -MatrixOperations::matmul(B, R.transpose());
-        return MatrixOperations::Pi(A, denergydA);
+        tensor3 denergydA = MatrixOperations::matmul(B, R.transpose());
+        return -MatrixOperations::Pi(A, denergydA);
     }
 
 }}}}}

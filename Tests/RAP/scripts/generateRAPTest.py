@@ -24,8 +24,6 @@ temperature = param["temperature"]
 mass   = param["mass"]
 radius = param["radius"]
 
-Kh = param["Kh"]
-
 Krap = param["Krap"]
 R    = param["R"]
 
@@ -84,10 +82,11 @@ simulation["state"]["data"] = []
 
 previous = np.zeros(3)
 for i in range(N):
-    x = b*i
-    y = 0.0
-    z = 0.0
-    simulation["state"]["data"].append([i,[x,y,z],[0.0,0.0,0.0,1.0]])
+    # Generate a random quaternion
+    q = np.random.rand(4)
+    q /= np.linalg.norm(q)
+    q = q.tolist()
+    simulation["state"]["data"].append([i,[0.0,0.0,0.0],q])
 
 simulation["topology"] = {}
 simulation["topology"]["structure"] = {}
@@ -98,14 +97,6 @@ for i in range(N):
     simulation["topology"]["structure"]["data"].append([i, "A"])
 
 simulation["topology"]["forceField"] = {}
-
-simulation["topology"]["forceField"]["harmonic"] = {}
-simulation["topology"]["forceField"]["harmonic"]["type"]   = ["Bond2", "Harmonic"]
-simulation["topology"]["forceField"]["harmonic"]["labels"] = ["id_i", "id_j", "K", "r0"]
-simulation["topology"]["forceField"]["harmonic"]["data"]   = []
-
-for i in range(N-1):
-    simulation["topology"]["forceField"]["harmonic"]["data"].append([i, i+1, Kh, b])
 
 simulation["topology"]["forceField"]["rap"] = {}
 simulation["topology"]["forceField"]["rap"]["type"]   = ["Bond2", "RAP"]
@@ -123,6 +114,28 @@ simulation["simulationStep"][f"write"]["parameters"] = {}
 simulation["simulationStep"][f"write"]["parameters"]["intervalStep"]   = nStepsOutput
 simulation["simulationStep"][f"write"]["parameters"]["outputFilePath"] = f"output"
 simulation["simulationStep"][f"write"]["parameters"]["outputFormat"]   = "itpd"
+
+simulation["simulationStep"][f"writeSPO"] = {}
+simulation["simulationStep"][f"writeSPO"]["type"] = ["WriteStep", "WriteStep"]
+simulation["simulationStep"][f"writeSPO"]["parameters"] = {}
+simulation["simulationStep"][f"writeSPO"]["parameters"]["intervalStep"]   = nStepsOutput
+simulation["simulationStep"][f"writeSPO"]["parameters"]["outputFilePath"] = f"output"
+simulation["simulationStep"][f"writeSPO"]["parameters"]["outputFormat"]   = "spo"
+
+simulation["simulationStep"]["thermo"] = {}
+simulation["simulationStep"]["thermo"]["type"] = ["ThermodynamicMeasure","ThermodynamicQuantityMeasure"]
+simulation["simulationStep"]["thermo"]["parameters"] = {}
+simulation["simulationStep"]["thermo"]["parameters"]["intervalStep"] = nStepsOutput
+simulation["simulationStep"]["thermo"]["parameters"]["outputFilePath"] = "thermo.dat"
+
+#simulation["simulationStep"]["potMeasure"] = {}
+#simulation["simulationStep"]["potMeasure"]["type"] = ["ParticlesListMeasure","PotentialMeasure"]
+#simulation["simulationStep"]["potMeasure"]["parameters"] = {
+#        "intervalStep": 1,
+#        "outputFilePath": "pot.dat"
+#        }
+#simulation["simulationStep"]["potMeasure"]["labels"] = ["id"]
+#simulation["simulationStep"]["potMeasure"]["data"] = [[i] for i in range(N)]
 
 simulation["simulationStep"]["info"] = {}
 simulation["simulationStep"]["info"]["type"] = ["UtilsStep", "InfoStep"]

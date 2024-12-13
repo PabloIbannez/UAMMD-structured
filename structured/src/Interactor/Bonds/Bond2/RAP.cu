@@ -82,17 +82,22 @@ namespace Bond2{
                                              const BondParameters &bondParam){
 
 
-            const tensor3 A = MatrixOperations::quat2mat(computational.dir[index_i]);
-            const tensor3 B = MatrixOperations::quat2mat(computational.dir[index_j]);
 
             real    K = bondParam.K;
             tensor3 R = MatrixOperations::quat2mat(bondParam.R);
 
+            int otherParticleIndex;
             if(index_j == currentParticleIndex){
+                otherParticleIndex = index_i;
                 R = R.transpose();
+            } else {
+                otherParticleIndex = index_j;
             }
 
-            real e = BasicPotentials::RAP::energy(A, B, R);
+            const tensor3 A = MatrixOperations::quat2mat(computational.dir[currentParticleIndex]);
+            const tensor3 B = MatrixOperations::quat2mat(computational.dir[otherParticleIndex]);
+
+            real e = K*BasicPotentials::RAP::energy(A, B, R);
 
             return e;
         }
@@ -101,21 +106,35 @@ namespace Bond2{
                                                          int currentParticleIndex,
                                                          const ComputationalData &computational,
                                                          const BondParameters &bondParam){
-            ForceTorque forceTorque;
-            forceTorque.force = make_real4(0.0);
-
-            const tensor3 A = MatrixOperations::quat2mat(computational.dir[index_i]);
-            const tensor3 B = MatrixOperations::quat2mat(computational.dir[index_j]);
 
             real    K = bondParam.K;
             tensor3 R = MatrixOperations::quat2mat(bondParam.R);
 
+            int otherParticleIndex;
             if(index_j == currentParticleIndex){
+                otherParticleIndex = index_i;
                 R = R.transpose();
+            } else {
+                otherParticleIndex = index_j;
             }
 
-            real3 t = -K*BasicPotentials::RAP::torque(A, B, R)/real(4.0);
-            forceTorque.torque = make_real4(t, 0.0);
+            const tensor3 A = MatrixOperations::quat2mat(computational.dir[currentParticleIndex]);
+            const tensor3 B = MatrixOperations::quat2mat(computational.dir[otherParticleIndex]);
+
+            ForceTorque forceTorque;
+            forceTorque.force = make_real4(0.0);
+
+            real3 t = K*BasicPotentials::RAP::torque(A, B, R)/real(4.0);
+            forceTorque.torque = make_real4(t);
+
+            //real e = K*BasicPotentials::RAP::energy(A, B, R);
+            //printf("curr %i, i:%i, j:%i, Energy: %f, Torque: %f %f %f\n", currentParticleIndex, index_i, index_j, e, t.x, t.y, t.z);
+            //printf("Torque: %f %f %f\n", t.x, t.y, t.z);
+            //printf("qR: n:%f x:%f y:%f z:%f, Rmatrix: %f %f %f\n %f %f %f\n %f %f %f\n\n\n",
+            //       bondParam.R.n, bondParam.R.v.x, bondParam.R.v.y, bondParam.R.v.z,
+            //       R.xx, R.xy, R.xz,
+            //       R.yx, R.yy, R.yz,
+            //       R.zx, R.zy, R.zz);
 
             return forceTorque;
         }
