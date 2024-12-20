@@ -109,7 +109,7 @@ namespace NonBondedPatches{
 
             const real r2 = dot(rij, rij);
 
-            real4 fe = make_real4(0.0);
+            real4 fe = make_real4(0.0,0.0,0.0,E);
             real3 t  = make_real3(0.0);
 
             if(r2<=rc*rc){
@@ -119,9 +119,10 @@ namespace NonBondedPatches{
 
             EnergyForceTorque eFrcTrq;
 
-            eFrcTrq.energy = fe.w;
+            eFrcTrq.energy = fe.w - E;
             eFrcTrq.force  = make_real4(make_real3(fe),0.0);
             eFrcTrq.torque = make_real4(t,0.0);
+
 
             return eFrcTrq;
 
