@@ -124,7 +124,7 @@ namespace Bond2{
             ForceTorque forceTorque;
             forceTorque.force = make_real4(0.0);
 
-            real3 t = K*BasicPotentials::RAP::torque(A, B, R)/real(4.0);
+            real3 t = K*BasicPotentials::RAP::torque(A, B, R);
             forceTorque.torque = make_real4(t);
 
             //real e = K*BasicPotentials::RAP::energy(A, B, R);

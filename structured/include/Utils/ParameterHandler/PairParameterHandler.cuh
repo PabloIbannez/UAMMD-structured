@@ -33,6 +33,8 @@ namespace structured{
 
             std::map<std::tuple<std::string,std::string,int>,PairParameters> pairParameters;
 
+            bool symmetric = PairType::symmetric;
+
             int nPairTypes;
 
             bool isBatched;
@@ -46,10 +48,14 @@ namespace structured{
                 auto newp = PairType::processPairParameters(p);
 
                 UAMMD_SET_3D_ROW_MAJOR(pairParameters_cpu,nBatches,nPairTypes,nPairTypes,batchId,ti,tj,newp);
-                UAMMD_SET_3D_ROW_MAJOR(pairParameters_cpu,nBatches,nPairTypes,nPairTypes,batchId,tj,ti,newp);
+                if(symmetric){
+                    UAMMD_SET_3D_ROW_MAJOR(pairParameters_cpu,nBatches,nPairTypes,nPairTypes,batchId,tj,ti,newp);
+                }
 
                 //UAMMD_SET_3D_COL_MAJOR(pairParameters_cpu,nBatches,nPairTypes,nPairTypes,batchId,ti,tj,newp);
-                //UAMMD_SET_3D_COL_MAJOR(pairParameters_cpu,nBatches,nPairTypes,nPairTypes,batchId,tj,ti,newp);
+                //if(symmetric){
+                    //UAMMD_SET_3D_COL_MAJOR(pairParameters_cpu,nBatches,nPairTypes,nPairTypes,batchId,tj,ti,newp);
+                //}
 
                 ////////////////////////////////////////
 
@@ -60,12 +66,11 @@ namespace structured{
 
                     //Check if the inverse pair parameters have already been added
                     std::tuple<std::string,std::string,int> key2 = std::make_tuple(p.name_j, p.name_i, batchId);
-                    if(pairParameters.find(key2) != pairParameters.end() and p.name_i != p.name_j){
+                    if(pairParameters.find(key2) != pairParameters.end() and p.name_i != p.name_j and symmetric){
                         System::log<System::DEBUG>("[PairParameterHandler] Added pair paraemters (%s,%s) but inverse pair parameters (%s,%s) already exist. The inverse pair parameters will be overwritten.",
                                                     p.name_i.c_str(),p.name_j.c_str(),p.name_j.c_str(),p.name_i.c_str());
                     }
-                }
-                else{
+                } else {
                     System::log<System::CRITICAL>("[PairParameterHandler] Trying to add pair parameters for the same pair (%s,%s) twice!",
                                                   p.name_i.c_str(),p.name_j.c_str());
                 }

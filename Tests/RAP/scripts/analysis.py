@@ -18,7 +18,7 @@ with open(paramsFile) as f:
 temperature = params["temperature"]
 beta = 1.0 / temperature
 
-MC_steps = 1000000
+MC_steps = 10000000
 MC_equilibration = 1000
 MC_output = 100000
 

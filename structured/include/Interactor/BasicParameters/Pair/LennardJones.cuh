@@ -9,6 +9,8 @@ namespace BasicParameters{
 
         struct LennardJones {
 
+            static constexpr bool symmetric = true;
+
             struct InputPairParameters{
 
                 std::string name_i;

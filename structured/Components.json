@@ -212,7 +212,8 @@
         ],
         "Patches": [
             ["SurfacePatches", "Linker", "Linker.cu"],
-            ["NonBondedPatches", "DistanceSwitchCosine", "DistanceSwitch.cu"]
+            ["NonBondedPatches", "DistanceSwitchCosine", "DistanceSwitch.cu"],
+            ["NonBondedPatches", "COSRAP", "COSRAP.cu"]
         ],
         "AFM": [
             ["AFM", "SphericalTip", "SphericalTip.cu"],
