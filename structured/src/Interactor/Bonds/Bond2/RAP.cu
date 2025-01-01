@@ -17,10 +17,7 @@ namespace Bond2{
     struct RAP_{
 
         struct ComputationalData{
-            real4* pos;
             real4* dir;
-
-            Box    box;
         };
 
         //Potential parameters
@@ -43,10 +40,7 @@ namespace Bond2{
 
             std::shared_ptr<ParticleData> pd = pg->getParticleData();
 
-            computational.pos = pd->getPos(access::location::gpu, access::mode::read).raw();
             computational.dir = pd->getDir(access::location::gpu, access::mode::read).raw();
-
-            computational.box = gd->getEnsemble()->getBox();
 
             return computational;
         }

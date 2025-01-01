@@ -1,0 +1,22 @@
+{
+	"N":100,
+	"temperature":1.2,
+
+	"mass":1.0,
+	"radius":0.5,
+
+    "Khrm":100.0,
+    "Krap":50.0,
+
+    "helixRadius":1.5,
+    "helixPitch":5.0,
+
+	"viscosity":1.0,
+
+	"timeStep":0.0001,
+
+	"nSteps":1,
+	"nStepsOutput":1,
+
+    "perturbation":0.1
+}
