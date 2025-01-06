@@ -130,7 +130,7 @@ namespace Bond2{
 
             // RAP section
             real  Krap = bondParam.Krap;
-            real e_rap = Krap*BasicPotentials::RAP::energy(A, B, R);
+            real e_rap = BasicPotentials::RAP::energy(A, B, R, Krap);
             //
 
             return e_harm + e_rap;
@@ -193,12 +193,7 @@ namespace Bond2{
 
             // RAP section
             real   Krap = bondParam.Krap;
-            real3 t_rap = Krap*BasicPotentials::RAP::torque(A, B, R);
-
-            //printf("f_harm = %f %f %f, t_harm = %f %f %f, t_rap = %f %f %f\n",
-            //       forceTorque.force.x, forceTorque.force.y, forceTorque.force.z,
-            //       forceTorque.torque.x, forceTorque.torque.y, forceTorque.torque.z,
-            //       t_rap.x, t_rap.y, t_rap.z);
+            real3 t_rap = BasicPotentials::RAP::torque(A, B, R, Krap);
 
             forceTorque.torque += make_real4(t_rap);
 

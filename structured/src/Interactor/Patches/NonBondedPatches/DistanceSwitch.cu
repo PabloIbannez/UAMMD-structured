@@ -109,17 +109,17 @@ namespace NonBondedPatches{
 
             const real r2 = dot(rij, rij);
 
-            real4 fe = make_real4(0.0,0.0,0.0,E);
+            real4 fe = make_real4(0.0);
             real3 t  = make_real3(0.0);
 
             if(r2<=rc*rc){
-                fe = E*BasicPotentials::DistanceSwitchCosine::forceEnergy(rij,r2,rc,K);
-                t  = cross(make_real3(computational.patchesVector[index_i]),make_real3(fe));
+                fe = -E*BasicPotentials::DistanceSwitchCosine::forceEnergy(rij,r2,rc,K);
+                t  =  cross(make_real3(computational.patchesVector[index_i]),make_real3(fe));
             }
 
             EnergyForceTorque eFrcTrq;
 
-            eFrcTrq.energy = fe.w - E;
+            eFrcTrq.energy = fe.w;
             eFrcTrq.force  = make_real4(make_real3(fe),0.0);
             eFrcTrq.torque = make_real4(t,0.0);
 

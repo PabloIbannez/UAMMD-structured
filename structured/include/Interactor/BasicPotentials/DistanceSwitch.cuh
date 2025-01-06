@@ -13,7 +13,7 @@ namespace BasicPotentials{
     struct DistanceSwitchCosine{
 
         static inline __device__ real energy(const real3& rij, const real& r2,
-                                             real rc,real K){
+                                             const real& rc,const real& K){
 
             const real r = sqrtf(r2);
 
@@ -23,15 +23,15 @@ namespace BasicPotentials{
                 swt = real(1.0);
             } else {
                 swt = cosf(real(M_PI)*r/rc);
-                swt = real(0.5)*(real(1.0)-swt);
+                swt = real(0.5)*(real(1.0)+swt);
                 swt = StiffnessMask::stiffnessMask(swt,K);
             }
 
             return swt;
         }
 
-        static inline __device__ real3 force(const real3& rij, const real& r2,
-                                             real rc,real K){
+        static inline __device__ real3 force(const real3& rij,const real& r2,
+                                             const real& rc  ,const real& K){
 
             const real r = sqrtf(r2);
 
@@ -46,9 +46,9 @@ namespace BasicPotentials{
                 swt_der = real(0.0);
             } else {
                 swt = cosf(real(M_PI)*r/rc);
-                swt = real(0.5)*(real(1.0)-swt);
+                swt = real(0.5)*(real(1.0)+swt);
 
-                swt_der = (real(0.5)*real(M_PI)/rc)*sinf(real(M_PI)*r/rc);
+                swt_der = -(real(0.5)*real(M_PI)/rc)*sinf(real(M_PI)*r/rc);
 
                 swt_der = StiffnessMask::stiffnessMaskFirstDerivative(swt,K)*swt_der;
             }
@@ -59,7 +59,7 @@ namespace BasicPotentials{
         }
 
         static inline __device__ real4 forceEnergy(const real3& rij, const real& r2,
-                                                   real rc,real K){
+                                                   const real& rc,const real& K){
             const real r = sqrtf(r2);
 
             if(r < real(1e-6)){

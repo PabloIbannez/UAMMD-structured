@@ -91,7 +91,7 @@ namespace Bond2{
             const tensor3 A = MatrixOperations::quat2mat(computational.dir[currentParticleIndex]);
             const tensor3 B = MatrixOperations::quat2mat(computational.dir[otherParticleIndex]);
 
-            real e = K*BasicPotentials::RAP::energy(A, B, R);
+            real e = BasicPotentials::RAP::energy(A, B, R, K);
 
             return e;
         }
@@ -118,17 +118,8 @@ namespace Bond2{
             ForceTorque forceTorque;
             forceTorque.force = make_real4(0.0);
 
-            real3 t = K*BasicPotentials::RAP::torque(A, B, R);
+            real3 t = BasicPotentials::RAP::torque(A, B, R, K);
             forceTorque.torque = make_real4(t);
-
-            //real e = K*BasicPotentials::RAP::energy(A, B, R);
-            //printf("curr %i, i:%i, j:%i, Energy: %f, Torque: %f %f %f\n", currentParticleIndex, index_i, index_j, e, t.x, t.y, t.z);
-            //printf("Torque: %f %f %f\n", t.x, t.y, t.z);
-            //printf("qR: n:%f x:%f y:%f z:%f, Rmatrix: %f %f %f\n %f %f %f\n %f %f %f\n\n\n",
-            //       bondParam.R.n, bondParam.R.v.x, bondParam.R.v.y, bondParam.R.v.z,
-            //       R.xx, R.xy, R.xz,
-            //       R.yx, R.yy, R.yz,
-            //       R.zx, R.zy, R.zz);
 
             return forceTorque;
         }

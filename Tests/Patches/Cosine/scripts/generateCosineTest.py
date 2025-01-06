@@ -22,7 +22,11 @@ rc = parameters['rc']
 dt           = parameters['dt']
 nSteps       = parameters['nSteps']
 nStepsOutput = parameters['nStepsOutput']
-nStepsPot    = parameters['nStepsPot']
+
+if nSteps > 2:
+    ana = False
+else:
+    ana = True
 
 avoidPBC     = parameters.get('avoidPBC', False)
 
@@ -45,7 +49,7 @@ print('rc =', rc)
 L = (N/c)**(1.0/3.0)
 box = [L,L,L]
 
-if avoidPBC:
+if avoidPBC and ana:
     box[0] = 2.0*L
     box[1] = 2.0*L
     box[2] = 2.0*L
@@ -182,13 +186,14 @@ simulation["topology"]["forceField"]["cosine"]["patchesTopology"]["forceField"][
 
 simulation["simulationStep"] = {}
 
-simulation["simulationStep"]["pot"] = {}
-simulation["simulationStep"]["pot"]["type"] = ["ParticlesListMeasure", "PotentialMeasure"]
-simulation["simulationStep"]["pot"]["parameters"] = {}
-simulation["simulationStep"]["pot"]["parameters"]["intervalStep"]   = nStepsPot
-simulation["simulationStep"]["pot"]["parameters"]["outputFilePath"] = "pot.dat"
-simulation["simulationStep"]["pot"]["labels"] = ["id"]
-simulation["simulationStep"]["pot"]["data"]   = [[i] for i in range(N)]
+if ana:
+    simulation["simulationStep"]["pot"] = {}
+    simulation["simulationStep"]["pot"]["type"] = ["ParticlesListMeasure", "PotentialMeasure"]
+    simulation["simulationStep"]["pot"]["parameters"] = {}
+    simulation["simulationStep"]["pot"]["parameters"]["intervalStep"]   = 1
+    simulation["simulationStep"]["pot"]["parameters"]["outputFilePath"] = "pot.dat"
+    simulation["simulationStep"]["pot"]["labels"] = ["id"]
+    simulation["simulationStep"]["pot"]["data"]   = [[i] for i in range(N)]
 
 simulation["simulationStep"]["info"] = {}
 simulation["simulationStep"]["info"]["type"] = ["UtilsStep", "InfoStep"]

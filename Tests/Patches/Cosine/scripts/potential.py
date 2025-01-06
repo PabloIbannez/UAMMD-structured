@@ -66,19 +66,17 @@ def analyticPotential():
 
     normalized_r = r/rc_sym
 
-    swt = (1.0/2.0)*(1.0 - sp.cos(sp.pi*normalized_r))
+    swt = (1.0/2.0)*(1.0 + sp.cos(sp.pi*normalized_r))
 
     def g(x,K):
-        return (K*x)/(K*x + (1.0 - x))
+        return x/(x + K*(1.0 - x))
 
     Ub = sp.Piecewise((g(swt,K_sym),r < rc_sym),
-                      ( 1.0,r > rc_sym))
-
-    Ub = (Ub - 1.0)
+                      ( 0.0,r > rc_sym))
 
     ####################################################
 
-    U = Eb_sym*Ub
+    U = -Eb_sym*Ub
 
     #print("Computing S force ...")
     Uforce   = -U.diff(r_start)

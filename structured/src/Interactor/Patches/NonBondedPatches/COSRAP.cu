@@ -8,7 +8,7 @@
 #include "Interactor/Patches/PatchesFactory.cuh"
 
 #include "Interactor/BasicPotentials/DistanceSwitch.cuh"
-#include "Interactor/BasicPotentials/RotationalAlignmentPotential.cuh"
+#include "Interactor/BasicPotentials/OrientationSwitch.cuh"
 
 #include "Interactor/BasicParameters/Pair/SWTRAP.cuh"
 
@@ -80,8 +80,20 @@ namespace NonBondedPatches{
                 std::string name_j = std::get<1>(p.first);
                 int batchId        = std::get<2>(p.first);
 
+                auto symParam = pairsParam[std::make_tuple(name_j,name_i,batchId)];
+
+                // Check E,rc,Kswt,Krap are the same
+                if(p.second.E    != symParam.E)   {System::log<System::CRITICAL>("[COSRAP] The energy E for i: %s and j: %s is not the same",
+                                                                                 name_i.c_str(),name_j.c_str());}
+                if(p.second.rc   != symParam.rc)  {System::log<System::CRITICAL>("[COSRAP] The cut-off rc for i: %s and j: %s is not the same",
+                                                                                 name_i.c_str(),name_j.c_str());}
+                if(p.second.Kswt != symParam.Kswt){System::log<System::CRITICAL>("[COSRAP] The Kswt for i: %s and j: %s is not the same",
+                                                                                 name_i.c_str(),name_j.c_str());}
+                if(p.second.Krap != symParam.Krap){System::log<System::CRITICAL>("[COSRAP] The Krap for i: %s and j: %s is not the same",
+                                                                                 name_i.c_str(),name_j.c_str());}
+
                 real4 Rij_q = p.second.R;
-                real4 Rji_q = pairsParam[std::make_tuple(name_j,name_i,batchId)].R;
+                real4 Rji_q = symParam.R;
 
                 // Check if Rij.T=Rji
                 tensor3 Rij = MatrixOperations::quat2mat(Rij_q);
@@ -175,15 +187,18 @@ namespace NonBondedPatches{
                 real3 f_cos = make_real3(fe_cos);
                 real3 t_cos = cross(make_real3(computational.patchesVector[index_i]),f_cos);
 
-                EnergyForceTorque eFrcTrq_rap = BasicPotentials::RAP::Stiffness::energyForceTorque(ori_i,ori_j,R,Krap);
+                EnergyForceTorque eFrcTrq_rap = BasicPotentials::OrientationSwitch::Stiffness::energyForceTorque(ori_i,ori_j,R,Krap);
 
                 real  e_rap = eFrcTrq_rap.energy;
                 //real3 f_rap = make_real3(eFrcTrq_rap.force); //Not used since it is zero
                 real3 t_rap = make_real3(eFrcTrq_rap.torque);
 
-                e = E*(e_cos*e_rap-real(1.0));
-                f = E*f_cos*e_rap;
-                t = E*(t_cos*e_rap+t_rap*e_cos);
+                e = -E*e_cos*e_rap;
+                f = -E*f_cos*e_rap;
+                t = -E*(e_cos*t_rap + t_cos*e_rap);
+
+                //printf("e: %f f: %f %f %f t: %f %f %f,e_cos: %f f_cos: %f %f %f t_cos: %f %f %f,e_rap: %f t_rap: %f\n",
+                //       e,f.x,f.y,f.z,t.x,t.y,t.z,e_cos,f_cos.x,f_cos.y,f_cos.z,t_cos.x,t_cos.y,t_cos.z,e_rap,t_rap);
             }
 
             EnergyForceTorque eFrcTrq;

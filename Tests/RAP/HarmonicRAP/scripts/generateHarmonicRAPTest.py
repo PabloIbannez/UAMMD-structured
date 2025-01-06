@@ -137,19 +137,26 @@ for i in range(N):
     q = qt.from_rotation_matrix(ori[i])
 
     # Generate small random translation
-    translation = np.random.uniform(-perturbation,perturbation,3)
-    p += translation
+    if nSteps > 1:
+        pass
+    else:
+        translation = np.random.uniform(-perturbation,perturbation,3)
+        p += translation
 
     # Generate small random rotation
     # Generate random rotation axis
     axis = np.random.uniform(-1.0,1.0,3)
     axis /= np.linalg.norm(axis)
     # Generate random rotation angle
-    angle = np.random.uniform(-np.pi,np.pi)*perturbation
-    rot = Rotation.from_rotvec(angle*axis).as_matrix()
-    rot = qt.from_rotation_matrix(rot)
+    if nSteps > 1:
+        q = qt.as_float_array(q)
+    else:
+        angle = np.random.uniform(-np.pi,np.pi)*perturbation
+        rot = Rotation.from_rotvec(angle*axis).as_matrix()
+        rot = qt.from_rotation_matrix(rot)
 
-    q = qt.as_float_array(q*rot)
+        q = qt.as_float_array(q*rot)
+
     simulation["state"]["data"].append([i,p.tolist(),q.tolist()])
 
 simulation["topology"] = {}
@@ -192,14 +199,17 @@ simulation["simulationStep"]["thermo"]["parameters"] = {}
 simulation["simulationStep"]["thermo"]["parameters"]["intervalStep"] = nStepsOutput
 simulation["simulationStep"]["thermo"]["parameters"]["outputFilePath"] = "thermo.dat"
 
-simulation["simulationStep"]["potMeasure"] = {}
-simulation["simulationStep"]["potMeasure"]["type"] = ["ParticlesListMeasure","PotentialMeasure"]
-simulation["simulationStep"]["potMeasure"]["parameters"] = {
-        "intervalStep": 1,
-        "outputFilePath": "pot.dat"
-        }
-simulation["simulationStep"]["potMeasure"]["labels"] = ["id"]
-simulation["simulationStep"]["potMeasure"]["data"] = [[i] for i in range(N)]
+if nSteps > 1:
+    pass
+else:
+    simulation["simulationStep"]["potMeasure"] = {}
+    simulation["simulationStep"]["potMeasure"]["type"] = ["ParticlesListMeasure","PotentialMeasure"]
+    simulation["simulationStep"]["potMeasure"]["parameters"] = {
+            "intervalStep": 1,
+            "outputFilePath": "pot.dat"
+            }
+    simulation["simulationStep"]["potMeasure"]["labels"] = ["id"]
+    simulation["simulationStep"]["potMeasure"]["data"] = [[i] for i in range(N)]
 
 simulation["simulationStep"]["info"] = {}
 simulation["simulationStep"]["info"]["type"] = ["UtilsStep", "InfoStep"]

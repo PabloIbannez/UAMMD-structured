@@ -91,7 +91,7 @@ simulation = pyUAMMD.simulation()
 simulation["system"] = {
     "info": {
         "type": ["Simulation", "Information"],
-        "parameters": {"name": "dynamicExponentialTest"}
+        "parameters": {"name": "dynamicCosineTest"}
     }
 }
 
@@ -224,7 +224,7 @@ simulation["topology"]["forceField"]["wca"] = {
 }
 
 # Set up patchy interactions
-simulation["topology"]["forceField"]["exponential"] = {
+simulation["topology"]["forceField"]["cosine"] = {
     "type": ["PatchyParticles", "DynamicallyBondedPatchyParticles"],
     "patchesState": {
         "labels": ["id", "position"],
@@ -251,8 +251,8 @@ simulation["topology"]["forceField"]["exponential"] = {
                 "type": ["VerletConditionalListSet", "all"],
                 "parameters": {"cutOffVerletFactor": 1.2}
             },
-            "exponential": {
-                "type": ["NonBondedPatches", "DistanceSwitchExponential"],
+            "cosine": {
+                "type": ["NonBondedPatches", "DistanceSwitchCosine"],
                 "parameters": {"condition": "all"},
                 "labels": ["name_i", "name_j", "E", "K", "rc"],
                 "data": [["P", "P", E, Kb, rc]]
@@ -267,8 +267,8 @@ for i in range(N):
     patches = [connectionXup, connectionXdown, connectionYup, connectionYdown, connectionZup, connectionZdown]
     for j, patch in enumerate(patches):
         patch_id = index + j
-        simulation["topology"]["forceField"]["exponential"]["patchesState"]["data"].append([patch_id, patch])
-        simulation["topology"]["forceField"]["exponential"]["patchesTopology"]["structure"]["data"].append([patch_id, "P", i])
+        simulation["topology"]["forceField"]["cosine"]["patchesState"]["data"].append([patch_id, patch])
+        simulation["topology"]["forceField"]["cosine"]["patchesTopology"]["structure"]["data"].append([patch_id, "P", i])
 
 # %% [markdown]
 # ## Configure Simulation Steps
