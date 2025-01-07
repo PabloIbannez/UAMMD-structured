@@ -983,8 +983,8 @@ namespace SimulationMeasures{
 	        		}
 
 	        		//Create polymer, starting with id2
-	        		resultingPolymerId2 = createPolymer(step,tmp);
 	        		resultingPolymerId1 = polymerId1;
+	        		resultingPolymerId2 = createPolymer(step,tmp);
 
 	        	} else {
                     System::log<System::CRITICAL>("[PatchPolymers] Trying to split polymers (4)");
@@ -995,7 +995,7 @@ namespace SimulationMeasures{
 
             //Event processing functions
 
-            void processEvents(){
+            void processEvents(const ullint& step){
 
                 //Get the ids of the particles in the group
                 //Here is the place where we particularize the group of particles
@@ -1040,14 +1040,16 @@ namespace SimulationMeasures{
                     e.id -= idOffset;
 
                     System::log<System::DEBUG>("[PatchPolymers] Processing event, "
-                                               "step: %llu, id: %d, type: %d (0: Pp, 1: Pn, 2: Dp, 3: Dn, 4: S, 5: B), info: %d",
-                                               e.step,e.id,type,e.info);
+                                                 "step: %llu, id: %d, type: %d (0: Pp, 1: Pn, 2: Dp, 3: Dn, 4: S, 5: B), info: %d. Instance: %s",
+                                                 e.step,e.id,type,e.info,this->name.c_str());
 
 		            if       (type == PatchPolymers_ns::eventType::Pp){ //polymerization positive direction
                         System::log<System::DEBUG>("[PatchPolymers] Processing polymerization event.");
+                        e.info -= idOffset; //The info is the second monomer
 		            	processPolymerization(e);
 		            } else if(type == PatchPolymers_ns::eventType::Dp){ //depolymerization positive direction
                         System::log<System::DEBUG>("[PatchPolymers] Processing depolymerization event.");
+                        e.info -= idOffset; //The info is the second monomer
 		            	processDepolymerization(e);
 		            } else if(type == PatchPolymers_ns::eventType::S){ //from bulk to surface
                         System::log<System::DEBUG>("[PatchPolymers] Processing bulk to surface event.");
@@ -1319,7 +1321,7 @@ namespace SimulationMeasures{
                 }
 
                 System::log<System::DEBUG>("[PatchPolymers] Writing remaining events to file.");
-                processEvents();
+                processEvents(0); //Write remaining events to file
             }
 
             //We have to override the init function.
@@ -1454,115 +1456,121 @@ namespace SimulationMeasures{
                 //Set up buffer
                 if(!isBufferSet){
 
-                        thrust::host_vector<int2> monomer2patches_h;
-                        thrust::host_vector<int>  patch2monomer_h;
+                    System::log<System::MESSAGE>("[PatchPolymers] Instance %s is setting up the buffer.",this->name.c_str());
 
-                        auto polPPd = polymerPatchyParticles->getPatchesParticleData();
+                    thrust::host_vector<int2> monomer2patches_h;
+                    thrust::host_vector<int>  patch2monomer_h;
 
-                        monomer2patches_h.resize(this->pd->getNumParticles(),{-1,-1});
-                        patch2monomer_h.resize(polPPd->getNumParticles(),-1);
+                    auto polPPd = polymerPatchyParticles->getPatchesParticleData();
 
-                        auto parentId   = polPPd->getModelId(access::location::cpu,access::mode::read);
+                    monomer2patches_h.resize(this->pd->getNumParticles(),{-1,-1});
+                    patch2monomer_h.resize(polPPd->getNumParticles(),-1);
 
-                        auto patchesId  = polPPd->getId(access::location::cpu,access::mode::read);
-                        auto patchesPos = polPPd->getPos(access::location::cpu,access::mode::read);
+                    auto parentId   = polPPd->getModelId(access::location::cpu,access::mode::read);
 
-                        for(int index=0; index<polPPd->getNumParticles(); index++){
+                    auto patchesId  = polPPd->getId(access::location::cpu,access::mode::read);
+                    auto patchesPos = polPPd->getPos(access::location::cpu,access::mode::read);
 
-                                int currentParentId = parentId[index];
-                                int tpy = int(patchesPos[index].w);
+                    for(int index=0; index<polPPd->getNumParticles(); index++){
 
-                                if(tpy == startType){
-                                        monomer2patches_h[currentParentId].y = patchesId[index];
-                                        patch2monomer_h[patchesId[index]]    = currentParentId;
-                                } else if(tpy == endType){
-                                        monomer2patches_h[currentParentId].x = patchesId[index];
-                                        patch2monomer_h[patchesId[index]]    = currentParentId;
-                                } else {
-                                        System::log<System::CRITICAL>("[PatchPolymers] The type of the patch (%d)"
-                                                        "is not the start (%d) or the end (%d) type.",
-                                                        tpy, startType, endType);
-                                }
+                            int currentParentId = parentId[index];
+                            int tpy = int(patchesPos[index].w);
 
-                        }
+                            if(tpy == startType){
+                                    monomer2patches_h[currentParentId].y = patchesId[index];
+                                    patch2monomer_h[patchesId[index]]    = currentParentId;
+                            } else if(tpy == endType){
+                                    monomer2patches_h[currentParentId].x = patchesId[index];
+                                    patch2monomer_h[patchesId[index]]    = currentParentId;
+                            } else {
+                                    System::log<System::CRITICAL>("[PatchPolymers] The type of the patch (%d)"
+                                                    "is not the start (%d) or the end (%d) type.",
+                                                    tpy, startType, endType);
+                            }
 
-                        for(int pId = 0; pId < this->pd->getNumParticles(); pId++){
-                                if(monomer2patches_h[pId].x == -1 || monomer2patches_h[pId].y == -1){
-                                        System::log<System::CRITICAL>("[PatchPolymers] The monomer with id %d"
-                                                        "does not have a start or end patch.", pId);
-                                }
-                        }
+                    }
 
-                        for(int pId = 0; pId < polPPd->getNumParticles(); pId++){
-                                if(patch2monomer_h[pId] == -1){
-                                        System::log<System::CRITICAL>("[PatchPolymers] The patch with id %d"
-                                                        "does not have a monomer.", pId);
-                                }
-                        }
+                    for(int pId = 0; pId < this->pd->getNumParticles(); pId++){
+                            if(monomer2patches_h[pId].x == -1 || monomer2patches_h[pId].y == -1){
+                                    System::log<System::CRITICAL>("[PatchPolymers] The monomer with id %d"
+                                                    "does not have a start or end patch.", pId);
+                            }
+                    }
 
-                        patch2monomer   = patch2monomer_h;
-                        monomer2patches = monomer2patches_h;
+                    for(int pId = 0; pId < polPPd->getNumParticles(); pId++){
+                            if(patch2monomer_h[pId] == -1){
+                                    System::log<System::CRITICAL>("[PatchPolymers] The patch with id %d"
+                                                    "does not have a monomer.", pId);
+                            }
+                    }
 
-                        if(isSurface){
+                    patch2monomer   = patch2monomer_h;
+                    monomer2patches = monomer2patches_h;
 
-                                thrust::host_vector<int> monomer2surfPatches_h;
+                    if(isSurface){
 
-                                auto surfPPd = surfacePatchyParticles->getPatchesParticleData();
+                            thrust::host_vector<int> monomer2surfPatches_h;
 
-                                monomer2surfPatches_h.resize(this->pd->getNumParticles(),-1);
+                            auto surfPPd = surfacePatchyParticles->getPatchesParticleData();
 
-                                auto parentId   = surfPPd->getModelId(access::location::cpu,access::mode::read);
+                            monomer2surfPatches_h.resize(this->pd->getNumParticles(),-1);
 
-                                auto patchesId  = surfPPd->getId(access::location::cpu,access::mode::read);
-                                auto patchesPos = surfPPd->getPos(access::location::cpu,access::mode::read);
+                            auto parentId   = surfPPd->getModelId(access::location::cpu,access::mode::read);
 
-                                for(int index=0; index<surfPPd->getNumParticles(); index++){
+                            auto patchesId  = surfPPd->getId(access::location::cpu,access::mode::read);
+                            auto patchesPos = surfPPd->getPos(access::location::cpu,access::mode::read);
 
-                                        int currentParentId = parentId[index];
-                                        int tpy = int(patchesPos[index].w);
+                            for(int index=0; index<surfPPd->getNumParticles(); index++){
 
-                                        if(tpy == linkerType){
-                                                monomer2surfPatches_h[currentParentId] = patchesId[index];
-                                        } else {
-                                                System::log<System::CRITICAL>("[PatchPolymers] The type of the patch (%d)"
-                                                                "is not linker type (%d).",
-                                                                tpy, linkerType);
-                                        }
+                                    int currentParentId = parentId[index];
+                                    int tpy = int(patchesPos[index].w);
 
-                                }
+                                    if(tpy == linkerType){
+                                            monomer2surfPatches_h[currentParentId] = patchesId[index];
+                                    } else {
+                                            System::log<System::CRITICAL>("[PatchPolymers] The type of the patch (%d)"
+                                                            "is not linker type (%d).",
+                                                            tpy, linkerType);
+                                    }
 
-                                for(int pId = 0; pId < this->pd->getNumParticles(); pId++){
-                                        if(monomer2surfPatches_h[pId] == -1){
-                                                System::log<System::CRITICAL>("[PatchPolymers] The monomer with id %d"
-                                                                "does not have a linker patch.", pId);
-                                        }
-                                }
+                            }
 
-                                monomer2surfPatches = monomer2surfPatches_h;
-                        }
+                            for(int pId = 0; pId < this->pd->getNumParticles(); pId++){
+                                    if(monomer2surfPatches_h[pId] == -1){
+                                            System::log<System::CRITICAL>("[PatchPolymers] The monomer with id %d"
+                                                            "does not have a linker patch.", pId);
+                                    }
+                            }
 
-                        //Set up buffer
-                        cudaError_t status = cudaMallocHost((void**)&maxEventsCPU, sizeof(int));
-                        if (status != cudaSuccess){
-                                System::log<System::CRITICAL>("[PatchPolymers] Error allocating memory on the CPU.");
-                        }
-                        maxEventsGPU.resize(1);
+                            monomer2surfPatches = monomer2surfPatches_h;
+                    }
 
-                        // COMMENT ABOUT THE SIZE OF THE BUFFER
-                        // You can see that the size of the buffer is bufferSize+6.
-                        // 6 comes from the number of event types. Summing 6 to the bufferSize we
-                        // ensure that the buffer is big enough to store all the events. Somehow it is assuming
-                        // that a particle can have all the events at the same time. This is not true
-                        // (I think the maximum would be 4, or 2 since we are ignoring the negative direction events).
-                        // But in any case, the buffer is big enough to store all the events and we do not expect out of bounds errors.
+                    //Set up buffer
+                    cudaError_t status = cudaMallocHost((void**)&maxEventsCPU, sizeof(int));
+                    if (status != cudaSuccess){
+                            System::log<System::CRITICAL>("[PatchPolymers] Error allocating memory on the CPU.");
+                    }
+                    maxEventsGPU.resize(1);
 
-                        eventBufferGPU.resize(this->pd->getNumParticles()*(bufferSize+6)); //6 is the number of event types
-                        lastBufferStep = this->gd->getFundamental()->getCurrentStep();
+                    // COMMENT ABOUT THE SIZE OF THE BUFFER
+                    // You can see that the size of the buffer is bufferSize+6.
+                    // 6 comes from the number of event types. Summing 6 to the bufferSize we
+                    // ensure that the buffer is big enough to store all the events. Somehow it is assuming
+                    // that a particle can have all the events at the same time. This is not true
+                    // (I think the maximum would be 4, or 2 since we are ignoring the negative direction events).
+                    // But in any case, the buffer is big enough to store all the events and we do not expect out of bounds errors.
 
-                        isBufferSet = true;
+                    eventBufferGPU.resize(this->pd->getNumParticles()*(bufferSize+6)); //6 is the number of event types
+                    lastBufferStep = this->gd->getFundamental()->getCurrentStep();
+
+                    isBufferSet = true;
+
+                    System::log<System::MESSAGE>("[PatchPolymers] Buffer set up.");
                 }
 
                 //Open the output files
+
+                System::log<System::MESSAGE>("[PatchPolymers] Opening output files.");
 
                 if(writeEvents){
                     openFile("Events.dat",outputFileEvents);
@@ -1578,6 +1586,8 @@ namespace SimulationMeasures{
 
                 //Init monomerState
                 {
+                    System::log<System::MESSAGE>("[PatchPolymers] Initializing monomer state.");
+
                     // Set up nMonomers and idOffset
                     monomerState.resize(nMonomers);
 
@@ -1585,12 +1595,14 @@ namespace SimulationMeasures{
                                                                access::location::cpu);
 
                     ullint currentStep = this->gd->getFundamental()->getCurrentStep();
-                    for(int i=0; i<this->pd->getNumParticles(); i++){
+                    for(int i=0; i<nMonomers; i++){
                         int id = pgIds[i]-idOffset;
                         stateType state = getMonomerState(currentStep,id);
                         monomerState[id] = state;
                     }
                 }
+
+                System::log<System::MESSAGE>("[PatchPolymers] Initialization done.");
             }
 
             void update(ullint step, cudaStream_t st) override {
@@ -1728,7 +1740,7 @@ namespace SimulationMeasures{
                     if(step == lastUpdateStep){
                             // This means that the buffer has been reset in this step.
                             // It is ensured that the buffer information is stored in the CPU arrays eventBufferRead and nEventsPerMonomerRead.
-                            processEvents();
+                            processEvents(step);
                     }
 
             }
@@ -1737,11 +1749,21 @@ namespace SimulationMeasures{
 
                 if(lastUpdateStep != step){
                     resetBuffer(st);
+                    processEvents(step);
                     lastUpdateStep = step;
+
+                    //This is SUBTLE. We only process the events in the instance that reset the buffer.
+                    //The other instances will process the events in their update function.
+                    //The execution scheme of the simulation steps is the following:
+                    // 1: update
+                    // 1: applyStep
+                    // 2: update
+                    // 2: applyStep
+                    // 3: update
+                    // 3: applyStep
+                    // ...
                 }
 
-                //Now we process the events
-                processEvents();
 
                 //Write the data to the file
                 writePolymerDistribution(step);
