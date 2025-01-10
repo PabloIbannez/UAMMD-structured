@@ -1161,17 +1161,17 @@ namespace SimulationMeasures{
 			    }
 
                 //Write the polymer distribution to the file outputFilePolymerDistribution
-                outputFilePolymerDistribution << "# " << step << std::endl;
-                for(int i=0; i<distribution.size(); i++){
-                    outputFilePolymerDistribution << i << " " << distribution[i] << std::endl;
-                }
+                outputFilePolymerDistribution << step << " ";
+                for(int i=0; i<distribution.size(); i++)        { outputFilePolymerDistribution << distribution[i] << " "; }
+                for(int i=distribution.size(); i<nMonomers; i++){ outputFilePolymerDistribution << 0 << " "; }
+                outputFilePolymerDistribution << std::endl;
 
                 if(isSurface){
                     //Write the surface polymer distribution to the file outputFileSurfacePolymerDistribution
-                    outputFileSurfacePolymerDistribution << "# " << step << std::endl;
-                    for(int i=0; i<distributionSurface.size(); i++){
-                        outputFileSurfacePolymerDistribution << i << " " << distributionSurface[i] << std::endl;
-                    }
+                    outputFileSurfacePolymerDistribution << step << " ";
+                    for(int i=0; i<distributionSurface.size(); i++)        { outputFileSurfacePolymerDistribution << distributionSurface[i] << " "; }
+                    for(int i=distributionSurface.size(); i<nMonomers; i++){ outputFileSurfacePolymerDistribution << 0 << " "; }
+                    outputFileSurfacePolymerDistribution << std::endl;
                 }
             }
 
