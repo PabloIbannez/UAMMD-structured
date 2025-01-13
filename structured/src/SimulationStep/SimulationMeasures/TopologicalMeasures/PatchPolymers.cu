@@ -387,6 +387,8 @@ namespace SimulationMeasures{
 	        std::map<int,std::vector<int>> polymers;
 	        std::set<int>              ringPolymers;
 
+            std::set<int> idsToUpdate;
+
 	        //struct birthDeath{
 	        //	ullint birth;
 	        //	ullint death;
@@ -426,7 +428,7 @@ namespace SimulationMeasures{
 
 	        	} else {
 
-	        		const std::vector<int>& polymer = polymers[polymerId];
+	        		const std::vector<int>& polymer = polymers.at(polymerId);
 
 	        		//Find the position of the monomer in the polymer
 	        		int index = -1;
@@ -475,7 +477,7 @@ namespace SimulationMeasures{
 	        }
 
 		    bool isPolymerSurface(int pol){
-		    	std::vector<int> polymer = polymers[pol];
+		    	const std::vector<int>& polymer = polymers.at(pol);
 		    	bool surf = false;
 		    	for(int i=0; i<polymer.size(); i++){
 		    		if(isMonomerSurface[polymer[i]]){
@@ -522,6 +524,62 @@ namespace SimulationMeasures{
 
 	        	return key;
 	        }
+
+            void updateMonomerState(const ullint& step,const int& id){
+
+                stateType prevState = monomerState[id];
+                stateType newState  = getMonomerState(step,id);
+
+                ullint stepsInPrevState = newState.step - prevState.step;
+
+                auto ppKey = std::make_pair(state2key(prevState),state2key(prevState));
+                auto pnKey = std::make_pair(state2key(prevState),state2key(newState));
+
+                if (transitions.find(ppKey) == transitions.end()){
+                    transitions[ppKey] = 0;
+                }
+
+                if (transitions.find(pnKey) == transitions.end()){
+                    transitions[pnKey] = 0;
+                }
+
+                if (ppKey == pnKey){
+                    transitions[ppKey] += stepsInPrevState;
+                } else {
+                    // Here we are assuming that the transition has happened in the current step
+                    transitions[ppKey] += stepsInPrevState-1;
+                    transitions[pnKey] += 1;
+                }
+
+                //Update the state of the monomer
+                monomerState[id] = newState;
+
+                //Note that prevState and newState could be the same
+                //in this case, this function is just updating the transition matrix.
+                //So in it can be used when we want to write the transition matrix,
+                //ensuring that the matrix is updated according to the current state of the system.
+
+                //Check if the transition is possible
+                //Only one side of the polymer can be growing/shrinking
+
+                bool leftChange  = (prevState.left != newState.left);
+                bool rightChange = (prevState.right != newState.right);
+                if(leftChange and rightChange){
+                    System::log<System::MESSAGE>("[PatchPolymers] (%s) Monomer (id %d) has gone from state %s to state %s (step %d)",
+                                                 name.c_str(),id,
+                                                 state2key(prevState).c_str(),state2key(newState).c_str(),
+                                                 step);
+                    System::log<System::CRITICAL>("[PatchPolymers] Monomer is growing/shrinking in both sides");
+                }
+
+            }
+
+            void resetTransitions(){
+                for(auto& transition:transitions){
+                    transition.second = 0;
+                }
+            }
+
 
             //Measuring functions
 
@@ -676,7 +734,7 @@ namespace SimulationMeasures{
 
 	        	//Create polymer
 	        	int polymerId = createPolymer(step,ids[0],ids[1]);
-	        	std::vector<int>& polymer = polymers[polymerId];
+	        	std::vector<int>& polymer = polymers.at(polymerId);
 
 	        	//Add the rest of monomers to the polymer
 	        	for(int i=2;i<ids.size();i++){
@@ -700,12 +758,13 @@ namespace SimulationMeasures{
                     System::log<System::CRITICAL>("[PatchPolymers] Trying to destroy a ring polymer");
 	        	}
 
-	        	std::vector<int> polymer = polymers[polymerId];
+	        	std::vector<int> polymer = polymers.at(polymerId);
 
 	        	////////////////////////////////
 	        	for(int i=0; i<polymer.size(); i++){
 	        		monomer2polymer[polymer[i]] = -1;
 	        	}
+
 	        	//polymersLife[polymerId].death = step;
 	        	polymersAlive.erase(polymerId);
                 polymers.erase(polymerId);
@@ -723,8 +782,8 @@ namespace SimulationMeasures{
 	        	}
 
 	        	//Check that id1 is the last monomer in the polymer and id2 is the first
-	        	if(polymers[monomer2polymer[id1]].back() != id1 or
-	        	   polymers[monomer2polymer[id2]].front() != id2){
+	        	if(polymers.at(monomer2polymer[id1]).back() != id1 or
+	        	   polymers.at(monomer2polymer[id2]).front() != id2){
                     System::log<System::CRITICAL>("[PatchPolymers] Trying to create a ring with monomers that are not the last and first in the polymer");
 	        	}
 
@@ -756,7 +815,7 @@ namespace SimulationMeasures{
                 ringPolymers.erase(polymerId);
 
 	        	//Update polymer so id1 is the last monomer and id2 is the first
-	        	std::vector<int> polymer = polymers[polymerId];
+	        	std::vector<int> polymer = polymers.at(polymerId);
 
 	        	int index1 = std::find(polymer.begin(), polymer.end(), id1) - polymer.begin();
 	        	int index2 = std::find(polymer.begin(), polymer.end(), id2) - polymer.begin();
@@ -813,8 +872,8 @@ namespace SimulationMeasures{
 	        	}
 
 	        	//Check that id1 is the last monomer in the polymer and id2 is the first
-	        	if(polymers[polymerId1].back()  != id1 or
-	        	   polymers[polymerId2].front() != id2){
+	        	if(polymers.at(polymerId1).back()  != id1 or
+	        	   polymers.at(polymerId2).front() != id2){
                     System::log<System::CRITICAL>("[PatchPolymers] Trying to merge polymers with monomers that are not the last and first in the polymer");
 	        	}
 
@@ -822,7 +881,7 @@ namespace SimulationMeasures{
 	        	std::vector<int> polymer2 = destroyPolymer(step,id2);
 
 	        	//Add polymer 2 to polymer 1
-	        	polymers[polymerId1].insert(polymers[polymerId1].end(),polymer2.begin(),polymer2.end());
+	        	polymers.at(polymerId1).insert(polymers.at(polymerId1).end(),polymer2.begin(),polymer2.end());
 
 	        	//Update monomer2polymer
 	        	for(int i=0; i<polymer2.size(); i++){
@@ -843,7 +902,7 @@ namespace SimulationMeasures{
 	        	}
 
 	        	//Add monomer to polymer
-	        	polymers[polymerId1].push_back(id2);
+	        	polymers.at(polymerId1).push_back(id2);
 	        	monomer2polymer[id2] = polymerId1;
 
 	        	return polymerId1;
@@ -884,7 +943,7 @@ namespace SimulationMeasures{
                     System::log<System::CRITICAL>("[PatchPolymers] Trying to split polymers with monomers that belong to different polymers");
 	        	}
 
-	        	std::vector<int> polymer = polymers[polymerId1];
+	        	std::vector<int> polymer = polymers.at(polymerId1);
 
 	        	//Find the index of the monomers
 	        	int index1 = -1;
@@ -952,7 +1011,7 @@ namespace SimulationMeasures{
                         System::log<System::CRITICAL>("[PatchPolymers] Trying to split polymer, but id2 is not the last monomer");
 	        		}
 
-	        		std::vector<int>& polymer = polymers[polymerId1];
+	        		std::vector<int>& polymer = polymers.at(polymerId1);
 
 	        		//Remove last element of pol1
 	        		polymer.pop_back();
@@ -964,7 +1023,7 @@ namespace SimulationMeasures{
 	        		resultingPolymerId2 = -1;
 	        	} else if (not is1Monomer and not is2Monomer){
 
-	        		std::vector<int>& polymer = polymers[polymerId1];
+	        		std::vector<int>& polymer = polymers.at(polymerId1);
 	        		std::vector<int> tmp;
 
 	        		//Remove all elements from pol1 after id1
@@ -1036,20 +1095,36 @@ namespace SimulationMeasures{
                 ///////////////////////////
 
                 for(auto e : eventWriteBuffer){
+
+                    //Reset idsToUpdate
+                    idsToUpdate.clear();
+
                     int type = e.type;
                     e.id -= idOffset;
 
+                    idsToUpdate.insert(e.id);
+
                     System::log<System::DEBUG>("[PatchPolymers] Processing event, "
-                                                 "step: %llu, id: %d, type: %d (0: Pp, 1: Pn, 2: Dp, 3: Dn, 4: S, 5: B), info: %d. Instance: %s",
-                                                 e.step,e.id,type,e.info,this->name.c_str());
+                                               "step: %llu, id: %d, type: %d (0: Pp, 1: Pn, 2: Dp, 3: Dn, 4: S, 5: B), info: %d. Instance: %s",
+                                               e.step,e.id,type,e.info,this->name.c_str());
+
+                    int prevPolymerId = monomer2polymer[e.id];
+
+                    if(prevPolymerId != -1){
+                        for(int id:polymers.at(prevPolymerId)){
+                            idsToUpdate.insert(id);
+                        }
+                    }
 
 		            if       (type == PatchPolymers_ns::eventType::Pp){ //polymerization positive direction
                         System::log<System::DEBUG>("[PatchPolymers] Processing polymerization event.");
                         e.info -= idOffset; //The info is the second monomer
+                        idsToUpdate.insert(e.info);
 		            	processPolymerization(e);
 		            } else if(type == PatchPolymers_ns::eventType::Dp){ //depolymerization positive direction
                         System::log<System::DEBUG>("[PatchPolymers] Processing depolymerization event.");
                         e.info -= idOffset; //The info is the second monomer
+                        idsToUpdate.insert(e.info);
 		            	processDepolymerization(e);
 		            } else if(type == PatchPolymers_ns::eventType::S){ //from bulk to surface
                         System::log<System::DEBUG>("[PatchPolymers] Processing bulk to surface event.");
@@ -1061,28 +1136,18 @@ namespace SimulationMeasures{
                         System::log<System::CRITICAL>("[PatchPolymers] Event type not recognized.");
 		            }
 
-                    //At this point, the event has been processed
-                    stateType prevState = monomerState[e.id];
-                    stateType newState  = getMonomerState(e.step,e.id);
+                    int newPolymerId = monomer2polymer[e.id];
 
-				    ullint stepsInPrevState = newState.step - prevState.step;
-
-                    auto ppKey = std::make_pair(state2key(prevState),state2key(prevState));
-                    auto pnKey = std::make_pair(state2key(prevState),state2key(newState));
-
-                    if (transitions.find(ppKey) == transitions.end()){
-                        transitions[ppKey] = 0;
+                    if(newPolymerId != -1){
+                        for(int id:polymers.at(newPolymerId)){
+                            idsToUpdate.insert(id);
+                        }
                     }
 
-                    if (transitions.find(pnKey) == transitions.end()){
-                        transitions[pnKey] = 0;
+                    // Update the state of the monomers
+                    for(int id:idsToUpdate){
+                        updateMonomerState(e.step,id);
                     }
-
-				    transitions[ppKey] += stepsInPrevState;
-				    transitions[pnKey] += 1;
-
-                    //Update the state of the monomer
-                    monomerState[e.id] = newState;
                 }
             }
 
@@ -1131,7 +1196,7 @@ namespace SimulationMeasures{
 			    int localMaxPolymerSize = 0;
 			    for(std::set<int>::iterator it = polymersAlive.begin(); it != polymersAlive.end(); it++){
 			    	int polyd = *it;
-			    	int polSize = polymers[polyd].size()-1;
+			    	int polSize = polymers.at(polyd).size()-1;
 			    	localMaxPolymerSize = std::max(localMaxPolymerSize,polSize);
 			    }
 
@@ -1152,7 +1217,7 @@ namespace SimulationMeasures{
 			    //Iterate over polymers allive (set)
 			    for(std::set<int>::iterator it = polymersAlive.begin(); it != polymersAlive.end(); it++){
 			    	int polyd = *it;
-			    	int polSize = polymers[polyd].size()-1;
+			    	int polSize = polymers.at(polyd).size()-1;
 			    	if(not isPolymerSurface(polyd)){
 			    		distribution[polSize]++;
 			    	} else {
@@ -1194,16 +1259,24 @@ namespace SimulationMeasures{
             }
 
             void writeTransitionMatrix(const ullint& step){
+
+                //Update the transition matrix
+                for(int i=0; i<nMonomers; i++){
+                    updateMonomerState(step,i);
+                }
+
                 //Write the transition matrix to the file outputFileTransitionMatrix
-                outputFileTransitionMatrix << "# " << step << std::endl;
 			    for(auto it=transitions.begin(); it!=transitions.end(); it++){
 			    	std::string fromState = it->first.first;
 			    	std::string toState   = it->first.second;
 
 			    	ullint nEvents = it->second;
 
-			    	outputFileTransitionMatrix << fromState << " " << toState << " " << nEvents << std::endl;
+			    	outputFileTransitionMatrix << step << " " << fromState << " " << toState << " " << nEvents << std::endl;
 			    }
+
+                //Reset the transition matrix
+                resetTransitions();
             }
 
         public:
