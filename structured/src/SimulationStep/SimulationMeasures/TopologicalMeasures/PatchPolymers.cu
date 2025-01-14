@@ -564,7 +564,8 @@ namespace SimulationMeasures{
 
                 bool leftChange  = (prevState.left != newState.left);
                 bool rightChange = (prevState.right != newState.right);
-                if(leftChange and rightChange){
+                bool isRing      = prevState.ring or newState.ring;
+                if(leftChange and rightChange and not isRing){
                     System::log<System::MESSAGE>("[PatchPolymers] (%s) Monomer (id %d) has gone from state %s to state %s (step %d)",
                                                  name.c_str(),id,
                                                  state2key(prevState).c_str(),state2key(newState).c_str(),
