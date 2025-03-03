@@ -145,6 +145,9 @@ namespace Interactor {
 #define REGISTER_AFM_INTERACTOR(type, subType, ...) \
     __REGISTER_INTERACTOR__(type, subType, __VA_ARGS__)
 
+#define REGISTER_AFM_IMAGE_INTERACTOR(type, subType, ...) \
+    __REGISTER_INTERACTOR__(type, subType, __VA_ARGS__)
+
 // Macro for registering a non-bonded interactor
 #define REGISTER_NONBONDED_INTERACTOR(type, subType, ...) \
     namespace { \

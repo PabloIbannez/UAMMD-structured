@@ -218,6 +218,9 @@
         "AFM": [
             ["AFM", "SphericalTip", "SphericalTip.cu"],
             ["AFM", "SphericallyBluntedConicTip", "SphericallyBluntedConicTip.cu"]
+        ],
+        "AFMimage": [
+            ["AFMimage", "Takada", "Takada.cu"]
         ]
     },
     "DataStructures": {
