@@ -430,6 +430,9 @@ namespace Interactor{
                     cudaMalloc(&cubReductionTempStorage,
                                 cubForceReductionTempStorageSize*sizeof(real4));
 
+                    //Note we just use the size of the force reduction.
+                    //The energy reduction is expected to be smaller.
+
                 }
 
                 cudaDeviceSynchronize();

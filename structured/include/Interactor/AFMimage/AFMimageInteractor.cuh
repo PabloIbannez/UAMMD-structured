@@ -13,6 +13,13 @@
 #include "Definitions/Computations.cuh"
 #include "Definitions/Matrices.cuh"
 
+#include "Utils/Maths/MatrixIndexing.cuh"
+
+#include "cub/device/device_segmented_reduce.cuh"
+
+//TODO: Ensure we work with ids not indices !!!! also for the buffer !!!! <--- IMPORTANT (Check populateBuffer function !!!!)
+//TODO: I think the Npx and Npy should be extended to match the box size
+
 namespace uammd{
 namespace structured{
 namespace Interactor{
@@ -51,6 +58,14 @@ namespace Interactor{
             return make_real3(dx,dy,dz);
         }
 
+        __device__ real image(const real& gamma, const real& pixelSum){
+            return gamma*log(real(1.0) + pixelSum);
+        }
+
+        __device__ real3 image_derivative(const real& gamma, const real3& phi_derivative_val, const real& pixelSum){
+            return gamma*phi_derivative_val/(real(1.0) + pixelSum);
+        }
+
         __global__ void populateBuffer(real4* buffer,
                                        real4* pos, int* batchId,
                                        real sigma, real gamma, real tipRadius,
@@ -79,6 +94,67 @@ namespace Interactor{
                 UAMMD_SET_3D_ROW_MAJOR(buffer,N,Npx,Npy,n,px,py,phi_buffer);
             }
 
+        }
+
+        __global__ void updateBuffer(real4* buffer,
+                                     int*   batchId,
+                                     real*  pixelValueTheoretical, // It contains sum_(i=1)^N_i phi_i for each pixel
+                                     real   gamma,
+                                     int Npx, int Npy, int N, int Nbatches){
+            // This kernel is executed by Npx*Npy*N threads
+
+            // Compute the indices for each dimension.
+            const int px = blockIdx.x * blockDim.x + threadIdx.x;
+            const int py = blockIdx.y * blockDim.y + threadIdx.y;
+            const int n  = blockIdx.z * blockDim.z + threadIdx.z;
+
+            // Check if indices are within the matrix dimensions.
+            if (px < Npx && py < Npy && n < N) {
+
+                int currentBatch = batchId[n];
+
+                real4 buffer_val = UAMMD_GET_3D_ROW_MAJOR(buffer,N,Npx,Npy,n,px,py);
+                real pixelSum    = UAMMD_GET_3D_ROW_MAJOR(pixelValueTheoretical,Nbatches,Npx,Npy,currentBatch,px,py);
+
+                real3 phi_derivative_val = make_real3(buffer_val);
+                real3 image_derivative_val = image_derivative(gamma,phi_derivative_val,pixelSum);
+
+                // Update the buffer
+                real4 updated_buffer_val = make_real4(image_derivative_val,buffer_val.w);
+
+                UAMMD_SET_3D_ROW_MAJOR(buffer,N,Npx,Npy,n,px,py,updated_buffer_val);
+            }
+
+        }
+
+        // toReduceValue = buffer[reductionIds[i]].w
+        __global__ void prepareToReduceValueKernel(real4* buffer,
+                                                   int* reductionIds,
+                                                   real* toReduceValue,
+                                                   int N){
+            const int i = blockIdx.x * blockDim.x + threadIdx.x;
+
+            if(i < N){
+                int index = reductionIds[i];
+                toReduceValue[i] = buffer[index].w;
+            }
+        }
+
+        __global__ void computeImage(real* pixelValueTheoretical,
+                                     real gamma,
+                                     int Npx, int Npy, int Nbatches){
+
+            // Compute the indices for each dimension.
+            const int px = blockIdx.x * blockDim.x + threadIdx.x;
+            const int py = blockIdx.y * blockDim.y + threadIdx.y;
+            const int nb = blockIdx.z * blockDim.z + threadIdx.z;
+
+            // Check if indices are within the matrix dimensions.
+            if (px < Npx && py < Npy && nb < Nbatches) { //Note we use Nbatches here, instead of N
+                real pixelSum = UAMMD_GET_3D_ROW_MAJOR(pixelValueTheoretical,Nbatches,Npx,Npy,nb,px,py);
+                real pixelValue = image(gamma,pixelSum);
+                UAMMD_SET_3D_ROW_MAJOR(pixelValueTheoretical,Nbatches,Npx,Npy,nb,px,py,pixelValue); // Note we read and write from the same array. No problem here.
+            }
         }
 
     }
@@ -117,13 +193,53 @@ namespace Interactor{
             // GPU data
 
             int bufferSize;
+            // buffer stores the values of the phi function and its derivative
+            // The size of the buffer is (N,Npx,Npy) and it stores for each particle the values of the phi function and its derivative
+            // Note that here it uses the global index of the particle, meaning that the buffer ignores the batch information itself
             thrust::device_vector<real4> buffer_d;
 
             int pixelBufferSize;
+            // The two following vectors are constant.
+            // They stored the input data in a 3D array (batchId,x,y) to be used in the kernel
+            //
+            // The first vector encoded a 3d matrix of real2 (x,y).
+            // The size of the matrix is (Nbatches,Npx,Npy) and it stores for each batch the x and y values of the pixels
+            // Meaning, it transform from integer coordinates, i,j, to real2 coordinates, x,y for each batch
+            //
+            // The second vector encodes a 3d matrix of real (height).
+            // The size of the matrix is (Nbatches,Npx,Npy) and it stores for each batch the height of the pixels
+            // Meaning, it transform from integer coordinates, i,j, to real height for each batch
             thrust::device_vector<real2> pixelPos_d;
             thrust::device_vector<real>  pixelValue_d;
 
-            //
+            thrust::device_vector<real>  pixelValueTheoretical_d;
+
+            thrust::device_vector<int> reductionIds_d;
+            thrust::device_vector<int> reductionIdsSegmentStart_d;
+
+            // cub segmented reduction stuff
+            // int cub_num_segments = Npx*Npy*Nbatches;
+            size_t cub_temp_storage_bytes = 0;
+            void* cub_temp_storage = nullptr;
+
+            thrust::device_vector<real> toReduceValue_d;
+
+            void prepareToReduceValue(cudaStream_t st){
+
+                int Nthreads = 256;
+                int Nblocks  = bufferSize/Nthreads + ((bufferSize%Nthreads)?1:0);
+
+                real4* buffer_ptr        = thrust::raw_pointer_cast(buffer_d.data());
+                int*   reductionIds_ptr  = thrust::raw_pointer_cast(reductionIds_d.data());
+                real*  toReduceValue_ptr = thrust::raw_pointer_cast(toReduceValue_d.data());
+
+                AFMimageInteractor_ns::prepareToReduceValueKernel<<<Nblocks,Nthreads,0,st>>>(buffer_ptr,
+                                                                                             reductionIds_ptr,
+                                                                                             toReduceValue_ptr,
+                                                                                             bufferSize);
+            }
+
+            /////////////////////////////
 
             bool warningEnergy = false;
             bool warningForce  = false;
@@ -352,15 +468,117 @@ namespace Interactor{
                 pixelPos_d   = pixelPos_h;
                 pixelValue_d = pixelValue_h;
 
-                //
+                // Let's prepare the indexing arrays for reductions
+                // Mainly we have to reduce the columns of the buffer
+                // and store the ruduced values in the array pixelValueTheoretical_d
+                // pixelValueTheoretical_d has size (Nbatches,Npx,Npy) (as pixelValue_d)
+                // SO we have to determine the indices of the buffer that correspond to each pixel.
+                // For the pixel (currentBatch,px,py) the indices in the buffer that their values
+                // reduction give the pixel value.
+
+                // First, we initialize the result array. The array for the theoretical image
+                pixelValueTheoretical_d.resize(Nbatches*Npx*Npy);
+
+                // Now we are going to create an auxiliary array that associates each batch with the
+                // ids of the particles that belong to that batch.
+
+                std::map<int,std::vector<int>> batchId2ids;
+                for(int i=0;i<Nbatches;i++){
+                    batchId2ids[i] = std::vector<int>();
+                }
+
+                auto ids     = this->pd->getId(access::location::cpu, access::mode::read);
+                auto batchId = this->pd->getBatchId(access::location::cpu, access::mode::read);
+
+                for(int i=0;i<N;i++){
+                    batchId2ids[batchId[i]].push_back(ids[i]);
+                }
+
+                // The array reductionIds_h will store the indices of the buffer that correspond to each pixel
+                // The array reductionIdsSegmentStart_h will store the starting index of each segment in the reductionIds_h
+                thrust::host_vector<int> reductionIds_h(N*Npx*Npy,-1);
+                thrust::host_vector<int> reductionIdsSegmentStart_h(Nbatches*Npx*Npy,-1);
+
+                int previousId  = 0;
+                int currentSegmentStart = 0;
+
+                // First we iterate (IN ORDER) over the elements of pixelValueTheoretical_d
+                int pixelValueTheoreticalSize = Npx*Npy*Nbatches;
+                for(int pixelValueTheoretical_index=0;
+                        pixelValueTheoretical_index<pixelValueTheoreticalSize;
+                        pixelValueTheoretical_index++){
+
+                    int3 coordinates = MatrixIndexing::rowMajor3Dcoordinates(Nbatches,Npx,Npy,pixelValueTheoretical_index);
+
+                    int currentBatch = coordinates.x;
+                    int px = coordinates.y;
+                    int py = coordinates.z;
+
+                    // Now we have to determine the indices in the buffer that correspond to the pixel (currentBatch,px,py)
+                    for(int i=0;i<batchId2ids[currentBatch].size();i++){
+                        int id = batchId2ids[currentBatch][i];
+                        int index = MatrixIndexing::rowMajor3Dindex(N,Npx,Npy,id,px,py);
+                        reductionIds_h[previousId] = index;
+                        previousId++;
+                    }
+                    reductionIdsSegmentStart_h[pixelValueTheoretical_index] = currentSegmentStart;
+                    currentSegmentStart += batchId2ids[currentBatch].size();
+                }
+
+                // Check if all elements of reductionIds_h and reductionIdsSegmentStart_h have been filled
+                for(int i=0;i<reductionIds_h.size();i++){
+                    if(reductionIds_h[i] == -1){
+                        System::log<System::CRITICAL>("[AFMimageInteractor] (%s) Reduction indices have not been filled",
+                                                      name.c_str());
+                    }
+                }
+                for(int i=0;i<reductionIdsSegmentStart_h.size();i++){
+                    if(reductionIdsSegmentStart_h[i] == -1){
+                        System::log<System::CRITICAL>("[AFMimageInteractor] (%s) Reduction indices segment start have not been filled",
+                                                      name.c_str());
+                    }
+                }
+
+                reductionIds_d    = reductionIds_h;
+                reductionIdsSegmentStart_d = reductionIdsSegmentStart_h;
+
+                System::log<System::MESSAGE>("[AFMimageInteractor] (%s) Reduction indices prepared",
+                                             name.c_str());
+                // First we reserve memory for the auxiliary array to be used in the reduction
+                toReduceValue_d.resize(N*Npx*Npy);
+
+                // At this point we have to prepare all the stuff needed by cub for the reduction
+                // We use DeviceSegmentedReduce for the reduction
+                {
+                    prepareToReduceValue(0); // This is not necessary here, but it is a good way to check if the kernel works
+
+                    real* toReduceValue_ptr = thrust::raw_pointer_cast(toReduceValue_d.data());
+                    real* pixelValueTheoretical_ptr = thrust::raw_pointer_cast(pixelValueTheoretical_d.data());
+
+                    // Now we have to determine the size of the temporary storage needed by cub
+                    cub::DeviceSegmentedReduce::Sum(cub_temp_storage,cub_temp_storage_bytes,
+                                                    toReduceValue_ptr,pixelValueTheoretical_ptr, //d_in, d_out
+                                                    Npx*Npy*Nbatches, // num_segments
+                                                    reductionIdsSegmentStart_d.begin(),
+                                                    reductionIdsSegmentStart_d.begin()+1,
+                                                    0); // stream
+                    cudaDeviceSynchronize();
+
+                    cudaMalloc(&cub_temp_storage,cub_temp_storage_bytes*sizeof(real));
+
+                }
 
             }
 
-            ~AFMimageInteractor(){}
+            ~AFMimageInteractor(){
+                if(cub_temp_storage != nullptr){
+                    cudaFree(cub_temp_storage);
+                }
+            }
 
             void sum(Computables comp,cudaStream_t st) override {
 
-                if(comp.energy == true || comp.force){
+                if(comp.energy == true || comp.force == true){
                     // Common for both energy and force
                     System::log<System::MESSAGE>("[AFMimageInteractor] (%s) Computing common data",
                                                  name.c_str());
@@ -387,7 +605,46 @@ namespace Interactor{
                                                                                               pixelPos,pixelValue,
                                                                                               Npx,Npy,N,Nbatches,
                                                                                               gd->getEnsemble()->getBox());
+                    {
+                        prepareToReduceValue(st);
 
+                        real* toReduceValue_ptr = thrust::raw_pointer_cast(toReduceValue_d.data());
+                        real* pixelValueTheoretical_ptr = thrust::raw_pointer_cast(pixelValueTheoretical_d.data());
+
+                        // Now we have to determine the size of the temporary storage needed by cub
+                        cub::DeviceSegmentedReduce::Sum(cub_temp_storage,cub_temp_storage_bytes,
+                                                        toReduceValue_ptr,pixelValueTheoretical_ptr, //d_in, d_out
+                                                        Npx*Npy*Nbatches, // num_segments
+                                                        reductionIdsSegmentStart_d.begin(),
+                                                        reductionIdsSegmentStart_d.begin()+1,
+                                                        st); // stream
+                        cudaDeviceSynchronize();
+                    }
+
+                    // At this point we have the buffer with the values of the phi function and its derivative
+                    // and we have the quantity sum_(i=1)^N_i phi_i for each pixel stored in pixelValueTheoretical_d
+
+                    // Now we have to update the buffer (we use the same configuration as before)
+                    AFMimageInteractor_ns::updateBuffer<<<numBlocks,threadsPerBlock,0,st>>>(buffer,
+                                                                                            batchId,
+                                                                                            thrust::raw_pointer_cast(pixelValueTheoretical_d.data()),
+                                                                                            gamma,
+                                                                                            Npx,Npy,N,Nbatches);
+
+                    // Now each element of the buffer has the value of phi, and the derivative of phi respect to the particle position
+
+                    // Now we have to compute the image
+                    numBlocks.z = Nbatches/threadsPerBlock.z + ((Nbatches%threadsPerBlock.z)?1:0);
+
+                    real* pixelValueTheoretical_ptr = thrust::raw_pointer_cast(pixelValueTheoretical_d.data());
+
+                    AFMimageInteractor_ns::computeImage<<<numBlocks,threadsPerBlock,0,st>>>(pixelValueTheoretical_ptr,
+                                                                                            gamma,
+                                                                                            Npx,Npy,Nbatches);
+                    // At this point we have the theoretical image stored in pixelValueTheoretical_d
+
+                    // Now we have to compute the comparison and the normalization operations. These operations can vary
+                    // depending on the type of the potential.
                 }
 
                 if(comp.energy == true){
