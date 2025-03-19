@@ -18,6 +18,26 @@ class AFMimage_{
         //Potential parameters
         using StorageData = typename AFMimageType::StorageData;
 
+        //Expose auxiliary functions
+        static inline __device__ real OperationOverGenerated(const real& generatedPixelValue){
+            return AFMimageType::OperationOverGenerated(generatedPixelValue);
+        }
+
+        static inline __device__ real OperationOverReferenceAndGenerated(const real& referencePixelValue,
+                                                                         const real& generatedPixelValue){
+            return AFMimageType::OperationOverReferenceAndGenerated(referencePixelValue,generatedPixelValue);
+        }
+
+        static inline __device__ real3 OperationOverReferenceAndGeneratedDerivative(const real& referencePixelValue,
+                                                                                    const real3& generatedPixelValueDerivative){
+            return AFMimageType::OperationOverReferenceAndGeneratedDerivative(referencePixelValue,generatedPixelValueDerivative);
+        }
+
+        static inline __device__ real3 OperationOverGeneratedAndGeneratedDerivative(const real& generatedPixelValue,
+                                                                                    const real3& generatedPixelValueDerivative){
+            return AFMimageType::OperationOverGeneratedAndGeneratedDerivative(generatedPixelValue,generatedPixelValueDerivative);
+        }
+
         ///////////////////////////
 
         ComputationalData getComputationalData(const Computables& comp,
@@ -64,10 +84,12 @@ class AFMimage_{
             }
 
             inline __device__ resultType compute(const int currentParticleIndex,
-                                                 const int tipIndex,
-                                                 const ComputationalData& computational){
+                                                 const ComputationalData& computational,
+                                                 const real& opGen,const real& opRefGen,
+                                                 const real3& opRefGenDer,const real3& opGenGenDer){
 
-                return AFMimageType::energy(currentParticleIndex,tipIndex,computational);
+                return AFMimageType::energy(currentParticleIndex,computational,
+                                            opGen,opRefGen,opRefGenDer,opGenGenDer);
             }
 
             inline __device__ void       set(const int& index_i,resultType& quantity){
@@ -97,10 +119,12 @@ class AFMimage_{
             }
 
             inline __device__ resultType compute(const int currentParticleIndex,
-                                                 const int tipIndex,
-                                                 const ComputationalData& computational){
+                                                 const ComputationalData& computational,
+                                                 const real& opGen,const real& opRefGen,
+                                                 const real3& opRefGenDer,const real3& opGenGenDer){
 
-                return make_real4(AFMimageType::force(currentParticleIndex,tipIndex,computational),0.0);
+                return make_real4(AFMimageType::force(currentParticleIndex,computational,
+                                                      opGen,opRefGen,opRefGenDer,opGenGenDer),0.0);
             }
 
             inline __device__ void       set(const int& index_i,resultType& quantity){

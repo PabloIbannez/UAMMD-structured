@@ -51,7 +51,7 @@ L = 100.0
 timeStep = 0.001
 frictionConstant = 1.0
 
-nSteps       = 10000
+nSteps       = 100000
 nStepsInfo   = 1000
 nStepsOutput = 1000
 

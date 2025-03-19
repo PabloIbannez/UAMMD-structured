@@ -37,18 +37,42 @@ namespace AFMimage{
             return storage;
         }
 
+
+        static inline __device__ real OperationOverGenerated(const real& generatedPixelValue){
+            return generatedPixelValue*generatedPixelValue;
+        }
+
+        static inline __device__ real OperationOverReferenceAndGenerated(const real& referencePixelValue,
+                                                                         const real& generatedPixelValue){
+            return referencePixelValue*generatedPixelValue;
+        }
+
+        static inline __device__ real3 OperationOverReferenceAndGeneratedDerivative(const real& referencePixelValue,
+                                                                                    const real3& generatedPixelValueDerivative){
+            return referencePixelValue*generatedPixelValueDerivative;
+        }
+
+        static inline __device__ real3 OperationOverGeneratedAndGeneratedDerivative(const real& generatedPixelValue,
+                                                                                    const real3& generatedPixelValueDerivative){
+            return generatedPixelValue*generatedPixelValueDerivative;
+        }
+
+
+
         //Energy and force definition
 
         static inline __device__ real energy(int index,
-                                             int tipIndex,
-                                             const ComputationalData &computational){
+                                             const ComputationalData &computational,
+                                             const real& opGen,const real& opRefGen,
+                                             const real3& opRefGenDer,const real3& opGenGenDer){
             const real e = real(0.0);
             return e;
         }
 
         static inline __device__ real3 force(int index,
-                                             int tipIndex,
-                                             const ComputationalData &computational){
+                                             const ComputationalData &computational,
+                                             const real& opGen,const real& opRefGen,
+                                             const real3& opRefGenDer,const real3& opGenGenDer){
             real3 f = make_real3(0.0);
             return f;
 
