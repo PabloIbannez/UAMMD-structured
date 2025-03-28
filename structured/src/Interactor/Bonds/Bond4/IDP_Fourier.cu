@@ -108,9 +108,6 @@ namespace Bond4{
 
                 real e = real(0.0);
 
-                real cosnt;
-                real sinnt;
-
                 real tmp;
 
                 for(int s = 1; s <= 4; ++s){
@@ -148,9 +145,6 @@ namespace Bond4{
 
 
                 real de = real(0.0);
-
-                real cosnt;
-                real sinnt;
 
                 real tmp;
 
@@ -190,9 +184,6 @@ namespace Bond4{
 
 
                 real de = real(0.0);
-
-                real cosnt;
-                real sinnt;
 
                 real tmp;
 

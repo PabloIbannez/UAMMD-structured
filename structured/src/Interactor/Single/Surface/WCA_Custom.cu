@@ -160,7 +160,6 @@ namespace Surface{
             const real z0 = computational.z0;
 
             real r =  sqrt(pos.x*pos.x+pos.y*pos.y); //This Surface is defined in Cylindric coordinates
-            real3 drWall;
 
             real r_cyl   = Rcyl - r;
             real r_plain = pos.z-z0;

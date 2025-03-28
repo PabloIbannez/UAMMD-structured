@@ -148,7 +148,6 @@ struct TorqueForceTransverser_{
                                         const int& setIndex,
                                         const reduceType reduced[nReductions][nSet]){
 
-        spreadType result;
 
         const real totalMass = reduced[0][setIndex].w;
         const real3 com      = make_real3(reduced[0][setIndex])/totalMass;

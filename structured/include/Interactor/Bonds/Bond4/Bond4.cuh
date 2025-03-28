@@ -578,12 +578,6 @@ struct AngularForceTransverser_{
 	const real inv_raijk=sqrt(inv_raijk2);
 	const real inv_rajkl=sqrt(inv_rajkl2);
 
-	const real inv_raijk3=inv_raijk2*inv_raijk;
-	const real inv_rajkl3=inv_rajkl2*inv_rajkl;
-
-
-        const real inv_rjk  = real(1.0)/rjk;
-
         //
 
         const real dot_ijjk = dot(dij,djk);
