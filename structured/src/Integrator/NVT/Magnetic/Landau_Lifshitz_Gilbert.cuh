@@ -51,7 +51,7 @@ namespace Magnetic{
 
         namespace Euler{
 
-            inline __global__ void integrateLLG(real4* dir, real4*  field, real* anisotropy,
+	    __forceinline__ __global__ void integrateLLG(real4* dir, real4*  field, real* anisotropy,
                     real4* magnetization,
                     ParticleGroup::IndexIterator indexIterator,
                     real dt, real kbT, real damping, real msat, real gyroRatio,
@@ -104,7 +104,7 @@ namespace Magnetic{
 
         namespace Heun{
 
-            inline __global__ void integrateLLG(real4* dir, real4* field, real4* magnetization,
+            __forceinline__ __global__ void integrateLLG(real4* dir, real4* field, real4* magnetization,
                     real3* initialMagnetization, real* anisotropy,
                     ParticleGroup::IndexIterator indexIterator,
                     real dt, real kbT, real damping, real msat,
