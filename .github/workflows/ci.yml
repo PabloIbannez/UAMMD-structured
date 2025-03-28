@@ -79,7 +79,7 @@ jobs:
       run: |
         micromamba activate uammd
         mkdir build && cd build
-        cmake -DCMAKE_VERBOSE_MAKEFILE=yes -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} ..
+        cmake -DCMAKE_VERBOSE_MAKEFILE=yes -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} -DCMAKE_CUDA_ARCHITECTURES=OFF -DBUILD_PYTHON_WRAPPER=ON -DINSTALL_PYTHON_PACKAGE=ON ..
         make -j install
 
       shell: micromamba-shell {0}
