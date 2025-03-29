@@ -529,8 +529,6 @@ namespace SimulationMeasures{
 
 	        	ullint step = e.step;
 
-	        	int resultingPolymerId; //Id of the resulting polymer
-
 	        	int id1 = e.id;
 	        	int id2 = e.info;
 
@@ -541,21 +539,21 @@ namespace SimulationMeasures{
 
 	        	if(polymer1 == -1 and polymer2 == -1){
 	        		//Two monomers to a new polymer
-	        		resultingPolymerId = createPolymer(step,id1,id2);
+			        createPolymer(step,id1,id2);
 	        	} else {
 	        		if(polymer1 == polymer2){
 	        			//Polymer merges itself, a ring is formed
-	        			resultingPolymerId = createRing(id1,id2);
+	        		        createRing(id1,id2);
 	        		} else {
 	        			if        (polymer1 == -1){
 	        				//Merge monomer 1 to polymer 2
-	        				resultingPolymerId = mergeMonomerPolymer(step,id1,id2);
+	        			        mergeMonomerPolymer(step,id1,id2);
 	        			} else if (polymer2 == -1){
 	        				//Merge polymer 1 to monomer 2
-	        				resultingPolymerId = mergePolymerMonomer(id1,id2);
+	        				mergePolymerMonomer(id1,id2);
 	        			} else {
 	        				//Two polymers merge
-	        				resultingPolymerId = mergePolymers(step,id1,id2);
+	        				mergePolymers(step,id1,id2);
 	        			}
 	        		}
 	        	}
@@ -564,9 +562,6 @@ namespace SimulationMeasures{
 	        void processDepolymerization(const PatchPolymers_ns::event& e){
 
 	        	ullint step = e.step;
-
-	        	int resultingPolymerId1; //Id of the resulting polymer
-	        	int resultingPolymerId2; //Id of the resulting polymer
 
 	        	int id1 = e.id;
 	        	int id2 = e.info;
@@ -582,9 +577,7 @@ namespace SimulationMeasures{
 	        	} else {
 	        		if(isRing(id1)){
 	        			//Polymer splits itself, a ring is broken
-	        			int2 resultingPolymers = destroyRing(id1,id2);
-	        			resultingPolymerId1 = resultingPolymers.x;
-	        			resultingPolymerId2 = resultingPolymers.y;
+	        		        destroyRing(id1,id2);
 	        		} else {
 	        			if        (polymer1 == -1){
 	        				//This should not happen
@@ -594,9 +587,7 @@ namespace SimulationMeasures{
                             System::log<System::CRITICAL>("[PatchPolymers] Trying to depolymerize a polymer from a monomer");
 	        			} else {
 	        				//Two polymers split
-	        				int2 resultingPolymers = splitPolymer(step,id1,id2);
-	        				resultingPolymerId1 = resultingPolymers.x;
-	        				resultingPolymerId2 = resultingPolymers.y;
+	        			        splitPolymer(step,id1,id2);
 	        			}
 	        		}
 	        	}
@@ -604,7 +595,6 @@ namespace SimulationMeasures{
 
 	        void processBulkToSurface(const PatchPolymers_ns::event& e){
 
-	        	ullint step = e.step;
 	        	int id = e.id;
 
 	        	if(isMonomerSurface[id]){
@@ -616,7 +606,6 @@ namespace SimulationMeasures{
 
 	        void processSurfaceToBulk(const PatchPolymers_ns::event& e){
 
-	        	ullint step = e.step;
 	        	int id = e.id;
 
 	        	if(!isMonomerSurface[id]){

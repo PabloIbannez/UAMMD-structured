@@ -7,6 +7,16 @@ UAMMD-structured offers multiple compilation options to suit various user needs.
 
 Before we begin, ensure you have the necessary prerequisites installed on your system. These include Git for version control, CMake (version 3.8 or higher) for build configuration, CUDA Toolkit (nvcc and CUDA libraries), a C++ compiler compatible with C++14, and Python if you plan to build the Python wrapper.
 
+The environment.yml file lists all dependencies, which can be installed by running the following at the root of the project:
+
+.. code-block:: bash
+
+   conda env create -f environment.yml
+
+   
+conda is a package manager that simplifies the installation of dependencies. If you don't have conda installed, you can download it from https://docs.conda.io/en/latest/miniconda.html.
+
+
 **Obtaining the Source Code**
 
 To get started, you'll need to clone the UAMMD-structured repository. Open a terminal and run the following commands:
@@ -26,17 +36,7 @@ The compilation process for UAMMD-structured follows a standard CMake workflow. 
 
    mkdir build
    cd build
-
-Next, configure the build using CMake:
-
-.. code-block:: bash
-
    cmake ..
-
-This command generates the necessary makefiles based on your system configuration and the options you've specified. After configuration, you can compile the project:
-
-.. code-block:: bash
-
    make
 
 The compilation time may vary depending on your system specifications and the options you've chosen.
@@ -57,12 +57,6 @@ You can specify CUDA architectures to compile for, which can significantly reduc
 
    cmake -DCUDA_ARCHITECTURES="70;75" ..
 
-If you need to use a specific host compiler for CUDA, you can specify it with:
-
-.. code-block:: bash
-
-   cmake -DCUDA_HOST_COMPILER=/path/to/compiler ..
-
 For an interactive configuration interface, you can use `ccmake ..` instead of `cmake ..` (if available on your system). This will open a CMake configuration screen where you can set the different options.
 
 **Specific Compilation Options**
@@ -79,11 +73,11 @@ If you wish to install the executable, you can run:
 
    make install
 
-By default, this installs to `~/bin`. You can change the installation directory during the configuration step:
+By default, this installs to `${CMAKE_INSTALL_PREFIX}/bin`. You can change the installation directory during the configuration step:
 
 .. code-block:: bash
 
-   cmake -DINSTALL_DIR=/path/to/install ..
+   cmake -DCMAKE_INSTALL_PREFIX=/path/to/install ..
 
 ----
 
@@ -127,18 +121,18 @@ This will create a .deb file in the build directory, which can be installed usin
 Troubleshooting
 ---------------
 
-One common issue you might encounter is BLAS/LAPACK linking errors, especially on Ubuntu systems. These errors can occur due to incompatibilities between the installed libraries and UAMMD-structured's requirements. If you've installed BLAS/LAPACK using `apt install libopenblas-dev`, you might see `undefined reference to ''` errors. This happens because the `libopenblas.so` provided by the package manager may lack some symbols required by UAMMD-structured.
+Depending on your system, the BLAS and LAPACK libraries listed in the default environment.yml file (MKL) may not be compatible with your system. If you encounter issues, you can try using OpenBLAS or ATLAS instead. To do this, modify the environment.yml file to include the appropriate libraries. For example, to use OpenBLAS, replace the MKL lines with:
 
-To resolve this, you can compile OpenBLAS from source. Download the OpenBLAS source code from https://www.openblas.net/, then compile and install it:
+.. code-block:: yaml
 
-.. code-block:: bash
+   - openblas
+   - libopenblas-dev
 
-   mkdir build && cd build
-   cmake -DBUILD_SHARED_LIBS=ON ..
-   make
-   sudo make install
+Then, recreate the conda environment and start the compilation process again.
 
-The `-DBUILD_SHARED_LIBS=ON` flag is crucial as it ensures the creation of shared libraries. You may need sudo permissions to install the library system-wide.
+The `-DBUILD_SHARED_LIBS=ON` flag is crucial as it ensures the creation of shared libraries.
+
+You may need sudo permissions to install the library system-wide.
 
 Testing
 -------

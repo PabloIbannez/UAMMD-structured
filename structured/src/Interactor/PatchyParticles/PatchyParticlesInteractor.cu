@@ -1,5 +1,3 @@
-#pragma once
-
 #include "Interactor/PatchyParticles/PatchyParticlesInteractor.cuh"
 
 //TODO Check groups

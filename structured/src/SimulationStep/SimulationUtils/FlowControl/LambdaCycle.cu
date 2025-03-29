@@ -99,7 +99,6 @@ class LambdaCycle: public SimulationStepBase{
 
           if(cycleStep < this->activationLength){
             //Activation step
-            ullint lambdaStep  = cycleStep % this->activationStep;
             ullint lambdaIndex = cycleStep / this->activationStep;
 
             real lambda = this->lambdaValues[lambdaIndex];

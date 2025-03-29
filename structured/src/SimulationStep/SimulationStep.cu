@@ -15,6 +15,7 @@ namespace SimulationStep{
         } else {
             System::log<System::CRITICAL>("[SimulationStep] (%s) SimulationStep not initialized", name.c_str());
         }
+	return false;
     }
 
     SimulationStepBase::SimulationStepBase(std::shared_ptr<ParticleGroup>              pg,

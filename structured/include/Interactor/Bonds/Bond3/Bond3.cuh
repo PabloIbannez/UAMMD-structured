@@ -201,8 +201,6 @@ struct AngularForceTransverser_{
 
         const real ang = acos(cijk);
 
-        resultType result;
-
         real3 fi=make_real3(0.0);
         real3 fk=make_real3(0.0);
 
@@ -259,7 +257,7 @@ struct AngularHessianTransverser_{
     using resultType = tensor3;
 
   enum ParticleBondIndex {p_i = 0, p_j = 1, p_k = 2, none = -1};
-  
+
     AngularHessianTransverser_(tensor3* hessian,
 			       const int* id,
 			       const int* selectedId,
@@ -299,15 +297,15 @@ struct AngularHessianTransverser_{
       int id2 = (selId == bondParam.id_i) ? p_i :
 	        (selId == bondParam.id_j) ? p_j :
 	        (selId == bondParam.id_k) ? p_k : none;
-      
+
       if (id2 == none) return tensor3();
-      
+
       real3 posi = make_real3(computational.pos[i]);
       real3 posj = make_real3(computational.pos[j]);
       real3 posk = make_real3(computational.pos[k]);
-      
+
       ///////////////////////////////////////
-      
+
       //         i -------- j -------- k
       //             <- rji     rjk ->
       //Compute distances and vectors
@@ -321,19 +319,19 @@ struct AngularHessianTransverser_{
       const real rjk2 = dot(rjk, rjk);
       const real invrjk2 = real(1.0)/rjk2;
       const real invrjk  = sqrt(invrjk2);
-      
+
       const real3 rki = computational.box.apply_pbc(posi - posk);
       const real rki2 = dot(rki, rki);
       const real invrki2 = real(1.0)/rki2;
       const real invrki  = sqrt(invrki2);
-      
+
       const real inv_rjirjk = rsqrt(rji2*rjk2);
-      
+
       real cijk = dot(rji, rjk)*inv_rjirjk;
       //Cos must stay in range
       cijk = min(real( 1.0),cijk);
       cijk = max(real(-1.0),cijk);
-      
+
       const real ang = acos(cijk);
       real sijk = sin(ang);
       //Sin must be bigger than 0
@@ -345,31 +343,31 @@ struct AngularHessianTransverser_{
 
       real3 grad_i = -(rjk*inv_rjirjk-rji*crji)/sijk;
       real3 grad_k = -(rji*inv_rjirjk-rjk*crjk)/sijk;
-      
+
       bool id2_smaller = id2 < id1;
       if (id2_smaller) {
 	int temp = id1;
 	id1 = id2;
 	id2 = temp;
       }
-     
+
       real3 grad1 = (id1 == p_i) ?  grad_i :
 	            (id1 == p_j) ? -grad_i - grad_k :
 		    grad_k;
-  
+
       real3 grad2 = (id2 == p_i) ?  grad_i :
 	            (id2 == p_j) ? -grad_i - grad_k :
                       		    grad_k;
-        
+
       tensor3 grad_2_outer_grad_1 = computeGradientAngle2AngularPotential(rji, rjk, rki,
 									  invrji, invrjk, invrki,
 									  invrji2, invrjk2, invrki2,
 									  grad1, grad2,
 									  sijk, cijk, id1, id2);
-      
+
       real dudtheta   = BondType::energyDerivate(ang,computational,bondParam);
       real du2dtheta2 = BondType::energySecondDerivate(ang,computational,bondParam);
-      
+
       H = du2dtheta2*outer(grad2, grad1)+dudtheta*grad_2_outer_grad_1;
       if (id2_smaller) H = H.transpose();
       return H;
@@ -382,16 +380,16 @@ struct AngularHessianTransverser_{
 
   template <class BondType_>
   struct AngularPairwiseForceTransverser_{
-    
+
     real4*    pairwiseForce;
     const int*  id;
     const int*  selectedId;
     const int*  id2index;
-    
+
     using BondType   = BondType_;
     using resultType = real4;
     enum ParticleBondIndex {p_i = 0, p_j = 1, p_k = 2, none = -1};
-    
+
     AngularPairwiseForceTransverser_(real4* pairwiseForce,
 				     const int* id,
 				     const int* selectedId,
@@ -399,13 +397,13 @@ struct AngularHessianTransverser_{
 							  id(id),
 							  selectedId(selectedId),
 							  id2index(id2index){}
-    
+
     inline __device__ resultType zero(){return real4();}
-    
+
     inline __device__ void accumulate(resultType& total,const resultType current){
       total+=current;
     }
-    
+
     inline __device__ resultType compute(const int currentParticleIndex,
                                          const typename BondType::ComputationalData& computational,
                                          const typename BondType::BondParameters&    bondParam){
@@ -413,9 +411,9 @@ struct AngularHessianTransverser_{
         // xx xy xz
         // yx yy yz
         // zx zy zz
-      
+
         //We compute the box ij of the hessian
-      
+
       const int i = id2index[bondParam.id_i];
       const int j = id2index[bondParam.id_j];
       const int k = id2index[bondParam.id_k];
@@ -431,15 +429,15 @@ struct AngularHessianTransverser_{
       int id2 = (selId == bondParam.id_i) ? p_i :
 	        (selId == bondParam.id_j) ? p_j :
 	        (selId == bondParam.id_k) ? p_k : none;
-      
+
       if (id2 == none) return real4();
-      
+
       real3 posi = make_real3(computational.pos[i]);
       real3 posj = make_real3(computational.pos[j]);
       real3 posk = make_real3(computational.pos[k]);
-      
+
       ///////////////////////////////////////
-      
+
       //         i -------- j -------- k
       //             <- rji     rjk ->
       //Compute distances and vectors
@@ -451,25 +449,25 @@ struct AngularHessianTransverser_{
       const real3 rjk    = computational.box.apply_pbc(posk - posj);
       const real rjk2    = dot(rjk, rjk);
       const real invrjk  = rsqrt(rjk2);
-      
+
       const real inv_rjirjk = invrjk*invrji;
-      
+
       real cijk = dot(rji, rjk)*inv_rjirjk;
       //Cos must stay in range
       cijk = min(real( 1.0),cijk);
       cijk = max(real(-1.0),cijk);
-      
+
       const real ang = acos(cijk);
       real sijk = sin(ang);
       //Sin must be bigger than 0
       //sijk = max(std::numeric_limits<real>::min(),sijk);
       sijk = max(real(1e-6),sijk);
       real invsijk = real(1.0)/sijk;
-      
+
       real dtheta_drji = -(invrjk-cijk*invrji)*invrji*invsijk;
       real dtheta_drjk = -(invrji-cijk*invrjk)*invrjk*invsijk;
       real dtheta_drik =   invrji*invrjk*invsijk;
-      
+
       bool id2_smaller = id2 < id1;
       if (id2_smaller) {
 	int temp = id1;
@@ -480,11 +478,11 @@ struct AngularHessianTransverser_{
       real3 gradTheta = (id1 == p_i && id2 == p_j) ? dtheta_drji*rji :
 	                (id1 == p_i && id2 == p_k) ? dtheta_drik*(rji-rjk) :
 	                (id1 == p_j && id2 == p_k) ? -dtheta_drjk*rjk : real3();
-	
+
       real dudtheta   = BondType::energyDerivate(ang,computational,bondParam);
-            
+
       real4 f = make_real4(gradTheta * dudtheta * ((id2_smaller) ? -real(1.0):real(1.0)), real(0.0));
-      
+
       return f;
     }
 
@@ -653,8 +651,8 @@ class AngularBond3_ : public Bond3Base_<BondType_>{
             const int* id2index   = this->pd->getIdOrderedIndices(access::location::gpu);
 	    const int* id         = this->pd->getId(access::location::gpu, access::mode::read).raw();
             const int* selectedId = this->pd->getSelectedId(access::location::gpu, access::mode::read).raw();
-            
-	    
+
+
             return PairwiseForceTransverser(pforce,
 					    id,
 					    selectedId,id2index);
@@ -733,4 +731,3 @@ class Bond3Torque_ : public Bond3Base_<BondType_> {
 };
 
 }}}}
-

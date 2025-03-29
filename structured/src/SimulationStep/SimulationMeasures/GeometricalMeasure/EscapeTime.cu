@@ -116,6 +116,7 @@ bool stringToBool(const std::string& str) {
     } else {
         System::log<System::CRITICAL>("[EscapeTime] stopSimulation must be 'true' or 'false'");
     }
+        return false;
 }
 
 template <class InsideSystemChecker>

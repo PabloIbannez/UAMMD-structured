@@ -229,7 +229,6 @@ struct HessianTransverser_{
       const int i = id2index[bondParam.id_i];
       const int j = id2index[bondParam.id_j];
 
-      const int currentId = id[currentParticleIndex];
       const int selId     = selectedId[currentParticleIndex];
 
       real4 f = real4();
@@ -524,4 +523,3 @@ class Bond2Torque_ : public Bond2Base_<BondType_> {
 };
 
 }}}}
-
