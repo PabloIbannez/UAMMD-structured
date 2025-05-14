@@ -195,7 +195,7 @@ namespace SimulationMeasures{
 		     << " " << id_i   << " " << id_j
 		     << " " << Hij.xx << " " << Hij.xy << " " << Hij.xz
 		     << " " << Hij.yx << " " << Hij.yy << " " << Hij.yz
-		     << " " << Hij.xz << " " << Hij.yz << " " << Hij.zz;
+		     << " " << Hij.zx << " " << Hij.zy << " " << Hij.zz;
 	  outputFile<<"\n";
 	}
       }
