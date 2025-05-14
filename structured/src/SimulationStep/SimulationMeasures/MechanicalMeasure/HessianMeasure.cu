@@ -128,10 +128,10 @@ namespace SimulationMeasures{
 
         if (isFileEmpty){
             outputFile<<"#"<< std::left << std::fixed
-                      << std::setw(9)  << "Id_i"<< std::setw(10)  << "Id_j"
-                      << std::setw(20) << "Hxx" << std::setw(20) << "Hxy" << std::setw(20)  << "Hxz"
-                      << std::setw(20) << "Hyx" << std::setw(20) << "Hyy" << std::setw(20)  << "Hyz"
-                      << std::setw(20) << "Hzx" << std::setw(20) << "Hzy" << std::setw(20)  << "Hzz"
+                      << " "  << "Id_i"<< " "  << "Id_j"
+                      << " " << "Hxx" << " " << "Hxy" << " "  << "Hxz"
+                      << " " << "Hyx" << " " << "Hyy" << " "  << "Hyz"
+                      << " " << "Hzx" << " " << "Hzy" << " "  << "Hzz"
                       <<"\n";
 
         } else {
@@ -192,10 +192,10 @@ namespace SimulationMeasures{
 	  tensor3 Hij = hessian_i[index_j];
 
 	  outputFile << std::left << std::fixed << std::setprecision(outputPrecision)
-		     << std::setw(10) << id_i   << std::setw(10) << id_j
-		     << std::setw(20) << Hij.xx << std::setw(20) << Hij.xy << std::setw(20) << Hij.xz
-		     << std::setw(20) << Hij.yx << std::setw(20) << Hij.yy << std::setw(20) << Hij.yz
-		     << std::setw(20) << Hij.xz << std::setw(20) << Hij.yz << std::setw(20) << Hij.zz;
+		     << " " << id_i   << " " << id_j
+		     << " " << Hij.xx << " " << Hij.xy << " " << Hij.xz
+		     << " " << Hij.yx << " " << Hij.yy << " " << Hij.yz
+		     << " " << Hij.xz << " " << Hij.yz << " " << Hij.zz;
 	  outputFile<<"\n";
 	}
       }
