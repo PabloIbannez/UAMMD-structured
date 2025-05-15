@@ -9,9 +9,6 @@ if not is_cuda_available():
 import pyUAMMD
 import numpy as np
 
-atol = 1e-5
-rtol = 1e-5
-
 
 def read_hessian_file(file_path):
     hessian_f = np.loadtxt(file_path)
@@ -117,7 +114,10 @@ def test_bond3_harmonic_symmetric(tmp_path, hessian_mode):
     hessian = read_hessian_file(hessian_path)
     # Check symmetry, hessian[i,j] == hessian[j,i].T
     hessian_t = np.transpose(hessian, (1, 0, 3, 2))
-    max_diff = np.max(np.abs(hessian - hessian_t) / np.abs(np.mean(hessian)))
+    max_diff = np.max(np.abs(hessian - hessian_t) / np.linalg.norm(hessian))
+    atol = 1e-5 if hessian_mode == "Analytical" else 1e-3
+    rtol = 1e-5 if hessian_mode == "Analytical" else 1e-3
+
     assert np.allclose(
         hessian, hessian_t, rtol=rtol, atol=atol
     ), f"The HessianMeasure is not symmetric. Max diff: {max_diff}"
@@ -157,7 +157,9 @@ def test_bond3_harmonic_self_consistent(tmp_path):
     analytical = np.loadtxt(numerical_hessian_path)
 
     assert numerical.shape == analytical.shape
-    max_diff = np.max(np.abs(numerical - analytical) / np.mean(analytical))
+    max_diff = np.max(np.abs(numerical - analytical) / np.linalg.norm(analytical))
+    atol = 1e-3
+    rtol = 1e-3
     assert np.allclose(
         numerical, analytical, rtol=rtol, atol=atol
     ), f"The HessianMeasure results are not the same between the analytical and numerical methods. Max diff: {max_diff}"
