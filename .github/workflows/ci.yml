@@ -83,6 +83,13 @@ jobs:
         make -j 2 install
 
       shell: micromamba-shell {0}
+      
+    - name: Install pyUAMMD
+      run: |
+        micromamba activate uammd
+        pip install -vv .
+
+      shell: micromamba-shell {0}
 
     - name: Run tests that do not require a GPU
       run: |
