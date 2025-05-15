@@ -9,6 +9,9 @@ if not is_cuda_available():
 import pyUAMMD
 import numpy as np
 
+atol = 1e-5
+rtol = 1e-5
+
 
 def bond3_base_simulation():
     temperature = 0
@@ -99,9 +102,11 @@ def test_bond3_harmonic_symmetric(tmp_path, hessian_mode):
     n = int(np.sqrt(hessian.shape[0]))
     hessian = hessian[:, 2:].reshape((n, n, 3, 3))
     # Check symmetry, hessian[i,j] == hessian[j,i].T
+    hessian_t = np.transpose(hessian, (1, 0, 2, 3))
+    max_diff = np.max(np.abs(hessian - hessian_t) / np.mean(hessian))
     np.allclose(
-        hessian, np.transpose(hessian, (1, 0, 2, 3)), rtol=1e-5, atol=1e-5
-    ), "The HessianMeasure is not symmetric."
+        hessian, hessian_t, rtol=rtol, atol=atol
+    ), f"The HessianMeasure is not symmetric. Max diff: {max_diff}"
 
 
 def test_bond3_harmonic_self_consistent(tmp_path):
@@ -138,7 +143,7 @@ def test_bond3_harmonic_self_consistent(tmp_path):
     analytical = np.loadtxt(numerical_hessian_path)
 
     assert numerical.shape == analytical.shape
-
+    max_diff = np.max(np.abs(numerical - analytical) / np.mean(analytical))
     assert np.allclose(
-        numerical, analytical, rtol=1e-5, atol=1e-5
-    ), "The HessianMeasure results are not the same between the analytical and numerical methods."
+        numerical, analytical, rtol=rtol, atol=atol
+    ), f"The HessianMeasure results are not the same between the analytical and numerical methods. Max diff: {max_diff}"
