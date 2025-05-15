@@ -13,6 +13,25 @@ atol = 1e-5
 rtol = 1e-5
 
 
+def read_hessian_file(file_path):
+    hessian_f = np.loadtxt(file_path)
+    # Hessian file has shape (npairs, 11), first two columns are the pair indices
+    assert (
+        hessian_f.shape[1] == 11
+    ), f"Hessian file has unexpected shape {hessian_f.shape}"
+    # Transform to a (n, n, 3, 3) array
+    n = int(np.sqrt(hessian_f.shape[0]))
+    assert (
+        n * n == hessian_f.shape[0]
+    ), f"Unexpected number of pairs {hessian_f.shape[0]}"
+    i = hessian_f[:, 0].astype(int)
+    j = hessian_f[:, 1].astype(int)
+    matrices = hessian_f[:, 2:].reshape(-1, 3, 3)
+    hessian = np.empty((n, n, 3, 3))
+    hessian[i, j] = matrices
+    return hessian
+
+
 def bond3_base_simulation():
     temperature = 0
     pos0 = [-1.1, -5.5, 2]
@@ -95,16 +114,11 @@ def test_bond3_harmonic_symmetric(tmp_path, hessian_mode):
     simulation = pyUAMMD.simulation(base_simulation)
     simulation.run()
     assert os.path.exists(hessian_path)
-
-    hessian = np.loadtxt(hessian_path)
-    # Hessian file has shape (npairs, 12), first two columns are the pair indices
-    # Transform to a (N, N, 3, 3) array
-    n = int(np.sqrt(hessian.shape[0]))
-    hessian = hessian[:, 2:].reshape((n, n, 3, 3))
+    hessian = read_hessian_file(hessian_path)
     # Check symmetry, hessian[i,j] == hessian[j,i].T
-    hessian_t = np.transpose(hessian, (1, 0, 2, 3))
-    max_diff = np.max(np.abs(hessian - hessian_t) / np.mean(hessian))
-    np.allclose(
+    hessian_t = np.transpose(hessian, (1, 0, 3, 2))
+    max_diff = np.max(np.abs(hessian - hessian_t) / np.abs(np.mean(hessian)))
+    assert np.allclose(
         hessian, hessian_t, rtol=rtol, atol=atol
     ), f"The HessianMeasure is not symmetric. Max diff: {max_diff}"
 
