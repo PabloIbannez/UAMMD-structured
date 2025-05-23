@@ -5,18 +5,6 @@ UAMMD-structured compilation and installation
 
 UAMMD-structured offers multiple compilation options to suit various user needs. This guide will walk you through the process of obtaining, configuring, and compiling UAMMD-structured. We'll cover the general compilation process and then we'll explore the three main compilation options: executable binary, Python wrapper, and Debian package.
 
-Before we begin, ensure you have the necessary prerequisites installed on your system. These include Git for version control, CMake (version 3.8 or higher) for build configuration, CUDA Toolkit (nvcc and CUDA libraries), a C++ compiler compatible with C++14, and Python if you plan to build the Python wrapper.
-
-The environment.yml file lists all dependencies, which can be installed by running the following at the root of the project:
-
-.. code-block:: bash
-
-   conda env create -f environment.yml
-
-   
-conda is a package manager that simplifies the installation of dependencies. If you don't have conda installed, you can download it from https://docs.conda.io/en/latest/miniconda.html.
-
-
 **Obtaining the Source Code**
 
 To get started, you'll need to clone the UAMMD-structured repository. Open a terminal and run the following commands:
@@ -28,6 +16,25 @@ To get started, you'll need to clone the UAMMD-structured repository. Open a ter
 
 This will download the latest version of UAMMD-structured and place you in the project directory.
 
+**Dependency installation**
+
+Then, we ensure you have the necessary prerequisites installed on your system. These include CMake for build configuration, CUDA Toolkit (nvcc and CUDA libraries), a C++ compiler compatible with C++14, and Python if you plan to build the Python wrapper.
+
+The `environment.yml` file lists all dependencies, which can be installed by running the following at the root of the project:
+
+.. code-block:: bash
+
+   conda env create-n uammd-structured
+
+   
+conda is a package manager that simplifies the installation of dependencies. If you don't have conda installed, you can download it from https://docs.conda.io/en/latest/miniconda.html.
+
+An environment called `uammd-structured` will be created, which you can activate with:
+
+.. code-block:: bash
+
+   conda activate uammd-structured
+
 **General Compilation Process**
 
 The compilation process for UAMMD-structured follows a standard CMake workflow. First, create a build directory to keep your source tree clean:
@@ -36,8 +43,10 @@ The compilation process for UAMMD-structured follows a standard CMake workflow. 
 
    mkdir build
    cd build
-   cmake ..
-   make
+   cmake -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX ..
+   make -j10 install
+
+The above will compile files using 10 cores and install the library and executables to your conda environment.
 
 The compilation time may vary depending on your system specifications and the options you've chosen.
 
