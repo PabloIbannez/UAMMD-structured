@@ -3,9 +3,9 @@ name: Build and upload conda packages
 on:
   release:
     types: ['released', 'prereleased']
-  # lets add on PR for testing
-#  pull_request:
-#    types: ['opened', 'edited', 'reopened', 'synchronize']
+# lets add on PR for testing
+  pull_request:
+    types: ['opened', 'edited', 'reopened', 'synchronize']
   workflow_dispatch:        # Un comment line if you also want to trigger action manually
 
 jobs:
@@ -49,6 +49,7 @@ jobs:
           CUDA_VERSION: ${{ matrix.cuda-version }}
           PYTHON_VERSION: ${{ matrix.python-version }}
           UAMMD_STRUCTURED_PACKAGE_NAME: "uammd-structured"
+          UAMMD_PRECISION: "SINGLE"
         with:
           meta_yaml_dir: devtools/conda-build
           python-version: ${{ matrix.python-version }}
