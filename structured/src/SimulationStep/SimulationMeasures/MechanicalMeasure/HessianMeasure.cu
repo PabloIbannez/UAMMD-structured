@@ -55,44 +55,59 @@ namespace SimulationMeasures{
 					int index_particle, cudaStream_t st){
 
 	int nParticles = pd->getNumParticles();
-	real dr        = sqrt(std::numeric_limits<real>::epsilon());
+	real dr        = 4.0*sqrt(std::numeric_limits<real>::epsilon());
 	auto hessian_i = pd->getHessian(access::location::cpu, access::mode::readwrite);
 
 	// Reference forces without any displacement
 	auto f_ref = computeForces(pd, interactors, st);
 
-	//x direction
-	moveElement(pd, dr, index_particle, 0);
-	auto forces_i_moved_x = computeForces(pd, interactors, st);
-	forj(0, nParticles){
-	  real3 df = make_real3(forces_i_moved_x[j] - f_ref[j])/dr;
-	  hessian_i[j].xx = -df.x;
-	  hessian_i[j].xy = -df.y;
-	  hessian_i[j].xz = -df.z;
+	// Copy current positions for restoration
+	thrust::device_vector<real4> pos_ref(nParticles);
+	{
+	  auto pos = pd->getPos(access::gpu, access::read);
+	  thrust::copy(thrust::cuda::par.on(st), pos.begin(), pos.end(), pos_ref.begin());
 	}
-	moveElement(pd, -dr, index_particle, 0);
+	auto restore_pos = [&](){
+	  auto pos = pd->getPos(access::gpu, access::write);
+	  thrust::copy(thrust::cuda::par.on(st), pos_ref.begin(), pos_ref.end(), pos.begin());
+	};
+	//x direction
+	{
+	  moveElement(pd, dr, index_particle, 0);
+	  auto forces_i_moved_x = computeForces(pd, interactors, st);
+	  forj(0, nParticles){
+	    real3 df = make_real3(forces_i_moved_x[j] - f_ref[j])/dr;
+	    hessian_i[j].xx = -df.x;
+	    hessian_i[j].xy = -df.y;
+	    hessian_i[j].xz = -df.z;
+	  }
+	  restore_pos();
+	}
 
 	//y direction
-	moveElement(pd,  dr, index_particle, 1);
-	auto forces_i_moved_y = computeForces(pd, interactors, st);
-	forj(0, nParticles){
-	  real3 df = make_real3(forces_i_moved_y[j] - f_ref[j])/dr;
-	  hessian_i[j].yx = -df.x;
-	  hessian_i[j].yy = -df.y;
-	  hessian_i[j].yz = -df.z;
+	{
+	  moveElement(pd,  dr, index_particle, 1);
+	  auto forces_i_moved_y = computeForces(pd, interactors, st);
+	  forj(0, nParticles){
+	    real3 df = make_real3(forces_i_moved_y[j] - f_ref[j])/dr;
+	    hessian_i[j].yx = -df.x;
+	    hessian_i[j].yy = -df.y;
+	    hessian_i[j].yz = -df.z;
+	  }
+	  restore_pos();
 	}
-	moveElement(pd,  -dr, index_particle, 1);
-
 	//z direction
-	moveElement(pd,  dr, index_particle, 2);
-	auto forces_i_moved_z = computeForces(pd, interactors, st);
-	forj(0, nParticles){
-	  real3 df = make_real3(forces_i_moved_z[j] - f_ref[j])/dr;
-	  hessian_i[j].zx = -df.x;
-	  hessian_i[j].zy = -df.y;
-	  hessian_i[j].zz = -df.z;
+	{
+	  moveElement(pd,  dr, index_particle, 2);
+	  auto forces_i_moved_z = computeForces(pd, interactors, st);
+	  forj(0, nParticles){
+	    real3 df = make_real3(forces_i_moved_z[j] - f_ref[j])/dr;
+	    hessian_i[j].zx = -df.x;
+	    hessian_i[j].zy = -df.y;
+	    hessian_i[j].zz = -df.z;
+	  }
+	  restore_pos();
 	}
-	moveElement(pd,  -dr, index_particle, 2);
       }
     }
 
@@ -128,10 +143,10 @@ namespace SimulationMeasures{
 
         if (isFileEmpty){
             outputFile<<"#"<< std::left << std::fixed
-                      << std::setw(9)  << "Id_i"<< std::setw(10)  << "Id_j"
-                      << std::setw(20) << "Hxx" << std::setw(20) << "Hxy" << std::setw(20)  << "Hxz"
-                      << std::setw(20) << "Hyx" << std::setw(20) << "Hyy" << std::setw(20)  << "Hyz"
-                      << std::setw(20) << "Hzx" << std::setw(20) << "Hzy" << std::setw(20)  << "Hzz"
+                      << " "  << "Id_i"<< " "  << "Id_j"
+                      << " " << "Hxx" << " " << "Hxy" << " "  << "Hxz"
+                      << " " << "Hyx" << " " << "Hyy" << " "  << "Hyz"
+                      << " " << "Hzx" << " " << "Hzy" << " "  << "Hzz"
                       <<"\n";
 
         } else {
@@ -192,10 +207,10 @@ namespace SimulationMeasures{
 	  tensor3 Hij = hessian_i[index_j];
 
 	  outputFile << std::left << std::fixed << std::setprecision(outputPrecision)
-		     << std::setw(10) << id_i   << std::setw(10) << id_j
-		     << std::setw(20) << Hij.xx << std::setw(20) << Hij.xy << std::setw(20) << Hij.xz
-		     << std::setw(20) << Hij.yx << std::setw(20) << Hij.yy << std::setw(20) << Hij.yz
-		     << std::setw(20) << Hij.xz << std::setw(20) << Hij.yz << std::setw(20) << Hij.zz;
+		     << " " << id_i   << " " << id_j
+		     << " " << Hij.xx << " " << Hij.xy << " " << Hij.xz
+		     << " " << Hij.yx << " " << Hij.yy << " " << Hij.yz
+		     << " " << Hij.zx << " " << Hij.zy << " " << Hij.zz;
 	  outputFile<<"\n";
 	}
       }
