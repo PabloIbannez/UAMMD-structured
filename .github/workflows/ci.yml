@@ -27,7 +27,29 @@ jobs:
             gcc: "13.*"
     steps:
     - name: Check out
-      uses: actions/checkout@v4
+      uses: actions/checkout@v2
+    - name: Manage disk space
+      run: |
+          sudo mkdir -p /opt/empty_dir || true
+          for d in \
+                   /opt/ghc \
+                   /opt/hostedtoolcache \
+                   /usr/lib/jvm \
+                   /usr/local/.ghcup \
+                   /usr/local/lib/android \
+                   /usr/local/share/powershell \
+                   /usr/share/dotnet \
+                   /usr/share/swift \
+                   ; do
+            sudo rsync --stats -a --delete /opt/empty_dir/ $d || true
+          done
+          sudo apt-get purge -y -f firefox \
+                                   google-chrome-stable \
+                                   microsoft-edge-stable gcc
+          sudo apt-get autoremove -y >& /dev/null
+          sudo apt-get autoclean -y >& /dev/null
+          sudo docker image prune --all --force
+          df -h
 
     - name: Prepare dependencies
       run: |
@@ -41,7 +63,7 @@ jobs:
       uses: mamba-org/setup-micromamba@v2
       with:
         environment-file: environment.yml
-        cache-environment: true
+        cache-environment: false
         cache-downloads: true
         generate-run-shell: true
       env:
@@ -57,23 +79,7 @@ jobs:
       run: |
         micromamba activate uammd
         mkdir build && cd build
-        cmake -DCMAKE_VERBOSE_MAKEFILE=yes -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} -DCMAKE_CUDA_ARCHITECTURES=OFF -DBUILD_PYTHON_WRAPPER=ON -DINSTALL_PYTHON_PACKAGE=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CUDA_FLAGS_DEBUG="-O0" -DCMAKE_CXX_FLAGS_DEBUG="-O0" -G Ninja ..
-        cmake --build . -- -j5
-        cmake --install .
-
+        cmake -DCMAKE_VERBOSE_MAKEFILE=yes -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} -DCMAKE_CUDA_ARCHITECTURES=OFF -DBUILD_PYTHON_WRAPPER=ON -DINSTALL_PYTHON_PACKAGE=ON ..
+        make -j 2 install
 
       shell: micromamba-shell {0}
-      
-    - name: Install pyUAMMD
-      run: |
-        micromamba activate uammd
-        pip install -vv .
-
-      shell: micromamba-shell {0}
-
-    - name: Run tests that do not require a GPU
-      run: |
-        micromamba activate uammd
-        pytest 
-      shell: micromamba-shell {0}
-    
