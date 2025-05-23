@@ -3,7 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - cmake >=3.27
-  - cuda-version 12.*
+  - cuda-version < 12.8
   - gxx 11.*
   - gcc
   - cuda-libraries-dev
