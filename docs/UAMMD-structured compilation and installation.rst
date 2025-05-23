@@ -24,16 +24,26 @@ The `environment.yml` file lists all dependencies, which can be installed by run
 
 .. code-block:: bash
 
-   conda env create-n uammd-structured
+   conda env create -n uammd-structured
 
    
 conda is a package manager that simplifies the installation of dependencies. If you don't have conda installed, you can download it from https://docs.conda.io/en/latest/miniconda.html.
+
+.. warning:: Make sure the CUDA version installed in the environment is compatible with your current NVIDIA driver. You can check with `nvidia-smi`.
+
+	     You can choose a different cuda version (e.g. 12.3) when creating the environment by running:
+
+	     .. code:: bash
+
+		       conda env create -n uammd-structured cuda-version==12.3
 
 An environment called `uammd-structured` will be created, which you can activate with:
 
 .. code-block:: bash
 
    conda activate uammd-structured
+
+
 
 **General Compilation Process**
 
@@ -65,8 +75,12 @@ You can specify CUDA architectures to compile for, which can significantly reduc
 .. code-block:: bash
 
    cmake -DCUDA_ARCHITECTURES="70;75" ..
+   #Or
+   cmake -DCUDA_ARCHITECTURES=OFF ..
 
-For an interactive configuration interface, you can use `ccmake ..` instead of `cmake ..` (if available on your system). This will open a CMake configuration screen where you can set the different options.
+Setting this variable to `OFF` creates a binary that will work for any GPU in exchange for an slight overhead when running the code for the first time in a new architecture.
+
+.. warning:: Make sure the CUDA version installed in the environment is compatible with your current NVIDIA driver. You can check with `nvidia-smi`
 
 **Specific Compilation Options**
 
