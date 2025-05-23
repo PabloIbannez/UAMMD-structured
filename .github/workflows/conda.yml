@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11"]
-        cuda-version: ["12.1","12.8"]
+        cuda-version: ["12.1"]
     steps:
       - uses: actions/checkout@v4
         with:
