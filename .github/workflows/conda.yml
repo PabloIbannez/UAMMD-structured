@@ -8,10 +8,10 @@ on:
   workflow_dispatch:        # Un comment line if you also want to trigger action manually
 
 jobs:
-  runs-on: [self-hosted, gpu]
   conda_deployment_with_new_tag:
     name: Conda deployment of package with Python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: [self-hosted, gpu]
     strategy:
       matrix:
         python-version: ["3.11"]
