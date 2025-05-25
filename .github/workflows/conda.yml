@@ -23,7 +23,7 @@ jobs:
       - name: Install Mamba
         uses: mamba-org/setup-micromamba@v2
         with:
-          environment-file: environment.yml
+          environment-file: devtools/conda-envs/build_env.yaml    # Path to the build conda environment
           cache-environment: false
           cache-downloads: true
           generate-run-shell: true
