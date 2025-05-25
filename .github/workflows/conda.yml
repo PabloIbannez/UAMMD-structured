@@ -1,5 +1,7 @@
 name: Build and upload conda packages
 
+runs-on: [self-hosted, gpu]
+
 on:
   release:
     types: ['released', 'prereleased']
