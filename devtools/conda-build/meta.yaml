@@ -41,6 +41,8 @@ requirements:
 
 
 test:
+  requires:
+    - tqdm
   imports:
     - pyUAMMD
   commands:

@@ -24,7 +24,7 @@ jobs:
         uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: devtools/conda-envs/build_env.yaml    # Path to the build conda environment
-          cache-environment: false
+          cache-environment: true
           cache-downloads: true
           generate-run-shell: true
       - name: Enforce .tar.bz2 packages
