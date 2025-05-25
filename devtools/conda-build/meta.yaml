@@ -20,7 +20,6 @@ requirements:
     - python {{ PYTHON_VERSION }}
     - cmake >=3.27
     - pybind11
-    - cuda-version {{ CUDA_VERSION }}
     - gxx <12
     - cuda-nvcc
     - make
@@ -28,6 +27,7 @@ requirements:
     - blas-devel
     - cuda-libraries-dev
     - cuda-cudart-dev
+    - cuda-version {{ CUDA_VERSION }}
     - libblas
     - liblapacke
     - python
