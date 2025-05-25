@@ -1,7 +1,4 @@
 name: Build and upload conda packages
-
-runs-on: [self-hosted, gpu]
-
 on:
   release:
     types: ['released', 'prereleased']
@@ -11,6 +8,7 @@ on:
   workflow_dispatch:        # Un comment line if you also want to trigger action manually
 
 jobs:
+  runs-on: [self-hosted, gpu]
   conda_deployment_with_new_tag:
     name: Conda deployment of package with Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
