@@ -28,8 +28,8 @@ jobs:
           auto-update-conda: false
           auto-activate-base: true
           show-channel-urls: true
-        env:
-          CONDA: ${HOME}/miniforge3
+          miniforge-version: "latest"
+
       - name: Enforce .tar.bz2 packages
         # Temporary work-arounds while the action uibcdf/action-build-and-upload-conda-packages gets updated:
         # We create a `~/.condarc` file with the correct options to enforce the use of `.tar.bz2` packages
