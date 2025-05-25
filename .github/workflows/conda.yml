@@ -56,3 +56,11 @@ jobs:
           overwrite: true
           upload: true
           token: ${{ secrets.ANACONDA_TOKEN }}
+      - name: Check for broken packages
+        shell: bash
+        run: |
+          if compgen -G "$CONDA_PREFIX/conda-bld/broken/*.tar.bz2" > /dev/null; then
+            echo "Conda build failed: broken packages found"
+            exit 1
+          fi
+      

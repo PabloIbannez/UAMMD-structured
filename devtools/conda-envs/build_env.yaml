@@ -4,3 +4,4 @@ channels:    # write here the list of channels to look for your library dependen
 dependencies:   # Keep this block with only these two packages
   - anaconda-client
   - conda-build
+  - conda-verify

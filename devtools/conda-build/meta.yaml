@@ -46,8 +46,8 @@ test:
   imports:
     - pyUAMMD
   commands:
-    - which UAMMDlauncher
-    
+    - ls $PREFIX/bin/UAMMDlauncher
+     
 about:
   home: https://github.com/PabloIbannez/uammd-structured
   license: GPL-v3
