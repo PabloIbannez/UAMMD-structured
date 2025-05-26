@@ -14,7 +14,7 @@ if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
   set(CMAKE_CUDA_ARCHITECTURES "all")
 endif()
 
-set(INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/bin CACHE PATH "Installation directory")
+set(INSTALL_DIR ${CMAKE_INSTALL_PREFIX} CACHE PATH "Installation directory")
 
 option(INSTALL_PYTHON_PACKAGE "Install Python package during make install" OFF)
 option(BUILD_PYTHON_WRAPPER "Build Python wrapper for UAMMDlauncher" OFF)
@@ -264,6 +264,7 @@ add_library(structured_objects SHARED ${STRUCTURED_ALL_FILES})
 set_target_properties(structured_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
 uammd_setup_target(structured_objects)
 
+
 add_executable(UAMMDlauncher ${PROJECT_SOURCE_DIR}/main/UAMMDlauncher.cu)
 uammd_setup_target(UAMMDlauncher)
 target_link_libraries(UAMMDlauncher PRIVATE structured_objects)
@@ -301,8 +302,10 @@ endif()
 if(NOT BUILD_DEB_PACKAGE)
 
     install(TARGETS UAMMDlauncher
-            RUNTIME DESTINATION ${INSTALL_DIR})
-
+      RUNTIME DESTINATION ${INSTALL_DIR}/bin)
+    install(TARGETS structured_objects
+      LIBRARY DESTINATION ${INSTALL_DIR}/lib
+      ARCHIVE DESTINATION ${INSTALL_DIR}/lib)
     if(INSTALL_PYTHON_PACKAGE)
         add_custom_target(
             install_python_package
