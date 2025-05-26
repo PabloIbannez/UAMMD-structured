@@ -8,7 +8,8 @@ source:
 build:
   number: 0
   string: cuda{{ CUDA_VERSION }}py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
-    
+  script_env:
+    - UAMMD_PRECISION    
 requirements:
   run_constrained:
   {% if UAMMD_PRECISION == "DOUBLE" %}
