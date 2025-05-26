@@ -41,6 +41,7 @@ jobs:
             - nodefaults
           
           EOF
+
       - name: Build and upload the conda packages manually
         shell: micromamba-shell {0}
         env:
@@ -51,7 +52,7 @@ jobs:
         run: |
           conda build devtools/conda-build --python "$PYTHON_VERSION"      
           PKG_PATH=$(conda build devtools/conda-build --python "$PYTHON_VERSION" --output)      
-          anaconda -t ${{ ANACONDA_TOKEN }} upload "$PKG_PATH" \
+          anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload "$PKG_PATH" \
             --user ComplexFluidsUAM \
             --label main \
             --force
