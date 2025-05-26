@@ -51,5 +51,5 @@ test:
      
 about:
   home: https://github.com/PabloIbannez/uammd-structured
-  license: GPL-v3
+  license: GPL3
   summary: UAMMD-structured is an extension of the UAMMD (Universally Adaptable Multiscale Molecular Dynamics) software for coarse-grained simulations.
