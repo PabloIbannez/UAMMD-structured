@@ -37,6 +37,7 @@ requirements:
     - jsbeautifier
   run:
     - python
+    - tqdm
     - deepdiff
     - jsbeautifier
     - cuda-cudart
