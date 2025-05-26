@@ -260,7 +260,7 @@ parse_json_and_add_files(${UAMMD_COMPONENTS_PATH} ${UAMMD_STRUCTURED_SRC_PATH})
 set(STRUCTURED_ALL_FILES ${STRUCTURED_BACKBONE_FILES} ${STRUCTURED_COMPONENTS})
 
 list(REMOVE_DUPLICATES STRUCTURED_ALL_FILES)
-add_library(structured_objects OBJECT ${STRUCTURED_ALL_FILES})
+add_library(structured_objects SHARED ${STRUCTURED_ALL_FILES})
 set_target_properties(structured_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
 uammd_setup_target(structured_objects)
 
