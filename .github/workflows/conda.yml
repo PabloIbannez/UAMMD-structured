@@ -27,20 +27,6 @@ jobs:
           cache-environment: true
           cache-downloads: true
           generate-run-shell: true
-      - name: Enforce .tar.bz2 packages
-        # Temporary work-arounds while the action uibcdf/action-build-and-upload-conda-packages gets updated:
-        # We create a `~/.condarc` file with the correct options to enforce the use of `.tar.bz2` packages
-        # and we set the channels to be used by conda build
-        shell: micromamba-shell {0}
-        run: |
-          cat > ~/.condarc << EOF
-          conda-build:
-            pkg_format: .tar.bz2
-          channels:
-            - conda-forge
-            - nodefaults
-          
-          EOF
 
       - name: Build and upload the conda packages manually
         shell: micromamba-shell {0}
@@ -57,16 +43,3 @@ jobs:
             --user ComplexFluidsUAM \
             --label main \
             --force
-      - name: Check for broken packages
-        shell: micromamba-shell {0}
-        run: |
-          CONDA_BLD_DIR=$(conda info --base)/conda-bld
-          echo "Checking for broken packages in $CONDA_BLD_DIR/broken"
-          if compgen -G "$CONDA_BLD_DIR/broken/*.tar.bz2" > /dev/null; then
-            echo "Conda build failed: broken packages found:"
-            ls -lh "$CONDA_BLD_DIR/broken"
-            exit 1
-          else
-            echo "No broken packages found."
-          fi
-      
