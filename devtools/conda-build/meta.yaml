@@ -38,7 +38,9 @@ requirements:
     - python
     - deepdiff
     - jsbeautifier
-
+    - cuda-cudart
+    - cuda-libraries
+    - cuda-version {{ CUDA_VERSION }}    
 
 
 test:
