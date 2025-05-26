@@ -3,13 +3,15 @@ channels:
   - conda-forge
 dependencies:
   - cmake >=3.27
-  - cuda-version < 12.8
+  - cuda-version
   - gxx 11.*
   - gcc
   - cuda-libraries-dev
   - cuda-nvcc
   - make
-  - mkl-devel
+  - libblas
+  - liblapacke
+  - blas-devel
   - pybind11
   - python 3.*
   - pip
