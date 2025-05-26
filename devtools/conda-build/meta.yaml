@@ -21,13 +21,12 @@ requirements:
     - cmake >=3.27
     - pybind11
     - gxx <12
+    - cuda-version {{ CUDA_VERSION }}
     - cuda-nvcc
     - make
-    - cuda-version {{ CUDA_VERSION }}
   host:
     - blas-devel
     - cuda-libraries-dev
-    - cuda-cudart-dev
     - cuda-version {{ CUDA_VERSION }}
     - libblas
     - liblapacke
