@@ -78,6 +78,7 @@ add_compile_definitions(
 )
 # Ignore CUDA warnings about inline global kernels
 set(CMAKE_CUDA_FLAGS "-diag-suppress=20050")
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 
 if(INSTALL_PYTHON_PACKAGE)
     find_package(Python COMPONENTS Interpreter REQUIRED)
