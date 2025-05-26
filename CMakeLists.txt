@@ -30,7 +30,7 @@ if(BUILD_DEB_PACKAGE AND (BUILD_PYTHON_WRAPPER OR INSTALL_PYTHON_PACKAGE))
 endif()
 
 set(UAMMD_REPO_URL "https://github.com/RaulPPelaez/UAMMD.git")
-set(UAMMD_TAG "v2.8.0")
+set(UAMMD_TAG "v2.8.3")
 include(FetchContent)
 FetchContent_Declare(
   uammd
