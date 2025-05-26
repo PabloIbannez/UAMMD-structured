@@ -49,6 +49,7 @@ jobs:
           PYTHON_VERSION: ${{ matrix.python-version }}
           UAMMD_STRUCTURED_PACKAGE_NAME: uammd-structured
           UAMMD_PRECISION: SINGLE
+          UAMMD_TAG: fix_sm90
         run: |
           conda build devtools/conda-build --python "$PYTHON_VERSION"      
           PKG_PATH=$(conda build devtools/conda-build --python "$PYTHON_VERSION" --output)      
