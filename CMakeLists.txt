@@ -306,14 +306,14 @@ if(NOT BUILD_DEB_PACKAGE)
     install(TARGETS structured_objects
       LIBRARY DESTINATION ${INSTALL_DIR}/lib
       ARCHIVE DESTINATION ${INSTALL_DIR}/lib)
+
     if(INSTALL_PYTHON_PACKAGE)
         add_custom_target(
             install_python_package
             COMMAND ${CMAKE_COMMAND} -E echo "Installing Python package..."
-            COMMAND ${Python_EXECUTABLE} -m pip install ${CMAKE_SOURCE_DIR}
+            COMMAND ${Python_EXECUTABLE} -m pip install -v ${CMAKE_SOURCE_DIR}
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         )
-
         # Make sure the Python package is installed after the main target and Python wrapper (if built)
         add_dependencies(install_python_package UAMMDlauncher)
         if(BUILD_PYTHON_WRAPPER)
