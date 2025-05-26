@@ -63,6 +63,10 @@ if(NOT UAMMD_PRECISION STREQUAL "SINGLE" AND NOT UAMMD_PRECISION STREQUAL "DOUBL
   message(WARNING "UAMMD_PRECISION is not SINGLE or DOUBLE, set it to SINGLE")
 endif()
 
+if(UAMMD_PRECISION STREQUAL "DOUBLE")
+  add_compile_definitions(DOUBLE_PRECISION)
+endif()
+
 include_directories(${UAMMD_STRUCTURED_INCLUDE_PATH})
 include_directories(${UAMMD_STRUCTURED_SRC_PATH})
 add_compile_definitions(
@@ -250,27 +254,14 @@ function(parse_json_array current_path array)
 endfunction()
 
 parse_json_and_add_files(${UAMMD_COMPONENTS_PATH} ${UAMMD_STRUCTURED_SRC_PATH})
-list(REMOVE_DUPLICATES STRUCTURED_COMPONENTS)
-add_library(structured_objects STATIC ${STRUCTURED_BACKBONE_FILES} ${STRUCTURED_COMPONENTS})
-set_target_properties(structured_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set(STRUCTURED_ALL_FILES ${STRUCTURED_BACKBONE_FILES} ${STRUCTURED_COMPONENTS})
+
+list(REMOVE_DUPLICATES STRUCTURED_ALL_FILES)
+add_library(structured_objects ${STRUCTURED_ALL_FILES})
 uammd_setup_target(structured_objects)
-
-
-if(UAMMD_PRECISION STREQUAL "DOUBLE")
-    target_compile_definitions(structured_objects PRIVATE DOUBLE_PRECISION)
-endif()
-
 add_executable(UAMMDlauncher ${PROJECT_SOURCE_DIR}/main/UAMMDlauncher.cu)
 uammd_setup_target(UAMMDlauncher)
-if(UAMMD_PRECISION STREQUAL "DOUBLE")
-    target_compile_definitions(UAMMDlauncher PRIVATE DOUBLE_PRECISION)
-endif()
-
-target_link_libraries(UAMMDlauncher PRIVATE
-                      structured_objects
-                      $<TARGET_OBJECTS:structured_objects>)
-
-
+target_link_libraries(UAMMDlauncher PRIVATE structured_objects)
 foreach(SECTION ${SECTIONS})
     add_dependencies(UAMMDlauncher Generate${SECTION}Data)
 endforeach()
@@ -278,15 +269,7 @@ endforeach()
 if(BUILD_PYTHON_WRAPPER)
     pybind11_add_module(pyUAMMDlauncher ${PROJECT_SOURCE_DIR}/pyUAMMD/utils/launcher/UAMMDlauncher.cu)
     uammd_setup_target(pyUAMMDlauncher)
-    target_link_libraries(pyUAMMDlauncher PRIVATE
-                          structured_objects
-                          $<TARGET_OBJECTS:structured_objects>
-			)
-
-    if(UAMMD_PRECISION STREQUAL "DOUBLE")
-        target_compile_definitions(pyUAMMDlauncher PRIVATE DOUBLE_PRECISION)
-      endif()
-
+    target_link_libraries(pyUAMMDlauncher PRIVATE structured_objects)
     foreach(SECTION ${SECTIONS})
         add_dependencies(pyUAMMDlauncher Generate${SECTION}Data)
     endforeach()
