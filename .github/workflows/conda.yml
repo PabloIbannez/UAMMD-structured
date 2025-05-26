@@ -36,9 +36,9 @@ jobs:
           UAMMD_STRUCTURED_PACKAGE_NAME: uammd-structured
           UAMMD_PRECISION: "SINGLE"
         run: |
-          conda build devtools/conda-build --python "$PYTHON_VERSION"      
-          PKG_PATH=$(conda build devtools/conda-build --python "$PYTHON_VERSION" --output)      
-          anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload "$PKG_PATH" \
+          out_dir=`mktemp -d -t compilation-XXXXXXXXXX`
+          conda build devtools/conda-build --python "$PYTHON_VERSION" --no-anaconda-upload --output-folder $out_dir
+          anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload ${out_dir}/*.conda \
             --user ComplexFluidsUAM \
             --label main \
             --force
