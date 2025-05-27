@@ -9,7 +9,7 @@ namespace PluginUtils {
 
 /* This function is used to ensure that no two different plugins can have the same identifier.
  * If a plugin has already been registered with the same name but in a different location,
- * it will throw an exception. This is useful to prevent conflicts between plugins.
+ * it will throw an exception.
  */
 inline void registrationGuard(std::string identifier, std::string location)
 {
