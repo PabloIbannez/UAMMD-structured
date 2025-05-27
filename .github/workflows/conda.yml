@@ -14,7 +14,6 @@ jobs:
 #    runs-on: [self-hosted, gpu]
     strategy:
       matrix:
-        python-version: ["3.9", "3.11", "3.12", "3.13"]
         cuda-version: ["12.1", "12.3", "12.6", "12.9"]
     steps:
       - uses: actions/checkout@v4
@@ -32,13 +31,12 @@ jobs:
         shell: micromamba-shell {0}
         env:
           CUDA_VERSION: ${{ matrix.cuda-version }}
-          PYTHON_VERSION: ${{ matrix.python-version }}
           UAMMD_STRUCTURED_PACKAGE_NAME: uammd-structured
           UAMMD_PRECISION: "SINGLE"
         run: |
           out_dir=`mktemp -d -t compilation-XXXXXXXXXX`
           conda verify devtools/conda-build
-          conda build devtools/conda-build --python "$PYTHON_VERSION" --no-anaconda-upload --output-folder $out_dir
+          conda build devtools/conda-build --no-anaconda-upload --output-folder $out_dir
           pkg_files=`find ${out_dir} -name *.conda`
           anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload ${pkg_files} \
             --user ComplexFluidsUAM \

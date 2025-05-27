@@ -7,7 +7,7 @@ source:
 
 build:
   number: 0
-  string: cuda{{ CUDA_VERSION }}py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+  string: cuda{{ CUDA_VERSION | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
   script_env:
     - UAMMD_PRECISION    
 requirements:
@@ -18,7 +18,7 @@ requirements:
     - uammd-structured-double 9999999999
   {% endif %}
   build:
-    - python {{ PYTHON_VERSION }}
+    - python
     - cmake >=3.27
     - pybind11
     - gxx <12
