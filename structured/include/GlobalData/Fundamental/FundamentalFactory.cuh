@@ -84,17 +84,13 @@ private:
 
 }}}
 
-#include<source_location>
-
 #define REGISTER_FUNDAMENTAL(type, subType, ...)                                                                       \
     namespace {                                                                                                        \
     struct registerFundamental##type##subType                                                                          \
     {                                                                                                                  \
         registerFundamental##type##subType()                                                                           \
         {                                                                                                              \
-            uammd::structured::PluginUtils::registrationGuard("Fundamental" + std::string(#type) +                     \
-                                                              std::string(#subType) +                                  \
-                                                              std::source_location::current().file_name());            \
+            PLUGIN_REGISTRATION_GUARD("Fundamental" + std::string(#type) + std::string(#subType));                     \
             uammd::structured::Fundamental::FundamentalFactory::getInstance().registerFundamental(                     \
                 #type,                                                                                                 \
                 #subType,                                                                                              \

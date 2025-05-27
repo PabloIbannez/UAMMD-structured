@@ -82,7 +82,6 @@ private:
 };
 
 }}}
-#include <source_location>
 
 #define REGISTER_ENSEMBLE(type, subType, ...)                                                                          \
     namespace {                                                                                                        \
@@ -90,9 +89,7 @@ private:
     {                                                                                                                  \
         registerEnsemble##type##subType()                                                                              \
         {                                                                                                              \
-            uammd::structured::PluginUtils::registrationGuard("Ensemble" + std::string(#type) +                        \
-                                                              std::string(#subType) +                                  \
-                                                              std::source_location::current().file_name());            \
+            PLUGIN_REGISTRATION_GUARD("Ensemble" + std::string(#type) + std::string(#subType));                        \
             uammd::structured::Ensemble::EnsembleFactory::getInstance().registerEnsemble(                              \
                 #type,                                                                                                 \
                 #subType,                                                                                              \

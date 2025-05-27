@@ -110,7 +110,6 @@ namespace Interactor {
     };
 }}}
 
-#include <source_location>
 
 // Macro for registering a standard interactor
 #define __REGISTER_INTERACTOR__(type, subType, ...)                                                                    \
@@ -119,9 +118,7 @@ namespace Interactor {
     {                                                                                                                  \
         registerInteractor##type##subType()                                                                            \
         {                                                                                                              \
-            uammd::structured::PluginUtils::registrationGuard("Interactor" + std::string(#type) +                      \
-                                                              std::string(#subType) +                                  \
-                                                              std::source_location::current().file_name());            \
+            PLUGIN_REGISTRATION_GUARD("Interactor" + std::string(#type) + std::string(#subType));                      \
             uammd::structured::Interactor::InteractorFactory::getInstance()                                            \
                 .registerInteractor<uammd::structured::Interactor::InteractorFactory::Creator>(                        \
                     #type,                                                                                             \
@@ -159,9 +156,7 @@ namespace Interactor {
     {                                                                                                                  \
         registerInteractor##type##subType()                                                                            \
         {                                                                                                              \
-            uammd::structured::PluginUtils::registrationGuard("InteractorNonBonded" + std::string(#type) +             \
-                                                              std::string(#subType) +                                  \
-                                                              std::source_location::current().file_name());            \
+            PLUGIN_REGISTRATION_GUARD("InteractorNonBonded" + std::string(#type) + std::string(#subType));             \
             uammd::structured::Interactor::InteractorFactory::getInstance()                                            \
                 .registerInteractor<uammd::structured::Interactor::InteractorFactory::NonBondedCreator>(               \
                     #type,                                                                                             \
@@ -185,9 +180,7 @@ namespace Interactor {
     {                                                                                                                  \
         registerInteractor##type##subType()                                                                            \
         {                                                                                                              \
-            uammd::structured::PluginUtils::registrationGuard("PatchyParticleInteractor" + std::string(#type) +        \
-                                                              std::string(#subType) +                                  \
-                                                              std::source_location::current().file_name());            \
+            PLUGIN_REGISTRATION_GUARD("PatchyParticleInteractor" + std::string(#type) + std::string(#subType));        \
             uammd::structured::Interactor::InteractorFactory::getInstance()                                            \
                 .registerInteractor<uammd::structured::Interactor::InteractorFactory::PatchyParticleCreator>(          \
                     #type,                                                                                             \

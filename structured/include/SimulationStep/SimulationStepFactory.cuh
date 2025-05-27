@@ -92,17 +92,13 @@ private:
 
 }}}
 
-#include <source_location>
-
 #define REGISTER_SIMULATION_STEP(type, subType, ...)                                                                   \
     namespace {                                                                                                        \
     struct registerSimulationStep##type##subType                                                                       \
     {                                                                                                                  \
         registerSimulationStep##type##subType()                                                                        \
         {                                                                                                              \
-            uammd::structured::PluginUtils::registrationGuard("SimulationStep" + std::string(#type) +                  \
-                                                              std::string(#subType) +                                  \
-                                                              std::source_location::current().file_name());            \
+            PLUGIN_REGISTRATION_GUARD("SimulationStep" + std::string(#type) + std::string(#subType));                  \
             uammd::structured::SimulationStep::SimulationStepFactory::getInstance().registerSimulationStep(            \
                 #type,                                                                                                 \
                 #subType,                                                                                              \

@@ -88,7 +88,6 @@ private:
 
 }}}
 
-#include <source_location>
 
 #define REGISTER_INTEGRATOR(type, subType, ...)                                                                        \
     namespace {                                                                                                        \
@@ -96,8 +95,7 @@ private:
     {                                                                                                                  \
         registerIntegrator##type##subType()                                                                            \
         {                                                                                                              \
-            uammd::structured::PluginUtils::registrationGuard("IntegratorFactory" + std::string(#type) +               \
-                                                              std::string(#subType));                                  \
+            PLUGIN_REGISTRATION_GUARD("IntegratorFactory" + std::string(#type) + std::string(#subType));               \
             uammd::structured::Integrator::IntegratorFactory::getInstance().registerIntegrator(                        \
                 #type,                                                                                                 \
                 #subType,                                                                                              \

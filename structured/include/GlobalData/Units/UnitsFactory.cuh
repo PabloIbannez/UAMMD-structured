@@ -84,16 +84,13 @@ private:
 }}}
 
 #include "Utils/Plugins/Plugins.cuh"
-#include <source_location>
 #define REGISTER_UNITS(type, subType, ...)                                                                             \
     namespace {                                                                                                        \
     struct registerUnits##type##subType                                                                                \
     {                                                                                                                  \
         registerUnits##type##subType()                                                                                 \
         {                                                                                                              \
-            uammd::structured::PluginUtils::registrationGuard("UnitsFactory" + std::string(#type) +                    \
-                                                              std::string(#subType) +                                  \
-                                                              std::source_location::current().file_name());            \
+            PLUGIN_REGISTRATION_GUARD("UnitsFactory" + std::string(#type) + std::string(#subType));                    \
             uammd::structured::Units::UnitsFactory::getInstance().registerUnits(                                       \
                 #type,                                                                                                 \
                 #subType,                                                                                              \

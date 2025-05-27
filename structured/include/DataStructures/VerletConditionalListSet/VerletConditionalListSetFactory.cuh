@@ -65,16 +65,13 @@ class VerletConditionalListSetFactory{
     };
 }}
 
-#include <source_location>
-
 #define REGISTER_VERLET_CONDITIONAL_LIST_SET(type, ...)                                                                \
     namespace {                                                                                                        \
     struct registerVCLS##type                                                                                          \
     {                                                                                                                  \
         registerVCLS##type()                                                                                           \
         {                                                                                                              \
-            uammd::structured::PluginUtils::registrationGuard("VerletConditionalListSetFactory" + std::string(#type) + \
-                                                              std::source_location::current().file_name());            \
+            PLUGIN_REGISTRATION_GUARD("VerletConditionalListSetFactory" + std::string(#type));                         \
             uammd::structured::VerletConditionalListSetFactory::getInstance().registerVerletConditionalListSet(        \
                 #type,                                                                                                 \
                 [](std::shared_ptr<uammd::structured::GlobalData> gd,                                                  \

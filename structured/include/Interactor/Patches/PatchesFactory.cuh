@@ -100,8 +100,6 @@ namespace Interactor {
     };
 }}}
 
-#include <source_location>
-
 // Macro for registering a patches interactor
 #define REGISTER_PATCHES_INTERACTOR(type, subType, ...)                                                                \
     namespace {                                                                                                        \
@@ -109,9 +107,7 @@ namespace Interactor {
     {                                                                                                                  \
         registerInteractor##type##subType()                                                                            \
         {                                                                                                              \
-            uammd::structured::PluginUtils::registrationGuard("PatchesInteractor" + std::string(#type) +               \
-                                                              std::string(#subType) +                                  \
-                                                              std::source_location::current().file_name());            \
+            PLUGIN_REGISTRATION_GUARD("PatchesInteractor" + std::string(#type) + std::string(#subType));               \
             uammd::structured::Interactor::PatchesFactory::getInstance()                                               \
                 .registerInteractor<uammd::structured::Interactor::PatchesFactory::PatchesCreator>(                    \
                     #type,                                                                                             \
@@ -136,9 +132,7 @@ namespace Interactor {
     {                                                                                                                  \
         registerInteractor##type##subType()                                                                            \
         {                                                                                                              \
-            uammd::structured::PluginUtils::registrationGuard("NonBondedPatchesInteractor" + std::string(#type) +      \
-                                                              std::string(#subType) +                                  \
-                                                              std::source_location::current().file_name());            \
+            PLUGIN_REGISTRATION_GUARD("NonBondedPatchesInteractor" + std::string(#type) + std::string(#subType));      \
             uammd::structured::Interactor::PatchesFactory::getInstance()                                               \
                 .registerInteractor<uammd::structured::Interactor::PatchesFactory::NonBondedPatchesCreator>(           \
                     #type,                                                                                             \

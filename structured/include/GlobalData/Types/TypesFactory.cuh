@@ -84,7 +84,6 @@ private:
 
 }}}
 
-#include <source_location>
 
 #define REGISTER_TYPES(type, subType, ...)                                                                             \
     namespace {                                                                                                        \
@@ -92,9 +91,7 @@ private:
     {                                                                                                                  \
         registerTypes##type##subType()                                                                                 \
         {                                                                                                              \
-            uammd::structured::PluginUtils::registrationGuard("TypesFactory" + std::string(#type) +                    \
-                                                              std::string(#subType) +                                  \
-                                                              std::source_location::current().file_name());            \
+            PLUGIN_REGISTRATION_GUARD("TypesFactory" + std::string(#type) + std::string(#subType));                    \
             uammd::structured::Types::TypesFactory::getInstance().registerTypes(                                       \
                 #type,                                                                                                 \
                 #subType,                                                                                              \
