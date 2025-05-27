@@ -26,6 +26,7 @@ requirements:
     - cuda-nvcc
     - make
     - pip
+    - setuptools
   host:
     - blas-devel
     - cuda-libraries-dev
