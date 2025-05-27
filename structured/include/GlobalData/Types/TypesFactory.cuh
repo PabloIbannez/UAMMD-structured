@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "Definitions/Hashes.cuh"
+#include "Utils/Plugins/Plugins.cuh"
 
 namespace uammd {
 namespace structured {
@@ -29,11 +30,6 @@ public:
                                      typesType.c_str(), typesSubType.c_str());
 
         std::pair<std::string, std::string> key(typesType, typesSubType);
-        if (isTypesRegistered(typesType, typesSubType)) {
-            System::log<System::CRITICAL>("[TypesFactory] Types already registered: %s, %s",
-                                         typesType.c_str(), typesSubType.c_str());
-            throw std::runtime_error("Types already registered");
-        }
         getCreatorsRef()[key] = creator;
     }
 
@@ -83,19 +79,21 @@ private:
 
 }}}
 
-#define REGISTER_TYPES(type, subType, ...) \
-    namespace { \
-        struct registerTypes##type##subType { \
-            registerTypes##type##subType() { \
-                if (__INCLUDE_LEVEL__ == 0) { \
-                    uammd::structured::Types::TypesFactory::getInstance().registerTypes( \
-                        #type,#subType,\
-                            [](uammd::structured::DataEntry&  data \
-                               ) -> std::shared_ptr<uammd::structured::Types::TypesHandler> { \
-                        return std::make_shared<__VA_ARGS__>(data); \
-                    }); \
-                } \
-            } \
-        }; \
-        registerTypes##type##subType registerTypes##type##subType##Instance; \
+
+#define REGISTER_TYPES(type, subType, ...)                                                                             \
+    namespace {                                                                                                        \
+    struct registerTypes##type##subType                                                                                \
+    {                                                                                                                  \
+        registerTypes##type##subType()                                                                                 \
+        {                                                                                                              \
+            PLUGIN_REGISTRATION_GUARD("TypesFactory" + std::string(#type) + std::string(#subType));                    \
+            uammd::structured::Types::TypesFactory::getInstance().registerTypes(                                       \
+                #type,                                                                                                 \
+                #subType,                                                                                              \
+                [](uammd::structured::DataEntry& data) -> std::shared_ptr<uammd::structured::Types::TypesHandler> {    \
+                    return std::make_shared<__VA_ARGS__>(data);                                                        \
+                });                                                                                                    \
+        }                                                                                                              \
+    };                                                                                                                 \
+    registerTypes##type##subType registerTypes##type##subType##Instance;                                               \
     }

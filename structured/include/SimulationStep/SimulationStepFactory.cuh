@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SimulationStep/SimulationStep.cuh"
-
+#include "Utils/Plugins/Plugins.cuh"
 #include <functional>
 #include <memory>
 #include <string>
@@ -34,11 +34,6 @@ public:
                                      simulationStepType.c_str(), simulationStepSubType.c_str());
 
         std::pair<std::string, std::string> key(simulationStepType, simulationStepSubType);
-        if (isSimulationStepRegistered(simulationStepType, simulationStepSubType)) {
-            System::log<System::CRITICAL>("[SimulationStepFactory] SimulationStep already registered: %s, %s",
-                                          simulationStepType.c_str(), simulationStepSubType.c_str());
-            throw std::runtime_error("SimulationStep already registered");
-        }
         getCreatorsRef()[key] = creator;
     }
 
@@ -92,22 +87,24 @@ private:
 
 }}}
 
-#define REGISTER_SIMULATION_STEP(type, subType, ...) \
-    namespace { \
-        struct registerSimulationStep##type##subType { \
-            registerSimulationStep##type##subType() { \
-                if (__INCLUDE_LEVEL__ == 0) { \
-                    uammd::structured::SimulationStep::SimulationStepFactory::getInstance().registerSimulationStep( \
-                        #type, #subType,\
-                        [](std::shared_ptr<uammd::ParticleGroup>                 pg, \
-                           std::shared_ptr<uammd::structured::IntegratorManager> integrator, \
-                           std::shared_ptr<uammd::structured::ForceField>        ff, \
-                           uammd::structured::DataEntry&  data, \
-                           std::string name ) -> std::shared_ptr<uammd::structured::SimulationStep::SimulationStepBase> { \
-                        return std::make_shared<__VA_ARGS__>(pg, integrator, ff, data, name); \
-                    }); \
-                } \
-            } \
-        }; \
-        registerSimulationStep##type##subType registerSimulationStep##type##subType##Instance; \
+#define REGISTER_SIMULATION_STEP(type, subType, ...)                                                                   \
+    namespace {                                                                                                        \
+    struct registerSimulationStep##type##subType                                                                       \
+    {                                                                                                                  \
+        registerSimulationStep##type##subType()                                                                        \
+        {                                                                                                              \
+            PLUGIN_REGISTRATION_GUARD("SimulationStep" + std::string(#type) + std::string(#subType));                  \
+            uammd::structured::SimulationStep::SimulationStepFactory::getInstance().registerSimulationStep(            \
+                #type,                                                                                                 \
+                #subType,                                                                                              \
+                [](std::shared_ptr<uammd::ParticleGroup> pg,                                                           \
+                   std::shared_ptr<uammd::structured::IntegratorManager> integrator,                                   \
+                   std::shared_ptr<uammd::structured::ForceField> ff,                                                  \
+                   uammd::structured::DataEntry& data,                                                                 \
+                   std::string name) -> std::shared_ptr<uammd::structured::SimulationStep::SimulationStepBase> {       \
+                    return std::make_shared<__VA_ARGS__>(pg, integrator, ff, data, name);                              \
+                });                                                                                                    \
+        }                                                                                                              \
+    };                                                                                                                 \
+    registerSimulationStep##type##subType registerSimulationStep##type##subType##Instance;                             \
     }

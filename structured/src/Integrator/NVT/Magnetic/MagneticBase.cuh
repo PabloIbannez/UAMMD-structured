@@ -1,3 +1,4 @@
+#pragma once
 
 #include "System/ExtendedSystem.cuh"
 #include "GlobalData/GlobalData.cuh"
@@ -164,4 +165,3 @@ namespace Magnetic{
   };
 
 }}}}}
-
