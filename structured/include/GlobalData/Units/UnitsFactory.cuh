@@ -83,19 +83,24 @@ private:
 
 }}}
 
-#define REGISTER_UNITS(type, subType, ...) \
-    namespace { \
-        struct registerUnits##type##subType { \
-            registerUnits##type##subType() { \
-                if (__INCLUDE_LEVEL__ == 0) { \
-                    uammd::structured::Units::UnitsFactory::getInstance().registerUnits( \
-                        #type,#subType,\
-                            [](uammd::structured::DataEntry&  data \
-                               ) -> std::shared_ptr<uammd::structured::Units::UnitsHandler> { \
-                        return std::make_shared<__VA_ARGS__>(data); \
-                    }); \
-                } \
-            } \
-        }; \
-        registerUnits##type##subType registerUnits##type##subType##Instance; \
+#include "Utils/Plugins/Plugins.cuh"
+#include <source_location>
+#define REGISTER_UNITS(type, subType, ...)                                                                             \
+    namespace {                                                                                                        \
+    struct registerUnits##type##subType                                                                                \
+    {                                                                                                                  \
+        registerUnits##type##subType()                                                                                 \
+        {                                                                                                              \
+            uammd::structured::PluginUtils::registrationGuard("UnitsFactory" + std::string(#type) +                    \
+                                                              std::string(#subType) +                                  \
+                                                              std::source_location::current().file_name());            \
+            uammd::structured::Units::UnitsFactory::getInstance().registerUnits(                                       \
+                #type,                                                                                                 \
+                #subType,                                                                                              \
+                [](uammd::structured::DataEntry& data) -> std::shared_ptr<uammd::structured::Units::UnitsHandler> {    \
+                    return std::make_shared<__VA_ARGS__>(data);                                                        \
+                });                                                                                                    \
+        }                                                                                                              \
+    };                                                                                                                 \
+    registerUnits##type##subType registerUnits##type##subType##Instance;                                               \
     }

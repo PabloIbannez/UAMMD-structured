@@ -1,4 +1,5 @@
 #pragma once
+#include "Utils/Plugins/Plugins.cuh"
 
 namespace uammd{
 namespace structured{
@@ -64,20 +65,25 @@ class VerletConditionalListSetFactory{
     };
 }}
 
-#define REGISTER_VERLET_CONDITIONAL_LIST_SET(type, ...) \
-    namespace { \
-        struct registerVCLS##type { \
-            registerVCLS##type() { \
-                if (__INCLUDE_LEVEL__ == 0) { \
-                    uammd::structured::VerletConditionalListSetFactory::getInstance().registerVerletConditionalListSet( \
-                        #type, [](std::shared_ptr<uammd::structured::GlobalData>    gd, \
-                                  std::shared_ptr<uammd::ParticleGroup> pg, \
-                                  uammd::structured::DataEntry& data, \
-                                  std::string name) -> std::shared_ptr<uammd::structured::VerletConditionalListSetBase> { \
-                        return std::make_shared<__VA_ARGS__>(gd, pg, data, name); \
-                    }); \
-                } \
-            } \
-        }; \
-        registerVCLS##type registerVCLS##type##Instance; \
+#include <source_location>
+
+#define REGISTER_VERLET_CONDITIONAL_LIST_SET(type, ...)                                                                \
+    namespace {                                                                                                        \
+    struct registerVCLS##type                                                                                          \
+    {                                                                                                                  \
+        registerVCLS##type()                                                                                           \
+        {                                                                                                              \
+            uammd::structured::PluginUtils::registrationGuard("VerletConditionalListSetFactory" + std::string(#type) + \
+                                                              std::source_location::current().file_name());            \
+            uammd::structured::VerletConditionalListSetFactory::getInstance().registerVerletConditionalListSet(        \
+                #type,                                                                                                 \
+                [](std::shared_ptr<uammd::structured::GlobalData> gd,                                                  \
+                   std::shared_ptr<uammd::ParticleGroup> pg,                                                           \
+                   uammd::structured::DataEntry& data,                                                                 \
+                   std::string name) -> std::shared_ptr<uammd::structured::VerletConditionalListSetBase> {             \
+                    return std::make_shared<__VA_ARGS__>(gd, pg, data, name);                                          \
+                });                                                                                                    \
+        }                                                                                                              \
+    };                                                                                                                 \
+    registerVCLS##type registerVCLS##type##Instance;                                                                   \
     }

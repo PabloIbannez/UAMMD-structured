@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include "Utils/Plugins/Plugins.cuh"
 
 namespace uammd {
 namespace structured {
@@ -87,22 +88,26 @@ private:
 
 }}}
 
-#define REGISTER_INTEGRATOR(type, subType, ...) \
-    namespace { \
-        struct registerIntegrator##type##subType { \
-            registerIntegrator##type##subType() { \
-                if (__INCLUDE_LEVEL__ == 0) { \
-                    uammd::structured::Integrator::IntegratorFactory::getInstance().registerIntegrator( \
-                        #type,#subType,\
-                            [](std::shared_ptr<uammd::structured::GlobalData>    gd, \
-                               std::shared_ptr<uammd::ParticleGroup> pg, \
-                               uammd::structured::DataEntry&  data, \
-                               std::string name \
-                               ) -> std::shared_ptr<uammd::Integrator> { \
-                        return std::make_shared<__VA_ARGS__>(gd,pg,data,name); \
-                    }); \
-                } \
-            } \
-        }; \
-        registerIntegrator##type##subType registerIntegrator##type##subType##Instance; \
+#include <source_location>
+
+#define REGISTER_INTEGRATOR(type, subType, ...)                                                                        \
+    namespace {                                                                                                        \
+    struct registerIntegrator##type##subType                                                                           \
+    {                                                                                                                  \
+        registerIntegrator##type##subType()                                                                            \
+        {                                                                                                              \
+            uammd::structured::PluginUtils::registrationGuard("IntegratorFactory" + std::string(#type) +               \
+                                                              std::string(#subType));                                  \
+            uammd::structured::Integrator::IntegratorFactory::getInstance().registerIntegrator(                        \
+                #type,                                                                                                 \
+                #subType,                                                                                              \
+                [](std::shared_ptr<uammd::structured::GlobalData> gd,                                                  \
+                   std::shared_ptr<uammd::ParticleGroup> pg,                                                           \
+                   uammd::structured::DataEntry& data,                                                                 \
+                   std::string name) -> std::shared_ptr<uammd::Integrator> {                                           \
+                    return std::make_shared<__VA_ARGS__>(gd, pg, data, name);                                          \
+                });                                                                                                    \
+        }                                                                                                              \
+    };                                                                                                                 \
+    registerIntegrator##type##subType registerIntegrator##type##subType##Instance;                                     \
     }

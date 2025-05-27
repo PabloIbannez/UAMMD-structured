@@ -7,7 +7,7 @@
 #include <utility>
 
 #include "Definitions/Hashes.cuh"
-
+#include "Utils/Plugins/Plugins.cuh"
 namespace uammd {
 namespace structured {
 namespace Ensemble {
@@ -82,20 +82,25 @@ private:
 };
 
 }}}
+#include <source_location>
 
-#define REGISTER_ENSEMBLE(type, subType, ...) \
-    namespace { \
-        struct registerEnsemble##type##subType { \
-            registerEnsemble##type##subType() { \
-                if (__INCLUDE_LEVEL__ == 0) { \
-                    uammd::structured::Ensemble::EnsembleFactory::getInstance().registerEnsemble( \
-                        #type,#subType,\
-                            [](uammd::structured::DataEntry&  data \
-                               ) -> std::shared_ptr<uammd::structured::Ensemble::EnsembleHandler> { \
-                        return std::make_shared<__VA_ARGS__>(data); \
-                    }); \
-                } \
-            } \
-        }; \
-        registerEnsemble##type##subType registerEnsemble##type##subType##Instance; \
+#define REGISTER_ENSEMBLE(type, subType, ...)                                                                          \
+    namespace {                                                                                                        \
+    struct registerEnsemble##type##subType                                                                             \
+    {                                                                                                                  \
+        registerEnsemble##type##subType()                                                                              \
+        {                                                                                                              \
+            uammd::structured::PluginUtils::registrationGuard("Ensemble" + std::string(#type) +                        \
+                                                              std::string(#subType) +                                  \
+                                                              std::source_location::current().file_name());            \
+            uammd::structured::Ensemble::EnsembleFactory::getInstance().registerEnsemble(                              \
+                #type,                                                                                                 \
+                #subType,                                                                                              \
+                [](uammd::structured::DataEntry& data)                                                                 \
+                    -> std::shared_ptr<uammd::structured::Ensemble::EnsembleHandler> {                                 \
+                    return std::make_shared<__VA_ARGS__>(data);                                                        \
+                });                                                                                                    \
+        }                                                                                                              \
+    };                                                                                                                 \
+    registerEnsemble##type##subType registerEnsemble##type##subType##Instance;                                         \
     }

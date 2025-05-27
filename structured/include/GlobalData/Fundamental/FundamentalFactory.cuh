@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "Definitions/Hashes.cuh"
+#include "Utils/Plugins/Plugins.cuh"
 
 namespace uammd {
 namespace structured {
@@ -83,19 +84,25 @@ private:
 
 }}}
 
-#define REGISTER_FUNDAMENTAL(type, subType, ...) \
-    namespace { \
-        struct registerFundamental##type##subType { \
-            registerFundamental##type##subType() { \
-                if (__INCLUDE_LEVEL__ == 0) { \
-                    uammd::structured::Fundamental::FundamentalFactory::getInstance().registerFundamental( \
-                        #type,#subType,\
-                            [](uammd::structured::DataEntry&  data \
-                               ) -> std::shared_ptr<uammd::structured::Fundamental::FundamentalHandler> { \
-                        return std::make_shared<__VA_ARGS__>(data); \
-                    }); \
-                } \
-            } \
-        }; \
-        registerFundamental##type##subType registerFundamental##type##subType##Instance; \
+#include<source_location>
+
+#define REGISTER_FUNDAMENTAL(type, subType, ...)                                                                       \
+    namespace {                                                                                                        \
+    struct registerFundamental##type##subType                                                                          \
+    {                                                                                                                  \
+        registerFundamental##type##subType()                                                                           \
+        {                                                                                                              \
+            uammd::structured::PluginUtils::registrationGuard("Fundamental" + std::string(#type) +                     \
+                                                              std::string(#subType) +                                  \
+                                                              std::source_location::current().file_name());            \
+            uammd::structured::Fundamental::FundamentalFactory::getInstance().registerFundamental(                     \
+                #type,                                                                                                 \
+                #subType,                                                                                              \
+                [](uammd::structured::DataEntry& data)                                                                 \
+                    -> std::shared_ptr<uammd::structured::Fundamental::FundamentalHandler> {                           \
+                    return std::make_shared<__VA_ARGS__>(data);                                                        \
+                });                                                                                                    \
+        }                                                                                                              \
+    };                                                                                                                 \
+    registerFundamental##type##subType registerFundamental##type##subType##Instance;                                   \
     }
