@@ -26,32 +26,6 @@ void registrationGuard(std::string identifier, std::string location)
 } // namespace PluginUtils
 } // namespace structured
 } // namespace uammd
-// namespace {
-// struct registerInteractorBond3KratkyPorod
-// {
-//     registerInteractorBond3KratkyPorod()
-//     {
-//         uammd::structured::PluginUtils::registrationGuard(
-//             "Interactor" + std::string("Bond3") + std::string("KratkyPorod"),
-//             std::source_location::current().file_name() + ":" +
-//             std::to_string(std::source_location::current().line()) +
-//                 " in " + std::source_location::current().function_name());
-//         ;
-//         uammd::structured::Interactor::InteractorFactory::getInstance()
-//             .registerInteractor<uammd::structured::Interactor::InteractorFactory::Creator>(
-//                 "Bond3",
-//                 "KratkyPorod",
-//                 [](std::shared_ptr<uammd::structured::GlobalData> gd,
-//                    std::shared_ptr<uammd::ParticleGroup> pg,
-//                    uammd::structured::DataEntry& data,
-//                    std::string name) -> std::shared_ptr<uammd::Interactor> {
-//                     return std::make_shared<uammd::structured::Interactor::BondsInteractor<
-//                         uammd::structured::Potentials::Bond3::KratkyPorod>>(gd, pg, data, name);
-//                 });
-//     }
-// };
-// registerInteractorBond3KratkyPorod registerInteractorBond3KratkyPorodInstance;
-// } // namespace
 
 #define PLUGIN_REGISTRATION_GUARD(identifier)                                                                          \
     {                                                                                                                  \
