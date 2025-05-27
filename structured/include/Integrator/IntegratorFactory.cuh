@@ -32,11 +32,6 @@ public:
                                      integratorType.c_str(), integratorSubType.c_str());
 
         std::pair<std::string, std::string> key(integratorType, integratorSubType);
-        if (isIntegratorRegistered(integratorType, integratorSubType)) {
-            System::log<System::CRITICAL>("[IntegratorFactory] Integrator already registered: %s, %s",
-                                          integratorType.c_str(), integratorSubType.c_str());
-            throw std::runtime_error("Integrator already registered");
-        }
         getCreatorsRef()[key] = creator;
     }
 

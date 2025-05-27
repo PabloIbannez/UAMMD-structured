@@ -29,11 +29,6 @@ public:
                                      unitsType.c_str(), unitsSubType.c_str());
 
         std::pair<std::string, std::string> key(unitsType, unitsSubType);
-        if (isUnitsRegistered(unitsType, unitsSubType)) {
-            System::log<System::CRITICAL>("[UnitsFactory] Units type already registered: %s, %s",
-                                         unitsType.c_str(), unitsSubType.c_str());
-            throw std::runtime_error("Units type already registered");
-        }
         getCreatorsRef()[key] = creator;
     }
 

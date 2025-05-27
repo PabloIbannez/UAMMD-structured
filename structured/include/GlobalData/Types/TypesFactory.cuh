@@ -30,11 +30,6 @@ public:
                                      typesType.c_str(), typesSubType.c_str());
 
         std::pair<std::string, std::string> key(typesType, typesSubType);
-        if (isTypesRegistered(typesType, typesSubType)) {
-            System::log<System::CRITICAL>("[TypesFactory] Types already registered: %s, %s",
-                                         typesType.c_str(), typesSubType.c_str());
-            throw std::runtime_error("Types already registered");
-        }
         getCreatorsRef()[key] = creator;
     }
 

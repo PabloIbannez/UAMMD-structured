@@ -42,11 +42,6 @@ namespace Interactor {
                                              integratorType.c_str(), integratorSubType.c_str());
 
                 std::pair<std::string, std::string> key(integratorType, integratorSubType);
-                if (getCreatorsRef<CreatorType>().find(key) != getCreatorsRef<CreatorType>().end()) {
-                    System::log<System::CRITICAL>("[PatchesFactory] Interactor already registered: %s, %s",
-                                                  integratorType.c_str(), integratorSubType.c_str());
-                    throw std::runtime_error("Interactor already registered");
-                }
                 getCreatorsRef<CreatorType>()[key] = creator;
             }
 

@@ -34,11 +34,6 @@ public:
                                      simulationStepType.c_str(), simulationStepSubType.c_str());
 
         std::pair<std::string, std::string> key(simulationStepType, simulationStepSubType);
-        if (isSimulationStepRegistered(simulationStepType, simulationStepSubType)) {
-            System::log<System::CRITICAL>("[SimulationStepFactory] SimulationStep already registered: %s, %s",
-                                          simulationStepType.c_str(), simulationStepSubType.c_str());
-            throw std::runtime_error("SimulationStep already registered");
-        }
         getCreatorsRef()[key] = creator;
     }
 

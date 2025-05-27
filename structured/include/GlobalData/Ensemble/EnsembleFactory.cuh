@@ -29,11 +29,6 @@ public:
                                      ensembleType.c_str(), ensembleSubType.c_str());
 
         std::pair<std::string, std::string> key(ensembleType, ensembleSubType);
-        if (isEnsembleRegistered(ensembleType, ensembleSubType)) {
-            System::log<System::CRITICAL>("[EnsembleFactory] Ensemble already registered: %s, %s",
-                                         ensembleType.c_str(), ensembleSubType.c_str());
-            throw std::runtime_error("Ensemble already registered");
-        }
         getCreatorsRef()[key] = creator;
     }
 

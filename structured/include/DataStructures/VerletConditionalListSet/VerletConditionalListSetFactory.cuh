@@ -23,11 +23,6 @@ class VerletConditionalListSetFactory{
         void registerVerletConditionalListSet(const std::string& conditionType, Creator creator) {
             System::log<System::DEBUG>("[VerletConditionalListSetFactory] Registering VerletConditionalListSet in factory: %s",
                                          conditionType.c_str());
-            if (getCreatorsRef().find(conditionType) != getCreatorsRef().end()) {
-                System::log<System::CRITICAL>("[VerletConditionalListSetFactory] VerletConditionalListSet type already registered: %s",
-                                              conditionType.c_str());
-                throw std::runtime_error("VerletConditionalListSet type already registered");
-            }
             getCreatorsRef()[conditionType] = creator;
         }
 

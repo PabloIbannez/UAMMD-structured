@@ -30,11 +30,6 @@ public:
                                      fundamentalType.c_str(), fundamentalSubType.c_str());
 
         std::pair<std::string, std::string> key(fundamentalType, fundamentalSubType);
-        if (isFundamentalRegistered(fundamentalType, fundamentalSubType)) {
-            System::log<System::CRITICAL>("[FundamentalFactory] Fundamental already registered: %s, %s",
-                                          fundamentalType.c_str(), fundamentalSubType.c_str());
-            throw std::runtime_error("Fundamental already registered");
-        }
         getCreatorsRef()[key] = creator;
     }
 
