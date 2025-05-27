@@ -1,26 +1,27 @@
 #pragma once
 
-#include <set>
+#include <map>
 #include <source_location>
 #include <string>
 namespace uammd {
 namespace structured {
 namespace PluginUtils {
 
-/* This function is used to ensure that a plugin is registered only once.
- * It checks if the plugin identifier is already in the set of registered plugins.
- * If it is, it throws an exception; otherwise, it adds the identifier to the set.
+/* This function is used to ensure that no two different plugins can have the same identifier.
+ * If a plugin has already been registered with the same name but in a different location,
+ * it will throw an exception. This is useful to prevent conflicts between plugins.
  */
-void registrationGuard(std::string identifier, std::string location)
+inline void registrationGuard(std::string identifier, std::string location)
 {
-    static std::set<std::string> registeredPlugins;
-    auto key = identifier + " at " + location;
-    if (registeredPlugins.find(key) != registeredPlugins.end()) {
-        System::log<System::EXCEPTION>("[PluginUtils] Plugin already registered: %s", key.c_str());
-        throw std::runtime_error("Plugin already registered");
+    static std::map<std::string, std::string> registeredPlugins;
+    const bool alreadyRegistered = registeredPlugins.find(identifier) != registeredPlugins.end();
+    if (alreadyRegistered) {
+        if (registeredPlugins[identifier] != location) {
+            throw std::runtime_error("Plugin with identifier '" + identifier +
+                                     "' already registered at a different location: " + registeredPlugins[identifier]);
+        }
     }
-    registeredPlugins.insert(key);
-    System::log<System::DEBUG>("[PluginUtils] Registering plugin: %s", key.c_str());
+    registeredPlugins[identifier] = location;
 }
 
 } // namespace PluginUtils
@@ -31,6 +32,5 @@ void registrationGuard(std::string identifier, std::string location)
     {                                                                                                                  \
         auto __location = std::source_location::current();                                                             \
         uammd::structured::PluginUtils::registrationGuard(                                                             \
-            identifier,                                                                                                \
-            __location.file_name());   \
+            identifier, std::string(__location.file_name()) + " at " + std::to_string(__location.line()));             \
     }
