@@ -1,7 +1,6 @@
 #pragma once
 
 #include <map>
-#include <source_location>
 #include <string>
 namespace uammd {
 namespace structured {
@@ -30,7 +29,6 @@ inline void registrationGuard(std::string identifier, std::string location)
 
 #define PLUGIN_REGISTRATION_GUARD(identifier)                                                                          \
     {                                                                                                                  \
-        auto __location = std::source_location::current();                                                             \
-        uammd::structured::PluginUtils::registrationGuard(                                                             \
-            identifier, std::string(__location.file_name()) + " at " + std::to_string(__location.line()));             \
+        uammd::structured::PluginUtils::registrationGuard(identifier,                                                  \
+                                                          std::string(__FILE__) + " at " + std::to_string(__LINE__));  \
     }
