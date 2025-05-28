@@ -286,14 +286,9 @@ else()
   message(STATUS "uammd_structured: ${uammd_structured_path}")
   message(STATUS "UAMMDlauncher_wrapper: ${UAMMDlauncher_wrapper_path}")
   add_library(uammd_structured SHARED IMPORTED)
-  set_target_properties(uammd_structured PROPERTIES
-    IMPORTED_LOCATION ${uammd_structured_path}
-    )
+  set_target_properties(uammd_structured PROPERTIES IMPORTED_LOCATION ${uammd_structured_path})
   add_library(UAMMDlauncher_wrapper SHARED IMPORTED)
-  set_target_properties(UAMMDlauncher_wrapper PROPERTIES
-    IMPORTED_LOCATION ${UAMMDlauncher_wrapper_path}
-  )
-
+  set_target_properties(UAMMDlauncher_wrapper PROPERTIES IMPORTED_LOCATION ${UAMMDlauncher_wrapper_path})
 endif()
 
 if(BUILD_PYTHON_WRAPPER)
