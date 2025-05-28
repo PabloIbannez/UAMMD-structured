@@ -15,6 +15,9 @@ jobs:
     strategy:
       matrix:
         cuda-version: ["12.1", "12.3", "12.6", "12.9"]
+      include:
+          - cuda-version: "12.1"
+            build-py-wrapper: true
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,15 +30,23 @@ jobs:
           cache-downloads: true
           generate-run-shell: true
 
-      - name: Build and upload the conda packages manually
+      - name: Build and upload uammd-structured
         shell: micromamba-shell {0}
         env:
           CUDA_VERSION: ${{ matrix.cuda-version }}
         run: |
-          out_dir=`mktemp -d -t compilation-XXXXXXXXXX`
+          out_dir=`mktemp -d -t uammd-structured-XXXXXXXXXX`
           conda verify devtools/conda-build/uammd-structured
-          conda verify devtools/conda-build/pyuammd-structured
           conda build devtools/conda-build/uammd-structured --no-anaconda-upload --output-folder $out_dir -c conda-forge
-          conda build devtools/conda-build/pyuammd-structured --no-anaconda-upload --output-folder $out_dir -c conda-forge --use-local
+          pkg_files=`find ${out_dir} -name *.conda`
+          anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload ${pkg_files} --user ComplexFluidsUAM --label main --force
+          
+      - name: Build and upload pyuammd-structured
+        if: ${{ matrix.build-py-wrapper == true }}
+        shell: micromamba-shell {0}
+        run: |
+          out_dir=$(mktemp -d -t pyuammd-XXXXXXXXXX)
+          conda verify devtools/conda-build/pyuammd-structured
+          conda build devtools/conda-build/pyuammd-structured --no-anaconda-upload --output-folder "$out_dir" -c conda-forge --use-local
           pkg_files=`find ${out_dir} -name *.conda`
           anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload ${pkg_files} --user ComplexFluidsUAM --label main --force
