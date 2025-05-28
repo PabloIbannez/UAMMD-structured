@@ -36,9 +36,6 @@ jobs:
         run: |
           out_dir=`mktemp -d -t compilation-XXXXXXXXXX`
           conda verify devtools/conda-build
-          conda build devtools/conda-build --no-anaconda-upload --output-folder $out_dir
+          conda build devtools/conda-build --no-anaconda-upload --output-folder $out_dir -c conda-forge
           pkg_files=`find ${out_dir} -name *.conda`
-          anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload ${pkg_files} \
-            --user ComplexFluidsUAM \
-            --label main \
-            --force
+          anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload ${pkg_files} --user ComplexFluidsUAM --label main --force
