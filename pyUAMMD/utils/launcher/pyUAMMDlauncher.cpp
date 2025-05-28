@@ -1,12 +1,6 @@
-#include <csignal>
-#include <atomic>
-
 #include "../../ThirdParty/pybind11_json.hpp"
 #include "UAMMDlauncher.hpp"
 
-// ----------------
-// Python interface
-// ----------------
 namespace py = pybind11;
 PYBIND11_MODULE(pyUAMMDlauncher, m)
 {
