@@ -20,8 +20,6 @@ requirements:
   host:
     - python
     - uammd-structured {{ GIT_DESCRIBE_TAG }}
-    - cuda-nvcc
-    - cuda-libraries-dev    
   run:
     - python
     - uammd-structured
