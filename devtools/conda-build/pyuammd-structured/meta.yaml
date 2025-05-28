@@ -1,0 +1,39 @@
+package:
+  name: pyuammd-structured
+  version: {{ GIT_DESCRIBE_TAG }}
+
+source:
+  git_url: ../../../
+
+build:
+  number: 0
+  string: py{{ PY_VER }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+
+requirements:
+  build:
+    - python
+    - cmake
+    - pybind11
+    - gxx
+    - pip
+    - setuptools
+  host:
+    - python
+    - uammd-structured {{ GIT_DESCRIBE_TAG }}
+    - cuda-nvcc
+    - cuda-libraries-dev    
+  run:
+    - python
+    - uammd-structured
+    - tqdm
+    - deepdiff
+    - jsbeautifier
+
+test:
+  imports:
+    - pyUAMMD
+
+about:
+  home: https://github.com/PabloIbannez/uammd-structured
+  license: GPL3
+  summary: Python wrapper for UAMMD-structured
