@@ -21,18 +21,20 @@ requirements:
     - python
     - cmake >=3.27
     - pybind11
-    - gxx <12
+    - gxx
     - cuda-version {{ CUDA_VERSION }}
     - cuda-nvcc
     - make
     - pip
     - setuptools
   host:
+    - libblas
+    - libcblas
+    - liblapack
+    - liblapacke
     - blas-devel
     - cuda-libraries-dev
     - cuda-version {{ CUDA_VERSION }}
-    - libblas
-    - liblapacke
     - python
     - deepdiff
     - jsbeautifier
