@@ -281,8 +281,11 @@ if (BUILD_LIBRARY)
 else()
   message(STATUS "Skipping UAMMDlauncher and uammd_structured build as BUILD_LIBRARY is OFF")
   # Find libuammd_structured.so and UAMMDlauncher executable
-  find_library(uammd_structured NAMES uammd_structured PATHS ${CMAKE_INSTALL_PREFIX}/lib REQUIRED)
-  find_library(UAMMDlauncher_wrapper NAMES UAMMDlauncher_wrapper PATHS ${CMAKE_INSTALL_PREFIX}/lib REQUIRED)
+  find_library(uammd_structured NAMES uammd_structured PATHS ${CMAKE_PREFIX_PATH}/lib ${CMAKE_INSTALL_PREFIX}/lib REQUIRED)
+  find_library(UAMMDlauncher_wrapper NAMES UAMMDlauncher_wrapper PATHS ${CMAKE_PREFIX_PATH}/lib ${CMAKE_INSTALL_PREFIX}/lib REQUIRED)
+  message(STATUS "uammd_structured: ${uammd_structured}")
+  message(STATUS "UAMMDlauncher_wrapper: ${UAMMDlauncher_wrapper}")
+
 endif()
 
 if(BUILD_PYTHON_WRAPPER)
