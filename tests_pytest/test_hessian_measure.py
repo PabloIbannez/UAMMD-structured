@@ -685,6 +685,32 @@ def create_state_and_topology_bond3_harmonic():
     return state, topology
 
 
+def create_state_and_topology_bond3_kratkyporod():
+    pos0 = [-1.1, -5.5, 2]
+    pos1 = [4.5, 2.2, -4.3]
+    pos2 = [3.5, 6.1, 3.3]
+
+    k = 123
+    state = create_state([pos0, pos1, pos2])
+
+    topology = {
+        "forceField": {
+            "Bond": {
+                "type": ["Bond3", "KratkyPorod"],
+                "labels": ["id_i", "id_j", "id_k", "K"],
+                "data": [[0, 1, 2, k]],
+                "parameters": {},
+            }
+        },
+        "structure": {
+            "labels": ["id", "type"],
+            "data": [[0, "A"], [1, "A"], [2, "A"]],
+        },
+    }
+
+    return state, topology
+
+
 def create_state_and_topology_bond4_dihedral():
 
     pos0 = [1.5, 2.1, 4.342]
@@ -692,8 +718,8 @@ def create_state_and_topology_bond4_dihedral():
     pos2 = [0.65, 2, 2]
     pos3 = [1, 5, 2.1]
 
-    k = 123
-    phi0 = 1.321
+    k = 100
+    phi0 = 1.1
     n = 3
 
     state = create_state([pos0, pos1, pos2, pos3])
@@ -740,6 +766,7 @@ INTERACTOR_BUILDERS = {
     "NonBonded_WCAType2": create_state_and_topology_nonbonded_wcatype2,
     "NonBonded_WCAType3": create_state_and_topology_nonbonded_wcatype3,
     "Bond3_Harmonic": create_state_and_topology_bond3_harmonic,
+    "Bond3_KratkyPorod": create_state_and_topology_bond3_kratkyporod,
     "Bond4_Dihedral": create_state_and_topology_bond4_dihedral,
 }
 
@@ -837,7 +864,7 @@ def test_is_hessian_symmetric(tmp_path, hessian_mode, interactor):
     assert np.any(hessian != 0), "Hessian is entirely zero"
 
     hessian_t = np.transpose(hessian, (1, 0, 3, 2))
-    max_diff = np.max(np.abs(hessian - hessian_t) / np.abs(np.mean(hessian)))
+    max_diff = np.max(np.abs(hessian - hessian_t) / np.abs(np.max(hessian)))
     assert np.allclose(
         hessian, hessian_t, rtol=rtol, atol=atol
     ), f"The HessianMeasure is not symmetric. Max diff: {max_diff}"
