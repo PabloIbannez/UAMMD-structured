@@ -34,6 +34,8 @@ if(BUILD_PYTHON_WRAPPER)
   find_package(pybind11 REQUIRED)
 endif()
 
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+
 if (BUILD_LIBRARY)
   enable_language(CUDA)
   set(CMAKE_CUDA_STANDARD 17)
@@ -73,6 +75,9 @@ if (BUILD_LIBRARY)
     add_compile_definitions(DOUBLE_PRECISION)
   endif()
 
+  # Ignore CUDA warnings about inline global kernels
+  set(CMAKE_CUDA_FLAGS "-diag-suppress=20050")
+
   set(UAMMD_STRUCTURED_PATH "${PROJECT_SOURCE_DIR}")
   set(UAMMD_STRUCTURED_INCLUDE_PATH "${UAMMD_STRUCTURED_PATH}/structured/include")
   set(UAMMD_STRUCTURED_SRC_PATH "${UAMMD_STRUCTURED_PATH}/structured/src")
@@ -90,11 +95,6 @@ if (BUILD_LIBRARY)
     UAMMD_EXTENSIONS_PREAMBLE=${UAMMD_PREAMBLE_PATH}
     MAXLOGLEVEL=5
   )
-  # Ignore CUDA warnings about inline global kernels
-  set(CMAKE_CUDA_FLAGS "-diag-suppress=20050")
-  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-
-
 
   # Function to parse JSON and generate property definitions
   function(generate_property_definitions json_file section output_var)
