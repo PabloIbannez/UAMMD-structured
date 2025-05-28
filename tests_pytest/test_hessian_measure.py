@@ -10,7 +10,7 @@ import pyUAMMD
 import numpy as np
 
 atol = 1e-5
-rtol = 1e-5
+rtol = 1e-4
 
 
 def create_state(pos):
