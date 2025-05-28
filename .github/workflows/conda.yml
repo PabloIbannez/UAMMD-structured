@@ -38,8 +38,7 @@ jobs:
           out_dir=`mktemp -d -t uammd-structured-XXXXXXXXXX`
           conda verify devtools/conda-build/uammd-structured
           conda build devtools/conda-build/uammd-structured --no-anaconda-upload --output-folder $out_dir -c conda-forge
-          pkg_files=`find ${out_dir} -name *.conda`
-          anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload ${pkg_files} --user ComplexFluidsUAM --label main --force
+          find "${out_dir}" -name '*.conda' -print0 | xargs -0 anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload --user ComplexFluidsUAM --label main --force
           
       - name: Build and upload pyuammd-structured
         if: ${{ matrix.build-py-wrapper == true }}
@@ -48,5 +47,5 @@ jobs:
           out_dir=$(mktemp -d -t pyuammd-XXXXXXXXXX)
           conda verify devtools/conda-build/pyuammd-structured
           conda build devtools/conda-build/pyuammd-structured --no-anaconda-upload --output-folder "$out_dir" -c conda-forge --use-local
-          pkg_files=`find ${out_dir} -name *.conda`
-          anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload ${pkg_files} --user ComplexFluidsUAM --label main --force
+          find "${out_dir}" -name '*.conda' -print0 | xargs -0 anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload --user ComplexFluidsUAM --label main --force
+
