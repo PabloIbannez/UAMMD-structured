@@ -31,8 +31,6 @@ jobs:
         shell: micromamba-shell {0}
         env:
           CUDA_VERSION: ${{ matrix.cuda-version }}
-          UAMMD_STRUCTURED_PACKAGE_NAME: uammd-structured
-          UAMMD_PRECISION: "SINGLE"
         run: |
           out_dir=`mktemp -d -t compilation-XXXXXXXXXX`
           conda verify devtools/conda-build/uammd-structured
