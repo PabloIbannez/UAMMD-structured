@@ -46,7 +46,7 @@ if (BUILD_LIBRARY)
   endif()
 
   set(UAMMD_REPO_URL "https://github.com/RaulPPelaez/UAMMD.git")
-  set(UAMMD_TAG "v2.8.4")
+  set(UAMMD_TAG "v2.8.5")
   include(FetchContent)
   FetchContent_Declare(
     uammd
