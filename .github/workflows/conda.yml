@@ -30,7 +30,7 @@ jobs:
           environment-file: devtools/conda-envs/build_env.yaml
           auto-activate-base: false
           miniforge-version: latest
-          activate_environment: build
+          activate-environment: build
           channel-priority: strict
           channels: conda-forge
           conda-remove-defaults: true
