@@ -159,6 +159,42 @@ Then build the package:
 
 This will create a .deb file in the build directory, which can be installed using the `dpkg` command.
 
+
+Building the conda package
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A conda package can be created for easier distribution and installation across different systems. To build the conda package, first create the build environment, from the root of the repository, using:
+
+.. code-block:: bash
+
+   conda env create -f devtools/conda-envs/build_env.yml
+
+Then, build the package using the conda build command:
+
+.. code-block:: bash
+		
+   conda build -c conda-forge  --output-folder output devtools/conda-build/uammd-structured
+
+
+Then, the package for pyUAMMD can be built using:
+
+.. code-block:: bash
+
+   conda build -c conda-forge  --output-folder output devtools/conda-build/pyuammd-structured --use-local
+
+
+.. hint:: The `--use-local` option allows you to use the locally built UAMMD-structured package when building the pyUAMMD package, ensuring that the two are compatible.
+
+
+The packages will be created in the `output` directory, and can be installed using the `conda install` command:
+
+.. code-block:: bash
+
+   conda create -n structured --use-local uammd-structured pyuammd-structured
+   conda activate structured
+
+
+
 ----
 
 Testing
