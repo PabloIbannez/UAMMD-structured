@@ -36,6 +36,7 @@ jobs:
           CUDA_VERSION: ${{ matrix.cuda-version }}
         run: |
           out_dir=`mktemp -d -t uammd-structured-XXXXXXXXXX`
+          echo "out_dir=${out_dir}" >> $GITHUB_ENV
           conda verify devtools/conda-build/uammd-structured
           conda build devtools/conda-build/uammd-structured --no-anaconda-upload --output-folder ${out_dir} -c conda-forge
           find ${out_dir} -name '*.conda' -print0 | xargs -0 anaconda --verbose -t ${{ secrets.ANACONDA_TOKEN }} upload  --user ComplexFluidsUAM --label main --force
@@ -43,7 +44,7 @@ jobs:
       - name: Build and upload pyuammd-structured
         if: ${{ matrix.build-py-wrapper == true }}
         run: |
-          out_dir=$(mktemp -d -t pyuammd-XXXXXXXXXX)
+          out_dir="${{ env.out_dir }}"
           conda verify devtools/conda-build/pyuammd-structured
           conda build devtools/conda-build/pyuammd-structured --no-anaconda-upload --output-folder ${out_dir} -c conda-forge --use-local
           find ${out_dir} -name '*.conda' -print0 | xargs -0 anaconda --verbose -t ${{ secrets.ANACONDA_TOKEN }} upload  --user ComplexFluidsUAM --label main --force
