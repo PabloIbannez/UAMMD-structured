@@ -1,6 +1,10 @@
+{% set pyproject = load_file_data('pyproject.toml') %}
+{% set version = pyproject['project']['version'] %}
+
+
 package:
   name: pyuammd-structured
-  version: {{ GIT_DESCRIBE_TAG }}
+  version: {{ version }}
 
 source:
   git_url: ../../../
