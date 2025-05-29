@@ -48,7 +48,6 @@ jobs:
         conda-remove-defaults: true      
     - name: Configure and compile
       run: |
-        micromamba activate uammd
         mkdir build && cd build
         cmake -DCMAKE_VERBOSE_MAKEFILE=yes -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} -DCMAKE_CUDA_ARCHITECTURES=OFF -DBUILD_PYTHON_WRAPPER=ON -DINSTALL_PYTHON_PACKAGE=ON -DBUILD_LIBRARY=ON -DCMAKE_UNITY_BUILD=ON -DCMAKE_UNITY_BUILD_BATCH_SIZE=64 ..
         make -j4 install
