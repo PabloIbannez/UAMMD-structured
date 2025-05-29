@@ -9,7 +9,7 @@ on:
 
 jobs:
   conda_deployment_with_new_tag:
-    name: Conda deployment of package with Python ${{ matrix.python-version }}
+    name: Conda build for CUDA ${{ matrix.cuda-version }}
 #    runs-on: ubuntu-latest
     runs-on: [self-hosted, gpu]
     defaults:
