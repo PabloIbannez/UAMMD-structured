@@ -13,7 +13,8 @@ build:
 requirements:
   build:
     - cmake >=3.27
-    - gxx
+    - gxx >7
+    - gcc
     - cuda-version {{ CUDA_VERSION }}
     - cuda-nvcc
     - make
