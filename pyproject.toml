@@ -14,7 +14,7 @@ authors = [
 description = "UAMMD-structured python wrapper"
 readme = "README.md"
 requires-python = ">=3.7"
-license = {text = "GPL-3.0"}
+license =  "GPL-3.0"
 classifiers = [
         "Development Status :: 3 - Alpha",
         "Programming Language :: Python :: 3",
