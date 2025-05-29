@@ -16,8 +16,8 @@ defaults:
 jobs:
   build:
     name: ${{ matrix.name }}
-#    runs-on: ubuntu-latest
-    runs-on: [self-hosted, gpu]
+    runs-on: ubuntu-latest
+#    runs-on: [self-hosted, gpu]
     strategy:
       fail-fast: false
       matrix:
