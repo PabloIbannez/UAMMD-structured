@@ -12,6 +12,9 @@ jobs:
     name: Conda deployment of package with Python ${{ matrix.python-version }}
 #    runs-on: ubuntu-latest
     runs-on: [self-hosted, gpu]
+    defaults:
+      run:
+        shell: bash -el {0}
     strategy:
       matrix:
         cuda-version: ["12.1", "12.3", "12.6", "12.9"]
