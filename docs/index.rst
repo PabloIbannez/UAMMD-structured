@@ -87,6 +87,7 @@ Welcome to UAMMD-structured's documentation!
    Implementation/Input/index.rst
    Implementation/Design/index.rst
    Implementation/Extending/index.rst
+   Implementation/Developers.rst
 
 .. toctree::
    :maxdepth: 2
