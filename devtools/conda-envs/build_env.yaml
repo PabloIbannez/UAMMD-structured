@@ -5,3 +5,4 @@ dependencies:   # Keep this block with only these two packages
   - anaconda-client
   - conda-build
   - conda-verify
+  - git
