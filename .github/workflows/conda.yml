@@ -27,6 +27,7 @@ jobs:
           environment-file: devtools/conda-envs/build_env.yaml
           auto-activate-base: false
           miniforge-version: latest
+          activate_environment: "build"
       - name: Build and upload uammd-structured
         env:
           CUDA_VERSION: ${{ matrix.cuda-version }}
