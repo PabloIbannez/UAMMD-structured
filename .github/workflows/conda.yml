@@ -1,17 +1,17 @@
 name: Build and upload conda packages
 on:
   release:
-    types: ['released', 'prereleased']
-# lets add on PR for testing
-  pull_request:
-    types: ['opened', 'edited', 'reopened', 'synchronize']
+    types: ['released']
+  # lets add on PR for testing
+  # pull_request:
+  #   types: ['opened', 'edited', 'reopened', 'synchronize']
   workflow_dispatch:        # Un comment line if you also want to trigger action manually
 
 jobs:
   conda_deployment_with_new_tag:
     name: Conda build for CUDA ${{ matrix.cuda-version }}
-#    runs-on: ubuntu-latest
-    runs-on: [self-hosted, gpu]
+    runs-on: ubuntu-latest
+#    runs-on: [self-hosted, gpu]
     defaults:
       run:
         shell: bash -el {0}
