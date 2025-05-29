@@ -29,6 +29,7 @@ jobs:
           cache-environment: true
           cache-downloads: true
           generate-run-shell: true
+          post-cleanup: all
 
       - name: Build and upload uammd-structured
         shell: micromamba-shell {0}
