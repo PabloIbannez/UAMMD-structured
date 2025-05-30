@@ -20,6 +20,17 @@ You can install UAMMD-structured (library plus CLI utility) and pyUAMMD via cond
 
 .. hint:: Conda is a package manager that simplifies the installation of software and its dependencies, making it easier to manage different environments and versions. You can read more about conda at https://docs.conda.io/en/latest/. We recommend installing conda via `Miniforge <https://github.com/conda-forge/miniforge>`_. 
    
+Floating precision variants
+***************************
+
+UAMMD-structured can be compiled to use either single or double precision floating numbers. Conda packages are available for both precisions, and you can choose the one that best suits your needs:
+
+.. code-block:: bash
+
+     conda install -c ComplexFluidsUAM uammd-structured=*=*single* pyuammd-structured
+     # or for double precision
+     conda install -c ComplexFluidsUAM uammd-structured=*=*double* pyuammd-structured
+
 
 Installing from source
 ----------------------
