@@ -7,9 +7,9 @@ source:
 
 build:
   number: 0
-  string: cuda{{ CUDA_VERSION | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+  string: cuda{{ CUDA_VERSION | replace('.', '') }}_{{ precision | lower }}_h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
   script_env:
-    - UAMMD_PRECISION    
+    - UAMMD_PRECISION={{ precision }}
 requirements:
   build:
     - cmake >=3.27
