@@ -1,11 +1,7 @@
 #include <csignal>
 #include <atomic>
 
-#include "../../ThirdParty/pybind11_json.hpp"
-
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
+#include "UAMMDlauncher.hpp"
 #include "Simulation/Simulation.cuh"
 
 using namespace uammd::structured;
@@ -51,14 +47,4 @@ int UAMMDlauncher(const nlohmann::json& json) {
     g_sys.reset();
 
     return exitCode;
-}
-
-// ----------------
-// Python interface
-// ----------------
-namespace py = pybind11;
-PYBIND11_MODULE(pyUAMMDlauncher, m)
-{
-    m.doc() = "pyUAMMDlauncher: Python wrapper for UAMMDlauncher";
-    m.def("UAMMDlauncher", &UAMMDlauncher, "Run UAMMDlauncher simulation from JSON input");
 }

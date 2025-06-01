@@ -10,7 +10,7 @@ namespace structured{
 namespace Measures{
 namespace MeasuresTransforms{
 
-    struct posX : public thrust::unary_function<int,real>
+    struct posX
     {
         real4* pos;
         Box    box;
@@ -25,7 +25,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct posY : public thrust::unary_function<int,real>
+    struct posY
     {
         real4* pos;
         Box    box;
@@ -40,7 +40,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct posZ : public thrust::unary_function<int,real>
+    struct posZ
     {
         real4* pos;
         Box    box;
@@ -55,7 +55,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct totalDistance : public thrust::unary_function<int,real>
+    struct totalDistance
     {
         real4* pos;
         real3  point;
@@ -71,7 +71,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct totalSquareDistance : public thrust::unary_function<int,real>
+    struct totalSquareDistance
     {
         real4* pos;
         real3  point;
@@ -87,7 +87,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct computeVirial : public thrust::unary_function<int,real>
+    struct computeVirial
     {
         real4* pos;
         real4* force;
@@ -102,7 +102,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct totalVirial : public thrust::unary_function<int,real>
+    struct totalVirial
     {
         real* virial;
 
@@ -115,7 +115,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct totalStress : public thrust::unary_function<int,tensor3>
+    struct totalStress
     {
         tensor3* stress;
 
@@ -128,7 +128,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct kineticPressure : public thrust::unary_function<int,tensor3>
+    struct kineticPressure
     {
         real* mass;
         real3* vel;
@@ -144,7 +144,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct kineticEnergy : public thrust::unary_function<int,real>
+    struct kineticEnergy
     {
         real* mass;
         real3* vel;
@@ -160,7 +160,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct potentialEnergy : public thrust::unary_function<int,real>
+    struct potentialEnergy
     {
         real* energy;
 
@@ -173,7 +173,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct lambdaDerivative : public thrust::unary_function<int,real>
+    struct lambdaDerivative
     {
         real* lambdaD;
 
@@ -187,7 +187,7 @@ namespace MeasuresTransforms{
     };
 
 
-    struct totalPos : public thrust::unary_function<int,real4>
+    struct totalPos
     {
         real4* pos;
 
@@ -200,7 +200,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct maxForce : public thrust::unary_function<int,real>
+    struct maxForce
     {
         real4* force;
 
@@ -214,7 +214,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct totalForce : public thrust::unary_function<int,real4>
+    struct totalForce
     {
         real4* force;
 
@@ -227,7 +227,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct totalCharge : public thrust::unary_function<int,real>
+    struct totalCharge
     {
         real* charge;
 
@@ -240,7 +240,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct totalMass : public thrust::unary_function<int,real>
+    struct totalMass
     {
         real* mass;
 
@@ -253,7 +253,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct magneticMoment_vec : public thrust::unary_function<int,real3>
+    struct magneticMoment_vec
     {
         real4* dir;
         real4* magnetization;
@@ -272,7 +272,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct magneticMoment_mod : public thrust::unary_function<int,real>
+    struct magneticMoment_mod
     {
         real4* magnetization;
 
@@ -286,7 +286,7 @@ namespace MeasuresTransforms{
     };
 
     template<class targetType>
-        struct weightedSum : public thrust::unary_function<int,targetType>
+        struct weightedSum
     {
         real* weights;
         targetType* target;
@@ -302,7 +302,7 @@ namespace MeasuresTransforms{
             }
     };
 
-    struct angularMomentum : public thrust::unary_function<int,real3>
+    struct angularMomentum
     {
         real* mass;
         real4* pos;
@@ -340,7 +340,7 @@ namespace MeasuresTransforms{
     };
 
 
-    struct inertiaTensor : public thrust::unary_function<int,tensor3>
+    struct inertiaTensor
     {
         real* mass;
         real4* pos;

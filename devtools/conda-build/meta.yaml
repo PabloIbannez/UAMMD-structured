@@ -1,0 +1,60 @@
+package:
+  name: {{ UAMMD_STRUCTURED_PACKAGE_NAME }}
+  version: {{ GIT_DESCRIBE_TAG }}
+  
+source:
+  git_url: ../../
+
+build:
+  number: 0
+  string: cuda{{ CUDA_VERSION | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+  script_env:
+    - UAMMD_PRECISION    
+requirements:
+  run_constrained:
+  {% if UAMMD_PRECISION == "DOUBLE" %}
+    - uammd-structured 9999999999
+  {% else %}
+    - uammd-structured-double 9999999999
+  {% endif %}
+  build:
+    - python
+    - cmake >=3.27
+    - pybind11
+    - gxx
+    - cuda-version {{ CUDA_VERSION }}
+    - cuda-nvcc
+    - make
+    - pip
+    - setuptools
+  host:
+    - libblas
+    - libcblas
+    - liblapack
+    - liblapacke
+    - blas-devel
+    - cuda-libraries-dev
+    - cuda-version {{ CUDA_VERSION }}
+    - python
+    - deepdiff
+    - jsbeautifier
+  run:
+    - python
+    - tqdm
+    - deepdiff
+    - jsbeautifier
+    - cuda-cudart
+    - cuda-libraries
+    - cuda-version {{ CUDA_VERSION }}    
+
+
+test:
+  imports:
+    - pyUAMMD
+  commands:
+    - ls $PREFIX/bin/UAMMDlauncher
+     
+about:
+  home: https://github.com/PabloIbannez/uammd-structured
+  license: GPL3
+  summary: UAMMD-structured is an extension of the UAMMD (Universally Adaptable Multiscale Molecular Dynamics) software for coarse-grained simulations.
