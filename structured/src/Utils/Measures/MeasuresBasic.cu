@@ -7,7 +7,7 @@ namespace Measures{
     real meanDistance(std::shared_ptr<ParticleGroup> pg,
                       real3 point,
                       Box box,
-                      cudaStream_t st = 0){
+                      cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -31,7 +31,7 @@ namespace Measures{
     real gyrationRadius(std::shared_ptr<ParticleGroup> pg,
                         real3 center,
                         Box box,
-                        cudaStream_t st = 0){
+                        cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -55,7 +55,7 @@ namespace Measures{
     real2 extremalDistances(std::shared_ptr<ParticleGroup> pg,
                             real3 point,
                             Box box,
-                            cudaStream_t st = 0){
+                            cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -83,7 +83,7 @@ namespace Measures{
 
     std::tuple<real2,real2,real2> extremalPositions(std::shared_ptr<ParticleGroup> pg,
                                                     Box box,
-                                                    cudaStream_t st = 0){
+                                                    cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -130,7 +130,7 @@ namespace Measures{
     }
 
     tensor3  totalKineticPressure(std::shared_ptr<ParticleGroup> pg,
-                                  cudaStream_t st = 0){
+                                  cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -156,7 +156,7 @@ namespace Measures{
     }
 
     real  totalKineticEnergy(std::shared_ptr<ParticleGroup> pg,
-                                  cudaStream_t st = 0){
+                                  cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -180,7 +180,7 @@ namespace Measures{
     }
 
     real maxForce(std::shared_ptr<ParticleGroup> pg,
-                  cudaStream_t st = 0){
+                  cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -203,7 +203,7 @@ namespace Measures{
     }
 
     real totalPotentialEnergy(std::shared_ptr<ParticleGroup> pg,
-                              cudaStream_t st = 0){
+                              cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -226,7 +226,7 @@ namespace Measures{
     }
 
     real totalLambdaDerivative(std::shared_ptr<ParticleGroup> pg,
-                               cudaStream_t st = 0){
+                               cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -249,7 +249,7 @@ namespace Measures{
     }
 
     real3 totalForce(std::shared_ptr<ParticleGroup> pg,
-                     cudaStream_t st = 0){
+                     cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -272,7 +272,7 @@ namespace Measures{
     }
 
     real3 centroidPos(std::shared_ptr<ParticleGroup> pg,
-                      cudaStream_t st = 0){
+                      cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -295,7 +295,7 @@ namespace Measures{
     }
 
     real totalCharge(std::shared_ptr<ParticleGroup> pg,
-                     cudaStream_t st = 0){
+                     cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -318,7 +318,7 @@ namespace Measures{
     }
 
     real totalMass(std::shared_ptr<ParticleGroup> pg,
-                   cudaStream_t st = 0){
+                   cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -342,7 +342,7 @@ namespace Measures{
 
     real3 centerOfMassPos(std::shared_ptr<ParticleGroup> pg,
                           real totalMass,
-                          cudaStream_t st = 0){
+                          cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -367,7 +367,7 @@ namespace Measures{
 
     real3 centerOfMassVel(std::shared_ptr<ParticleGroup> pg,
                           real   totalMass,
-                          cudaStream_t st = 0){
+                          cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -394,7 +394,7 @@ namespace Measures{
                           real3 refp,
                           real3 refv,
                           Box box,
-                          cudaStream_t st = 0){
+                          cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -425,7 +425,7 @@ namespace Measures{
     tensor3 inertiaTensor(std::shared_ptr<ParticleGroup> pg,
                           real3 refp,
                           Box box,
-                          cudaStream_t st = 0){
+                          cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -452,7 +452,7 @@ namespace Measures{
                           real3  refp,
                           real3  refv,
                           Box    box,
-                          cudaStream_t st = 0){
+                          cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -500,7 +500,7 @@ namespace Measures{
     }
 
       real3 totalMagnetization(std::shared_ptr<ParticleGroup> pg,
-			      cudaStream_t st = 0){
+			      cudaStream_t st){
 
         auto pd  = pg->getParticleData();
 
@@ -523,7 +523,7 @@ namespace Measures{
       }
 
       real maxMagnetization(std::shared_ptr<ParticleGroup> pg,
-              cudaStream_t st = 0){
+              cudaStream_t st){
 
           auto pd  = pg->getParticleData();
 

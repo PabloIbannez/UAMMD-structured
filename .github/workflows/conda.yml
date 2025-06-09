@@ -1,0 +1,54 @@
+name: Build and upload conda packages
+on:
+  release:
+    types: ['released']
+  # lets add on PR for testing
+  # pull_request:
+  #   types: ['opened', 'edited', 'reopened', 'synchronize']
+  workflow_dispatch:        # Un comment line if you also want to trigger action manually
+
+jobs:
+  conda_deployment_with_new_tag:
+    name: Conda build for CUDA ${{ matrix.cuda-version }}
+    runs-on: ubuntu-latest
+#    runs-on: [self-hosted, gpu]
+    defaults:
+      run:
+        shell: bash -el {0}
+    strategy:
+      matrix:
+        cuda-version: ["12.1", "12.3", "12.6", "12.9"]
+        include:
+          - cuda-version: "12.1"
+            build-py-wrapper: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: devtools/conda-envs/build_env.yaml
+          auto-activate-base: false
+          miniforge-version: latest
+          activate-environment: build
+          channel-priority: strict
+          channels: conda-forge
+          conda-remove-defaults: true
+      - name: Build and upload uammd-structured
+        env:
+          CUDA_VERSION: ${{ matrix.cuda-version }}
+        run: |
+          out_dir=`mktemp -d -t uammd-structured-XXXXXXXXXX`
+          echo "out_dir=${out_dir}" >> $GITHUB_ENV
+          conda verify devtools/conda-build/uammd-structured
+          conda build devtools/conda-build/uammd-structured --no-anaconda-upload --output-folder ${out_dir} -c conda-forge
+          find ${out_dir} -name '*.conda' -print0 | xargs -0 anaconda --verbose -t ${{ secrets.ANACONDA_TOKEN }} upload  --user ComplexFluidsUAM --label main --force
+          
+      - name: Build and upload pyuammd-structured
+        if: ${{ matrix.build-py-wrapper == true }}
+        run: |
+          out_dir="${{ env.out_dir }}"
+          conda verify devtools/conda-build/pyuammd-structured
+          conda build devtools/conda-build/pyuammd-structured --no-anaconda-upload --output-folder ${out_dir} -c conda-forge --use-local
+          find ${out_dir} -name '*.conda' -print0 | xargs -0 anaconda --verbose -t ${{ secrets.ANACONDA_TOKEN }} upload  --user ComplexFluidsUAM --label main --force
+

@@ -17,6 +17,7 @@ jobs:
   build:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
+#    runs-on: [self-hosted, gpu]
     strategy:
       fail-fast: false
       matrix:
@@ -26,9 +27,9 @@ jobs:
             cuda: "12.*"
             gcc: "13.*"
     steps:
-    - name: Check out
-      uses: actions/checkout@v4
-
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - name: Prepare dependencies
       run: |
         sed -i -e "/cuda-version/c\  - cuda-version ${{ matrix.cuda }}" \
@@ -36,44 +37,19 @@ jobs:
                environment.yml
     - name: Show dependency file
       run: cat environment.yml
-      
-    - name: Install Mamba
-      uses: mamba-org/setup-micromamba@v2
+    - uses: conda-incubator/setup-miniconda@v3
       with:
         environment-file: environment.yml
-        cache-environment: true
-        cache-downloads: true
-        generate-run-shell: true
-      env:
-        CONDA_OVERRIDE_CUDA: ${{ matrix.nvcc }}
-
-    - name: List environment
-      run: |
-        micromamba activate uammd
-        micromamba list
-      shell: micromamba-shell {0}
-      
+        auto-activate-base: false
+        miniforge-version: latest
+        activate-environment: build
+        channel-priority: strict
+        channels: conda-forge
+        conda-remove-defaults: true      
     - name: Configure and compile
       run: |
-        micromamba activate uammd
         mkdir build && cd build
-        cmake -DCMAKE_VERBOSE_MAKEFILE=yes -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} -DCMAKE_CUDA_ARCHITECTURES=OFF -DBUILD_PYTHON_WRAPPER=ON -DINSTALL_PYTHON_PACKAGE=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CUDA_FLAGS_DEBUG="-O0" -DCMAKE_CXX_FLAGS_DEBUG="-O0" -G Ninja ..
-        cmake --build . -- -j5
-        cmake --install .
+        cmake -DCMAKE_VERBOSE_MAKEFILE=yes -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} -DCMAKE_CUDA_ARCHITECTURES=OFF -DBUILD_PYTHON_WRAPPER=ON -DINSTALL_PYTHON_PACKAGE=ON -DBUILD_LIBRARY=ON -DCMAKE_UNITY_BUILD=ON -DCMAKE_UNITY_BUILD_BATCH_SIZE=64 -G Ninja  ..
+        cmake --build . --config Release --parallel 4
+        cmake --install . --config Release
 
-
-      shell: micromamba-shell {0}
-      
-    - name: Install pyUAMMD
-      run: |
-        micromamba activate uammd
-        pip install -vv .
-
-      shell: micromamba-shell {0}
-
-    - name: Run tests that do not require a GPU
-      run: |
-        micromamba activate uammd
-        pytest 
-      shell: micromamba-shell {0}
-    

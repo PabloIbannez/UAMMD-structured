@@ -1,3 +1,4 @@
+#pragma once
 #include "System/ExtendedSystem.cuh"
 #include "GlobalData/GlobalData.cuh"
 #include "ParticleData/ExtendedParticleData.cuh"
@@ -19,4 +20,3 @@ REGISTER_PATCHY_PARTICLE_INTERACTOR(
     PatchyParticles,DynamicallyBondedPatchyParticles,
     uammd::structured::Interactor::PatchyParticles::DynamicallyBondedPatchyParticles
 )
-

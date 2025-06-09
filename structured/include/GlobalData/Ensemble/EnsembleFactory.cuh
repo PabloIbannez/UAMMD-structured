@@ -7,7 +7,7 @@
 #include <utility>
 
 #include "Definitions/Hashes.cuh"
-
+#include "Utils/Plugins/Plugins.cuh"
 namespace uammd {
 namespace structured {
 namespace Ensemble {
@@ -29,11 +29,6 @@ public:
                                      ensembleType.c_str(), ensembleSubType.c_str());
 
         std::pair<std::string, std::string> key(ensembleType, ensembleSubType);
-        if (isEnsembleRegistered(ensembleType, ensembleSubType)) {
-            System::log<System::CRITICAL>("[EnsembleFactory] Ensemble already registered: %s, %s",
-                                         ensembleType.c_str(), ensembleSubType.c_str());
-            throw std::runtime_error("Ensemble already registered");
-        }
         getCreatorsRef()[key] = creator;
     }
 
@@ -83,19 +78,21 @@ private:
 
 }}}
 
-#define REGISTER_ENSEMBLE(type, subType, ...) \
-    namespace { \
-        struct registerEnsemble##type##subType { \
-            registerEnsemble##type##subType() { \
-                if (__INCLUDE_LEVEL__ == 0) { \
-                    uammd::structured::Ensemble::EnsembleFactory::getInstance().registerEnsemble( \
-                        #type,#subType,\
-                            [](uammd::structured::DataEntry&  data \
-                               ) -> std::shared_ptr<uammd::structured::Ensemble::EnsembleHandler> { \
-                        return std::make_shared<__VA_ARGS__>(data); \
-                    }); \
-                } \
-            } \
-        }; \
-        registerEnsemble##type##subType registerEnsemble##type##subType##Instance; \
+#define REGISTER_ENSEMBLE(type, subType, ...)                                                                          \
+    namespace {                                                                                                        \
+    struct registerEnsemble##type##subType                                                                             \
+    {                                                                                                                  \
+        registerEnsemble##type##subType()                                                                              \
+        {                                                                                                              \
+            PLUGIN_REGISTRATION_GUARD("Ensemble" + std::string(#type) + std::string(#subType));                        \
+            uammd::structured::Ensemble::EnsembleFactory::getInstance().registerEnsemble(                              \
+                #type,                                                                                                 \
+                #subType,                                                                                              \
+                [](uammd::structured::DataEntry& data)                                                                 \
+                    -> std::shared_ptr<uammd::structured::Ensemble::EnsembleHandler> {                                 \
+                    return std::make_shared<__VA_ARGS__>(data);                                                        \
+                });                                                                                                    \
+        }                                                                                                              \
+    };                                                                                                                 \
+    registerEnsemble##type##subType registerEnsemble##type##subType##Instance;                                         \
     }

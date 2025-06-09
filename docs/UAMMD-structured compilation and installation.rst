@@ -1,33 +1,67 @@
 UAMMD-structured compilation and installation
 =============================================
 
-**Introduction**
+UAMMD-structured is composed of several components:
 
-UAMMD-structured offers multiple compilation options to suit various user needs. This guide will walk you through the process of obtaining, configuring, and compiling UAMMD-structured. We'll cover the general compilation process and then we'll explore the three main compilation options: executable binary, Python wrapper, and Debian package.
+- A CUDA/C++ library containing the core components and utilities called **libuammd_structured**.
+- An command-line utility called **UAMMDlauncher** that serves as the main interface for running simulations.
+- A Python wrapper called **pyUAMMD** that allows users to interact with the C++ library and the command-line utility from Python scripts.
 
-**Obtaining the Source Code**
 
-To get started, you'll need to clone the UAMMD-structured repository. Open a terminal and run the following commands:
+
+Installing from conda (recommended)
+-----------------------------------
+
+You can install UAMMD-structured (library plus CLI utility) and pyUAMMD via conda:
+
+.. code-block:: bash
+
+   conda install -c ComplexFluidsUAM uammd-structured pyuammd-structured
+
+.. hint:: Conda is a package manager that simplifies the installation of software and its dependencies, making it easier to manage different environments and versions. You can read more about conda at https://docs.conda.io/en/latest/. We recommend installing conda via `Miniforge <https://github.com/conda-forge/miniforge>`_. 
+   
+Floating precision variants
+***************************
+
+UAMMD-structured can be compiled to use either single or double precision floating numbers. Conda packages are available for both precisions, and you can choose the one that best suits your needs:
+
+.. code-block:: bash
+
+     conda install -c ComplexFluidsUAM uammd-structured=*=*single* pyuammd-structured
+     # or for double precision
+     conda install -c ComplexFluidsUAM uammd-structured=*=*double* pyuammd-structured
+
+
+Installing from source
+----------------------
+
+If you need to customize the build or are looking to contribute to the project, you can compile UAMMD-structured from source.
+
+This process involves several steps, including cloning the repository, installing dependencies, and configuring the build system.
+
+Getting the source code
+***********************
+
+UAMMD-structured is hosted on GitHub, and you can clone the repository to your local machine using the following command:
 
 .. code-block:: bash
 
    git clone https://github.com/PabloIbannez/UAMMD-structured.git
    cd UAMMD-structured
 
-This will download the latest version of UAMMD-structured and place you in the project directory.
+This will download the latest development version of UAMMD-structured and place you in the project directory.
 
-**Dependency installation**
+Getting the build dependencies
+******************************
 
-Then, we ensure you have the necessary prerequisites installed on your system. These include CMake for build configuration, CUDA Toolkit (nvcc and CUDA libraries), a C++ compiler compatible with C++14, and Python if you plan to build the Python wrapper.
-
-The `environment.yml` file lists all dependencies, which can be installed by running the following at the root of the project:
+The `environment.yml` file lists all dependencies, which can be installed with conda, by running the following at the root of the project:
 
 .. code-block:: bash
 
    conda env create -n uammd-structured
 
    
-conda is a package manager that simplifies the installation of dependencies. If you don't have conda installed, you can download it from https://docs.conda.io/en/latest/miniconda.html.
+.. hint:: conda is a package manager that simplifies the installation of dependencies. If you don't have conda installed, we recommend using the `Miniforge <https://github.com/conda-forge/miniforge>`_ distribution.
 
 .. warning:: Make sure the CUDA version installed in the environment is compatible with your current NVIDIA driver. You can check with `nvidia-smi`.
 
@@ -45,30 +79,45 @@ An environment called `uammd-structured` will be created, which you can activate
 
 
 
-**General Compilation Process**
+Compiling UAMMD-structured
+**************************
 
-The compilation process for UAMMD-structured follows a standard CMake workflow. First, create a build directory to keep your source tree clean:
+Once you have the source code and the dependencies installed, you can compile UAMMD-structured. The compilation process uses CMake, a cross-platform build system that generates makefiles or project files for various platforms.
 
 .. code-block:: bash
 
    mkdir build
    cd build
    cmake -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX ..
-   make -j10 install
+   make -j4 install
 
-The above will compile files using 10 cores and install the library and executables to your conda environment.
+.. hint:: You can adjust the number of cores used for compilation by changing the `-j4` option. For example, `-j10` will use 10 cores for compilation. Beware, though, compiling CUDA code requires vasts amounts of RAM memory.
 
-The compilation time may vary depending on your system specifications and the options you've chosen.
+The above will compile the UAMMD-structured library and the command-line utility. Including the Python wrapper (pyUAMMD) requires adding the following options to the CMake command:
 
-**Compilation Options**
+.. code-block:: bash
+
+   cmake -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_PYTHON_WRAPPER=ON -DINSTALL_PYTHON_PACKAGE=ON ..
+
+
+.. hint:: The `CMAKE_INSTALL_PREFIX` variable specifies where the compiled binaries and libraries will be installed. Setting it to `$CONDA_PREFIX` is standard when using conda, and installs everything into the conda environment, making it easier to manage dependencies and versions.
+
+Additional Compilation Options
+******************************
 
 UAMMD-structured offers several configuration options that can be set during the CMake configuration step. These options allow you to customize the build to your specific needs.
+
+Floating precision
+%%%%%%%%%%%%%%%%%%
 
 Precision can be set to either single (default) or double. While single precision is faster, especially on GPUs, double precision may be necessary for certain simulations requiring higher accuracy. To enable double precision, use:
 
 .. code-block:: bash
 
    cmake -DUAMMD_PRECISION=DOUBLE ..
+
+CUDA architectures
+%%%%%%%%%%%%%%%%%%
 
 You can specify CUDA architectures to compile for, which can significantly reduce compilation time if you know the specific GPU architectures you'll be using. For example:
 
@@ -77,53 +126,35 @@ You can specify CUDA architectures to compile for, which can significantly reduc
    cmake -DCUDA_ARCHITECTURES="70;75" ..
    #Or
    cmake -DCUDA_ARCHITECTURES=OFF ..
-
-Setting this variable to `OFF` creates a binary that will work for any GPU in exchange for an slight overhead when running the code for the first time in a new architecture.
+   #Or
+   cmake -DCUDA_ARCHITECTURES=all-major ..
+   
 
 .. warning:: Make sure the CUDA version installed in the environment is compatible with your current NVIDIA driver. You can check with `nvidia-smi`
 
-**Specific Compilation Options**
 
-----
+Not building UAMMDlauncher and the library
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-**Executable Binary**
-
-The executable binary is the default compilation option. It produces a standalone program that can be run from the command line. To compile the executable binary, simply follow the general compilation process outlined above. The resulting executable, named `UAMMDlauncher`, will be created in the build directory.
-
-If you wish to install the executable, you can run:
+The `BUILD_LIBRARY` option (ON by default) allows you to skip building the UAMMD-structured library and the command-line utility (UAMMDlauncher) when set to OFF. This is useful if you only want to build the Python wrapper. To do this, use:
 
 .. code-block:: bash
 
-   make install
+   cmake -DBUILD_LIBRARY=OFF ..
 
-By default, this installs to `${CMAKE_INSTALL_PREFIX}/bin`. You can change the installation directory during the configuration step:
+Unity builds
+%%%%%%%%%%%%%%
 
-.. code-block:: bash
-
-   cmake -DCMAKE_INSTALL_PREFIX=/path/to/install ..
-
-----
-
-**Python Wrapper**
-
-The Python wrapper allows UAMMD-structured to be used within Python scripts, integrating it with other Python-based tools. To build the Python wrapper, configure CMake with the following options:
+Unity builds can significantly speed up compilation by combining multiple source files into a single compilation unit. This reduces the overhead of compiling each file separately. To enable unity builds, use:
 
 .. code-block:: bash
 
-   cmake -DINSTALL_PYTHON_PACKAGE=ON -DBUILD_PYTHON_WRAPPER=ON ..
+   cmake -DCMAKE_UNITY_BUILD=ON -DCMAKE_UNITY_BUILD_BATCH_SIZE=256 ..
 
-Then compile and install as usual:
+The above will compile the entire UAMMD-structured library in a single compilation unit. This will greatly reduce the compilation time and the size of the final binary, but may increase the memory usage during compilation. You can adjust the `CMAKE_UNITY_BUILD_BATCH_SIZE` to control how many files are combined in each unit.
 
-.. code-block:: bash
-
-   make
-   make install
-
-This will build the Python wrapper and install the pyUAMMD package.
-
-----
-
-**Debian Package**
+Debian Package
+%%%%%%%%%%%%%%
 
 Creating a Debian package allows for easy installation on Debian-based systems. To build the .deb package, configure CMake with:
 
@@ -139,23 +170,43 @@ Then build the package:
 
 This will create a .deb file in the build directory, which can be installed using the `dpkg` command.
 
+
+Building the conda package
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A conda package can be created for easier distribution and installation across different systems. To build the conda package, first create the build environment, from the root of the repository, using:
+
+.. code-block:: bash
+
+   conda env create -f devtools/conda-envs/build_env.yml
+
+Then, build the package using the conda build command:
+
+.. code-block:: bash
+		
+   conda build -c conda-forge  --output-folder output devtools/conda-build/uammd-structured
+
+
+Then, the package for pyUAMMD can be built using:
+
+.. code-block:: bash
+
+   conda build -c conda-forge  --output-folder output devtools/conda-build/pyuammd-structured --use-local
+
+
+.. hint:: The `--use-local` option allows you to use the locally built UAMMD-structured package when building the pyUAMMD package, ensuring that the two are compatible.
+
+
+The packages will be created in the `output` directory, and can be installed using the `conda install` command:
+
+.. code-block:: bash
+
+   conda create -n structured --use-local uammd-structured pyuammd-structured
+   conda activate structured
+
+
+
 ----
-
-Troubleshooting
----------------
-
-Depending on your system, the BLAS and LAPACK libraries listed in the default environment.yml file (MKL) may not be compatible with your system. If you encounter issues, you can try using OpenBLAS or ATLAS instead. To do this, modify the environment.yml file to include the appropriate libraries. For example, to use OpenBLAS, replace the MKL lines with:
-
-.. code-block:: yaml
-
-   - openblas
-   - libopenblas-dev
-
-Then, recreate the conda environment and start the compilation process again.
-
-The `-DBUILD_SHARED_LIBS=ON` flag is crucial as it ensures the creation of shared libraries.
-
-You may need sudo permissions to install the library system-wide.
 
 Testing
 -------
