@@ -18,3 +18,4 @@ dependencies:
   - pip
   - numpy
   - tqdm
+  - pytest
