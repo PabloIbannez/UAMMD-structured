@@ -2,6 +2,7 @@ set -x
 SRC_DIR=$(pwd)
 TMPDIR=$(mktemp -d)
 cd $TMPDIR
+
 if [ -z ${CUDAARCHS+x} ]; then
   CUDAARCHS=$(nvcc --list-gpu-code | tr ' ' '\n' \
       | grep -E '^sm_[0-9]+$' \
