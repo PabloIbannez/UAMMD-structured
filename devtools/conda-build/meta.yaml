@@ -22,7 +22,6 @@ requirements:
     - cmake >=3.27
     - pybind11
     - gxx
-    - cuda-version {{ CUDA_VERSION }}
     - cuda-nvcc
     - make
     - pip
@@ -34,7 +33,6 @@ requirements:
     - liblapacke
     - blas-devel
     - cuda-libraries-dev
-    - cuda-version {{ CUDA_VERSION }}
     - python
     - deepdiff
     - jsbeautifier
@@ -45,7 +43,6 @@ requirements:
     - jsbeautifier
     - cuda-cudart
     - cuda-libraries
-    - cuda-version {{ CUDA_VERSION }}    
 
 
 test:

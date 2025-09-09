@@ -17,9 +17,9 @@ jobs:
         shell: bash -el {0}
     strategy:
       matrix:
-        cuda-version: ["12.1", "12.3", "12.6", "12.9"]
+        cuda-version: ["12.9"]
         include:
-          - cuda-version: "12.1"
+          - cuda-version: "12.9"
             build-py-wrapper: true
     steps:
       - uses: actions/checkout@v4
