@@ -7,7 +7,6 @@ source:
 
 build:
   number: 0
-  string: cuda{{ CUDA_VERSION | replace('.', '') }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
   script_env:
     - UAMMD_PRECISION    
 requirements:
@@ -22,7 +21,6 @@ requirements:
     - cmake >=3.27
     - pybind11
     - gxx
-    - cuda-version {{ CUDA_VERSION }}
     - cuda-nvcc
     - make
     - pip
@@ -34,7 +32,6 @@ requirements:
     - liblapacke
     - blas-devel
     - cuda-libraries-dev
-    - cuda-version {{ CUDA_VERSION }}
     - python
     - deepdiff
     - jsbeautifier
@@ -45,7 +42,6 @@ requirements:
     - jsbeautifier
     - cuda-cudart
     - cuda-libraries
-    - cuda-version {{ CUDA_VERSION }}    
 
 
 test:
