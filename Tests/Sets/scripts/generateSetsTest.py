@@ -250,7 +250,7 @@ for d in dihedrals3:
     sim["topology"]["forceField"]["dihedrals"]["data"].append([d[0],d[1],d[2],d[3],0.0,Kd,1])
 
 sim["topology"]["forceField"]["fixed"] = {}
-sim["topology"]["forceField"]["fixed"]["type"]       = ["Set1","FixedHarmonicCenterOfMass"]
+sim["topology"]["forceField"]["fixed"]["type"]       = ["Set1","FixedHarmonicAnisotropicCenterOfMass"]
 sim["topology"]["forceField"]["fixed"]["labels"]     = ["idSet_i","K","r0","position"]
 sim["topology"]["forceField"]["fixed"]["parameters"] = {}
 sim["topology"]["forceField"]["fixed"]["data"]       = [[ids1.copy(), [Kf,Kf,Kf], [0.0,0.0,0.0],[0.0,0.0,L/2]]]

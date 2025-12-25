@@ -3,7 +3,7 @@ import sys,os
 import numpy as np
 import matplotlib.pyplot as plt
 
-from scipy.integrate import simps
+from scipy.integrate import simpson
 
 from get_r0 import get_r0
 
@@ -13,8 +13,7 @@ TORSION_IN_DEGREES = False
 
 #######################
 
-COMPONENTS_PATH = os.path.join(os.getenv('UAMMD_PATH'),
-                               'USCM/Components.json')
+COMPONENTS_PATH = os.path.join(os.getenv('UAMMD_PATH'),'Components.json')
 
 with open(COMPONENTS_PATH) as f:
     components = json.load(f)
@@ -306,7 +305,7 @@ for bndCls,bndSubCls,_ in components["Interactor"]["Bonds"]:
                     prob = boltz_bond2_bound(x,potFunc,potParam,boundK,boundMaxDistance)
 
                 #We have than prob=pot(x), we have to integrate it between limInf and limSup to compute Z
-                Z = simps(prob,x)
+                Z = simpson(prob,x)
 
                 if not bound:
                     ax.plot(r,boltz_bond2(r,potFunc,potParam)/Z, label=f"{bndSubCls} {inte}")
@@ -378,7 +377,7 @@ for bndCls,bndSubCls,_ in components["Interactor"]["Bonds"]:
                 prob = boltz_bond3(x,potFunc,potParam)
 
                 #We have than prob=pot(x), we have to integrate it between limInf and limSup to compute Z
-                Z = simps(prob,x)
+                Z = simpson(prob,x)
 
                 ax.plot(theta,boltz_bond3(theta,potFunc,potParam)/Z, label=f"{bndSubCls} {inte}")
 
@@ -453,7 +452,7 @@ for bndCls,bndSubCls,_ in components["Interactor"]["Bonds"]:
                 prob = boltz_bond4(x,potFunc,potParam)
 
                 #We have than prob=pot(x), we have to integrate it between limInf and limSup to compute Z
-                Z = simps(prob,x)
+                Z = simpson(prob,x)
 
                 ax.plot(phi,boltz_bond4(phi,potFunc,potParam)/Z, label=f"{bndSubCls} {inte}")
 

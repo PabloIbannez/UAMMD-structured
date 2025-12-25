@@ -3,7 +3,7 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
-from scipy.integrate import simps
+from scipy.integrate import simpson
 
 kBT = 1.0
 
@@ -50,7 +50,7 @@ plt.hist(Z-pos0[2], bins=50, density=True, label="Z",alpha=0.33)
 
 x = np.linspace(-L/2.0,L/2.0,10000)
 prob = boltz_fixed(x,Harmonic,{"K":Kf,"r0":0.0})
-Z = simps(prob,x)
+Z = simpson(prob,x)
 
 plt.plot(x,prob/Z,label="Harmonic")
 
@@ -60,8 +60,8 @@ plt.xlabel("Distance")
 plt.ylabel("Probability")
 
 # Save figure
-#plt.savefig("results/posHist.png")
-plt.show()
+plt.savefig("results/posHist.png")
+#plt.show()
 
 # Plot distance
 dst = np.loadtxt(dstFile,skiprows=1)
@@ -73,7 +73,7 @@ plt.hist(dst, bins=50, density=True, label="Distance")
 
 x = np.linspace(0.0,L,10000)
 prob = boltz_bond2(x,Harmonic,{"K":Kc,"r0":r0})
-Z = simps(prob,x)
+Z = simpson(prob,x)
 
 plt.plot(x,prob/Z,label="Harmonic")
 
@@ -81,8 +81,8 @@ plt.xlim(np.min(dst),np.max(dst))
 
 plt.xlabel("Distance")
 plt.ylabel("Probability")
-#plt.savefig("results/dstHist.png")
-plt.show()
+plt.savefig("results/dstHist.png")
+#plt.show()
 
 
 

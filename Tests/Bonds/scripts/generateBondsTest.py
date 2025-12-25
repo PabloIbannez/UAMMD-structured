@@ -12,7 +12,7 @@ from get_r0 import get_r0
 #######################
 
 COMPONENTS_PATH = os.path.join(os.getenv('UAMMD_PATH'),
-                               'USCM/Components.json')
+                               'Components.json')
 
 with open(COMPONENTS_PATH) as f:
     components = json.load(f)
